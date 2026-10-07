@@ -1,0 +1,59 @@
+## ADDED Requirements
+
+### Requirement: Command surface
+The `wobook` CLI SHALL provide `add`, `edit`, `mv`, `rm`, `show`, `list`, `search`, `tags`, `import`, `export`, `status`, `hooks` and `completions` subcommands as thin clients of the daemon socket.
+
+#### Scenario: Add with tags
+- **WHEN** `wobook add example.com/x -t "ui library,react"` runs against a running daemon
+- **THEN** the exit code is 0 and `wobook show https://example.com/x` prints tags `react` and `ui library`
+
+#### Scenario: Help
+- **WHEN** `wobook --help` runs
+- **THEN** every subcommand above is listed
+
+### Requirement: Daemon unavailable
+When the socket cannot be connected, the CLI SHALL print a one-line message explaining how to start `wobookd` and exit with code 69.
+
+#### Scenario: No daemon
+- **WHEN** any data command runs with no daemon listening
+- **THEN** stderr contains `wobookd is not running` and the exit code is 69
+
+### Requirement: Output formats
+`list` and `search` SHALL support `--format tsv|json|jsonl|pretty`. TSV SHALL print `url<TAB>title<TAB>tags` with tags comma-joined and any tab or newline inside a field replaced by a space. `pretty` SHALL print a buku-like block per bookmark. Default is `pretty` on a TTY and `tsv` otherwise.
+
+#### Scenario: TSV for fzf
+- **WHEN** `wobook list --format tsv` runs
+- **THEN** each line has exactly two tabs and column 1 is the normalized URL
+
+#### Scenario: JSON output
+- **WHEN** `wobook show <url> --json` runs
+- **THEN** stdout is one JSON object in the JSONL record shape
+
+### Requirement: Editor flow
+`wobook edit <url>` SHALL open `$EDITOR` (fallback `$VISUAL`, then `vi`) on a buku-style template with commented instructions and lines for URL, TITLE, TAGS (comma-separated) and a multi-line DESCRIPTION. On save, a changed URL line SHALL perform a rename, other changes an update, and an unchanged file SHALL do nothing. `wobook edit --new` SHALL open the template empty and perform an add on save; a blank TITLE SHALL trigger metadata fetch and `-` SHALL mean no title.
+
+#### Scenario: Edit tags in editor
+- **WHEN** `EDITOR` is a script that rewrites the TAGS line to `a, b`
+- **THEN** after `wobook edit <url>` the bookmark has exactly tags `{a, b}`
+
+#### Scenario: URL changed in editor
+- **WHEN** the editor changes the URL line to a new URL
+- **THEN** the CLI performs a rename and prints `moved <old> -> <new>`
+
+#### Scenario: Editor aborted
+- **WHEN** the editor exits non-zero
+- **THEN** nothing is changed and the CLI exits 1
+
+### Requirement: Exit codes
+The CLI SHALL exit 0 on success, 1 on not found or invalid input, 2 on usage errors, 69 when the daemon is unavailable and 70 on internal errors.
+
+#### Scenario: Not found
+- **WHEN** `wobook show https://nope.example/` runs for an unknown URL
+- **THEN** the exit code is 1 and stderr says not found
+
+### Requirement: Delete and restore
+`wobook rm <url>...` SHALL tombstone each URL and `wobook rm --restore <url>` SHALL undelete it.
+
+#### Scenario: Restore
+- **WHEN** a bookmark is removed and then `wobook rm --restore <url>` runs
+- **THEN** `wobook list` shows it again with its previous tags

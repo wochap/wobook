@@ -1,20 +1,41 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  wobook: local-first personal bookmark manager replacing buku. Alpha software,
+  breaking changes are fine. Single user, personal stack (Linux NixOS desktops +
+  Android phone), no cloud server ever.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  Data model: bookmark = { url (identity, normalized), title, description,
+  tags (set of lowercase trimmed strings, spaces allowed inside a tag, commas
+  forbidden), created_ms, deleted tombstone }. Automerge document is the
+  source of truth on every device; SQLite is a disposable read model rebuilt
+  from Automerge heads. Deletes are tombstones, never physical.
+
+  Monorepo layout: crates/ (Rust workspace, edition 2024, rust 1.90+),
+  android/ (Kotlin + Jetpack Compose, minSdk 31, UniFFI bindings),
+  extension/ (WebExtension MV3, Firefox + google-chrome + brave),
+  contrib/ (wobook-fzf.sh, hooks examples, systemd unit), prompts/, design/
+  (Claude Design handoff bundle for Android), nix flake at repo root.
+
+  Crates: automerge_repo (copied verbatim from
+  /home/gean/Sandboxes/sandbox/fi/crates/automerge_repo, used from the first change with a
+  no-op NetworkTransport until p2p-sync adds the real one), wobook-core (domain,
+  projection, nucleo fuzzy search, URL normalize, metadata fetch),
+  wobook-sync (identity, trust store, QR pairing, QUIC transport, mDNS,
+  endpoint memory; extracted from fi app_core and session-tap hub),
+  wobookd (daemon: single writer, unix socket JSON-lines API, hooks runner),
+  wobook (CLI client), wobook-ffi (UniFFI for Android).
+
+  Reference projects to copy patterns and code from:
+  - /home/gean/Sandboxes/sandbox/fi (Automerge repo crate, quinn QUIC
+    transport, mDNS discovery, identity/trust, Flutter app; ports-and-adapters
+    traits StorageAdapter / ControlStore / NetworkTransport)
+  - /home/gean/Sandboxes/sandbox/session-tap (QR pairing with HMAC proof,
+    unix socket + lock + atomic write helpers in crates/sessiontap-infra,
+    Kotlin Compose Android app layout, nix flakes with android shells, Maestro)
+  - /home/gean/Sandboxes/sandbox/vendor/buku (buku.py, the tool being replaced)
+
+  Conventions: `rtk` prefix on shell commands; conventional commits; never add
+  co-authored-by lines; e2e tests preferred over unit tests (unit tests only
+  for stable pure functions: URL normalize, tag parse, merge semantics,
+  pairing reducer); Nix dev shells for toolchains; unsafe_code = forbid.
