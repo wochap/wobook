@@ -2,6 +2,7 @@
 
 mod client;
 mod editor;
+mod native_host;
 mod output;
 mod sync_cmd;
 
@@ -179,6 +180,18 @@ enum Command {
         #[command(subcommand)]
         command: SyncCommand,
     },
+    /// Native messaging host for the browser extension (stdio framing).
+    NativeHost {
+        /// Print the host manifest for a browser and exit.
+        #[arg(long, value_enum)]
+        print_manifest: Option<native_host::Browser>,
+        /// Extension id (required for chrome and brave).
+        #[arg(long, requires = "print_manifest")]
+        extension_id: Option<String>,
+        /// Absolute path of the host executable written into the manifest.
+        #[arg(long, requires = "print_manifest")]
+        binary: Option<PathBuf>,
+    },
     /// This device.
     Device {
         #[command(subcommand)]
@@ -279,6 +292,22 @@ fn main() -> ExitCode {
     let ctx = Ctx {
         socket: cli.socket.unwrap_or_else(wobook_core::paths::socket_path),
     };
+    if let Command::NativeHost {
+        print_manifest,
+        extension_id,
+        binary,
+    } = cli.command
+    {
+        return match print_manifest {
+            None => native_host::run(&ctx.socket),
+            Some(browser) => match native_host::print_manifest(browser, extension_id, binary) {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(message) => Cli::command()
+                    .error(clap::error::ErrorKind::MissingRequiredArgument, message)
+                    .exit(),
+            },
+        };
+    }
     match run(&ctx, cli.command) {
         Ok(()) => ExitCode::SUCCESS,
         Err(fail) => {
@@ -549,6 +578,7 @@ fn run(ctx: &Ctx, command: Command) -> Result<()> {
         } => {
             ctx.call(&Request::SyncNow)?;
         }
+        Command::NativeHost { .. } => unreachable!("dispatched in main"),
         Command::Device {
             command: DeviceCommand::Name { name },
         } => {

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>wobook popup harness</title>
+    <script src="fake-chrome.js"></script>
+  </head>
+  <body>
+    <script>
+      // Mounts the built popup markup, then the worker and popup bundles.
+      (async () => {
+        const base = "/dist/chromium/";
+        const html = await (await fetch(`${base}popup/popup.html`)).text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const css = document.createElement("link");
+        css.rel = "stylesheet";
+        css.href = `${base}popup/popup.css`;
+        document.head.append(css);
+        for (const s of doc.body.querySelectorAll("script")) s.remove();
+        document.body.innerHTML = doc.body.innerHTML;
+        for (const src of ["background.js", "popup/popup.js"]) {
+          await new Promise((resolve) => {
+            const s = document.createElement("script");
+            s.src = base + src;
+            s.onload = resolve;
+            document.body.append(s);
+          });
+        }
+        window.__ready = true;
+      })();
+    </script>
+  </body>
+</html>

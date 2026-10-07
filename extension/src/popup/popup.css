@@ -1,0 +1,395 @@
+/* wobook popup. Token blocks copied from design/project/wobook-tokens.css;
+   light theme follows prefers-color-scheme, no webfont download. */
+:root {
+  color-scheme: dark;
+  /* Catppuccin Mocha */
+  --ctp-base: #1e1e2e;
+  --ctp-mantle: #181825;
+  --ctp-crust: #11111b;
+  --ctp-surface0: #313244;
+  --ctp-surface1: #45475a;
+  --ctp-surface2: #585b70;
+  --ctp-overlay0: #6c7086;
+  --ctp-overlay1: #7f849c;
+  --ctp-overlay2: #9399b2;
+  --ctp-subtext0: #a6adc8;
+  --ctp-subtext1: #bac2de;
+  --ctp-text: #cdd6f4;
+  --ctp-blue: #89b4fa;
+  --ctp-lavender: #b4befe;
+  --ctp-sapphire: #74c7ec;
+  --ctp-red: #f38ba8;
+  --ctp-green: #a6e3a1;
+  --ctp-yellow: #f9e2af;
+  --ctp-peach: #fab387;
+
+  /* Roles → Compose colorScheme (see readme.md) */
+  --wb-bg: var(--ctp-base); /* background / surface */
+  --wb-bg-low: var(--ctp-mantle); /* surfaceContainerLow — keyboard, sheets' ground */
+  --wb-bg-lowest: var(--ctp-crust); /* surfaceContainerLowest — scrim-adjacent */
+  --wb-surface: var(--ctp-surface0); /* surfaceContainer — chips, fields */
+  --wb-surface-high: var(--ctp-surface1); /* surfaceContainerHigh — pressed, keys */
+  --wb-outline: var(--ctp-surface2); /* outline */
+  --wb-outline-variant: var(--ctp-surface1); /* outlineVariant — dividers */
+  --wb-text: var(--ctp-text); /* onSurface */
+  --wb-text-muted: var(--ctp-subtext0); /* onSurfaceVariant */
+  --wb-text-faint: var(--ctp-overlay1); /* hints, disabled text */
+  --wb-accent: var(--ctp-blue); /* primary */
+  --wb-on-accent: var(--ctp-crust); /* onPrimary */
+  --wb-accent-container: color-mix(in srgb, var(--ctp-blue) 16%, transparent); /* primaryContainer */
+  --wb-error: var(--ctp-red); /* error */
+  --wb-success: var(--ctp-green);
+  --wb-warning: var(--ctp-yellow);
+  --wb-tailscale: var(--ctp-lavender);
+  --wb-scrim: rgba(17, 17, 27, 0.6);
+  --wb-inverse-surface: var(--ctp-text); /* snackbar */
+  --wb-inverse-text: var(--ctp-base);
+
+  --wb-shadow-1: 0 0 0 1px var(--ctp-surface0);
+  --wb-shadow-2: 0 0 0 1px var(--ctp-surface1), 0 6px 18px rgba(0, 0, 0, 0.45);
+  --wb-shadow-3: 0 0 0 1px var(--ctp-surface2), 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    /* Catppuccin Latte */
+    --ctp-base: #eff1f5;
+    --ctp-mantle: #e6e9ef;
+    --ctp-crust: #dce0e8;
+    --ctp-surface0: #ccd0da;
+    --ctp-surface1: #bcc0cc;
+    --ctp-surface2: #acb0be;
+    --ctp-overlay0: #9ca0b0;
+    --ctp-overlay1: #8c8fa1;
+    --ctp-overlay2: #7c7f93;
+    --ctp-subtext0: #6c6f85;
+    --ctp-subtext1: #5c5f77;
+    --ctp-text: #4c4f69;
+    --ctp-blue: #1e66f5;
+    --ctp-lavender: #7287fd;
+    --ctp-sapphire: #209fb5;
+    --ctp-red: #d20f39;
+    --ctp-green: #40a02b;
+    --ctp-yellow: #df8e1d;
+    --ctp-peach: #fe640b;
+    /* Roles → Compose colorScheme (see readme.md) */
+    --wb-bg: var(--ctp-base); /* background / surface */
+    --wb-bg-low: var(--ctp-mantle); /* surfaceContainerLow — keyboard, sheets' ground */
+    --wb-bg-lowest: var(--ctp-crust); /* surfaceContainerLowest — scrim-adjacent */
+    --wb-surface: var(--ctp-surface0); /* surfaceContainer — chips, fields */
+    --wb-surface-high: var(--ctp-surface1); /* surfaceContainerHigh — pressed, keys */
+    --wb-outline: var(--ctp-surface2); /* outline */
+    --wb-outline-variant: var(--ctp-surface1); /* outlineVariant — dividers */
+    --wb-text: var(--ctp-text); /* onSurface */
+    --wb-text-muted: var(--ctp-subtext0); /* onSurfaceVariant */
+    --wb-text-faint: var(--ctp-overlay1); /* hints, disabled text */
+    --wb-accent: var(--ctp-blue); /* primary */
+    --wb-on-accent: var(--ctp-base); /* onPrimary */
+    --wb-accent-container: color-mix(in srgb, var(--ctp-blue) 16%, transparent); /* primaryContainer */
+    --wb-error: var(--ctp-red); /* error */
+    --wb-success: var(--ctp-green);
+    --wb-warning: var(--ctp-yellow);
+    --wb-tailscale: var(--ctp-lavender);
+    --wb-scrim: rgba(76, 79, 105, 0.4);
+    --wb-inverse-surface: var(--ctp-text); /* snackbar */
+    --wb-inverse-text: var(--ctp-base);
+
+    --wb-shadow-1: 0 0 0 1px var(--ctp-surface0);
+    --wb-shadow-2: 0 1px 2px rgba(76, 79, 105, 0.12), 0 6px 18px rgba(76, 79, 105, 0.14);
+    --wb-shadow-3: 0 2px 4px rgba(76, 79, 105, 0.14), 0 16px 40px rgba(76, 79, 105, 0.2);
+  }
+}
+
+:root {
+  /* Type — Inter; JetBrains Mono for URLs and fingerprints */
+  --wb-font: system-ui, sans-serif;
+  --wb-mono: ui-monospace, monospace;
+  --wb-t-display: 500 28px / 34px var(--wb-font); /* headlineMedium */
+  --wb-t-title: 500 20px / 26px var(--wb-font); /* titleLarge */
+  --wb-t-title-sm: 500 16px / 22px var(--wb-font); /* titleMedium */
+  --wb-t-body-lg: 400 16px / 24px var(--wb-font); /* bodyLarge */
+  --wb-t-body: 400 14px / 20px var(--wb-font); /* bodyMedium */
+  --wb-t-body-md: 500 14px / 20px var(--wb-font); /* labelLarge */
+  --wb-t-label: 400 12px / 16px var(--wb-font); /* labelMedium */
+  --wb-t-label-md: 500 12px / 16px var(--wb-font); /* labelMedium, emphasised */
+  --wb-t-mono: 400 13px / 18px var(--wb-mono); /* bodySmall mono */
+
+  /* Spacing — 4dp grid */
+  --wb-s1: 4px;
+  --wb-s2: 8px;
+  --wb-s3: 12px;
+  --wb-s4: 16px;
+  --wb-s5: 20px;
+  --wb-s6: 24px;
+  --wb-s8: 32px;
+
+  /* Radii */
+  --wb-r-sm: 4px;
+  --wb-r-md: 8px;
+  --wb-r-lg: 12px;
+  --wb-r-xl: 20px;
+  --wb-r-full: 999px;
+
+  /* Sizes */
+  --wb-tap: 48px;
+  --wb-row: 64px;
+  --wb-chip: 32px;
+  --wb-field: 52px;
+  --wb-appbar: 56px;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+}
+body {
+  width: 380px;
+  max-height: 560px;
+  overflow-y: auto;
+  background: var(--wb-bg);
+  color: var(--wb-text);
+  font: var(--wb-t-body);
+}
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--wb-outline-variant);
+}
+.tabs button {
+  flex: 1;
+  padding: var(--wb-s3);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--wb-text-muted);
+  font: var(--wb-t-body-md);
+  cursor: pointer;
+}
+.tabs button[aria-selected="true"] {
+  color: var(--wb-text);
+  border-bottom-color: var(--wb-accent);
+}
+section {
+  padding: var(--wb-s4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-s3);
+}
+section[hidden] {
+  display: none;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-s2);
+}
+label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-s1);
+  color: var(--wb-text-muted);
+  font: var(--wb-t-label-md);
+}
+input,
+textarea {
+  font: var(--wb-t-body);
+  color: var(--wb-text);
+  background: var(--wb-surface);
+  border: 1px solid transparent;
+  border-radius: var(--wb-r-md);
+  padding: var(--wb-s2) var(--wb-s3);
+  outline: none;
+  resize: vertical;
+}
+input:focus,
+textarea:focus,
+.tag-editor:focus-within {
+  border-color: var(--wb-accent);
+}
+#url {
+  font: var(--wb-t-mono);
+}
+.tag-editor {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wb-s1);
+  align-items: center;
+  background: var(--wb-surface);
+  border: 1px solid transparent;
+  border-radius: var(--wb-r-md);
+  padding: var(--wb-s1) var(--wb-s2);
+  min-height: 40px;
+}
+.tag-editor .chips {
+  display: contents;
+}
+.tag-editor input {
+  flex: 1;
+  min-width: 80px;
+  border: 0;
+  background: none;
+  padding: var(--wb-s1);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px var(--wb-s2);
+  border: 1px solid var(--wb-outline);
+  border-radius: var(--wb-r-full);
+  font: var(--wb-t-label);
+}
+.chip.tiny {
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--wb-text-muted);
+}
+.chip-remove {
+  background: none;
+  border: 0;
+  color: var(--wb-text-faint);
+  cursor: pointer;
+  padding: 0 2px;
+}
+.suggestions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 1;
+  margin: 4px 0 0;
+  padding: var(--wb-s1) 0;
+  list-style: none;
+  background: var(--wb-bg-low);
+  border-radius: var(--wb-r-md);
+  box-shadow: var(--wb-shadow-2);
+}
+.suggestions li {
+  padding: var(--wb-s1) var(--wb-s3);
+  cursor: pointer;
+}
+.suggestions li.active,
+.suggestions li:hover {
+  background: var(--wb-accent-container);
+}
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wb-s2);
+  margin-top: var(--wb-s2);
+}
+.status {
+  color: var(--wb-text-muted);
+  font: var(--wb-t-label);
+}
+body.saved .status {
+  color: var(--wb-success);
+}
+button.primary {
+  background: var(--wb-accent);
+  color: var(--wb-on-accent);
+  border: 0;
+  border-radius: var(--wb-r-full);
+  padding: var(--wb-s2) var(--wb-s5);
+  font: var(--wb-t-body-md);
+  cursor: pointer;
+}
+button.primary:disabled {
+  background: var(--wb-surface);
+  color: var(--wb-text-faint);
+  cursor: default;
+}
+.banner {
+  border-left: 3px solid var(--wb-accent);
+  padding: var(--wb-s2) var(--wb-s3);
+  background: var(--wb-bg-low);
+}
+.error {
+  border-left: 3px solid var(--wb-error);
+  padding: var(--wb-s2) var(--wb-s3);
+  background: var(--wb-bg-low);
+  white-space: pre-wrap;
+}
+.field-error {
+  color: var(--wb-error);
+  font: var(--wb-t-label);
+}
+[hidden] {
+  display: none !important;
+}
+.results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.result {
+  display: flex;
+  align-items: center;
+  gap: var(--wb-s2);
+  padding: var(--wb-s2);
+  border-radius: var(--wb-r-md);
+  border-left: 2px solid transparent;
+  cursor: pointer;
+}
+.result.selected {
+  background: var(--wb-bg-low);
+  border-left-color: var(--wb-accent);
+}
+.result-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.result-title,
+.result-url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.result-title {
+  font: var(--wb-t-body-md);
+}
+.result-url {
+  font: var(--wb-t-mono);
+  font-size: 12px;
+  color: var(--wb-text-muted);
+}
+.result-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.result.copied .result-url::after {
+  content: "  Copied";
+  color: var(--wb-success);
+  font-family: var(--wb-font);
+}
+mark {
+  background: none;
+  color: var(--wb-accent);
+  font-weight: 600;
+}
+.open {
+  background: none;
+  border: 0;
+  color: var(--wb-text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: var(--wb-s1) var(--wb-s2);
+}
+.open:hover {
+  color: var(--wb-accent);
+}
+.empty {
+  color: var(--wb-text-faint);
+  text-align: center;
+  padding: var(--wb-s6);
+}

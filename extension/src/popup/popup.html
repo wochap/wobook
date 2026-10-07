@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>wobook</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <nav class="tabs" role="tablist">
+      <button type="button" role="tab" id="tab-save" aria-selected="true">Save</button>
+      <button type="button" role="tab" id="tab-search" aria-selected="false">Search</button>
+    </nav>
+
+    <section id="panel-save" role="tabpanel">
+      <div id="saved-banner" class="banner" hidden></div>
+      <div id="save-error" class="error" role="alert" hidden></div>
+      <form id="save-form" autocomplete="off">
+        <label>URL
+          <input id="url" type="text" spellcheck="false" />
+        </label>
+        <div id="url-error" class="field-error" hidden></div>
+        <label>Title
+          <input id="title" type="text" />
+        </label>
+        <label>Description
+          <textarea id="description" rows="2"></textarea>
+        </label>
+        <label for="tag-input">Tags</label>
+        <div id="tag-editor" class="tag-editor">
+          <span class="chips"></span>
+          <input id="tag-input" type="text" placeholder="add tag, then comma or Enter" spellcheck="false" />
+          <ul class="suggestions" hidden></ul>
+        </div>
+        <div class="actions">
+          <span id="save-status" class="status"></span>
+          <button id="save" type="button" class="primary">Save</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="panel-search" role="tabpanel" hidden>
+      <input id="query" type="search" placeholder="Search bookmarks" spellcheck="false" />
+      <div id="search-error" class="error" role="alert" hidden></div>
+      <ul id="results" class="results"></ul>
+      <div id="empty" class="empty" hidden>Nothing matches</div>
+    </section>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

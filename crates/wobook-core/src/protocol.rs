@@ -163,6 +163,12 @@ pub enum ErrorCode {
     PairPendingMissing,
     UnknownDevice,
     DeviceRevoked,
+    /// Client-side (native messaging host only): the daemon socket is not reachable.
+    DaemonUnavailable,
+    /// Client-side (native messaging host only): the daemon response exceeds the
+    /// 1 MiB browser cap. `InvalidRequest` is also emitted by the host for
+    /// oversized or malformed frames.
+    ResponseTooLarge,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -197,6 +203,12 @@ impl Response {
                 message: message.into(),
             }),
         }
+    }
+    /// Serialized error response without the trailing newline.
+    pub fn err_json(code: ErrorCode, message: impl Into<String>) -> String {
+        let mut line = Self::err(code, message).to_line();
+        line.pop();
+        line
     }
     pub fn to_line(&self) -> String {
         let mut s = serde_json::to_string(self).unwrap_or_else(|_| {

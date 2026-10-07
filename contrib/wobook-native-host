@@ -1,0 +1,3 @@
+#!/bin/sh
+# Native messaging host manifests take a path without arguments.
+exec wobook native-host "$@"

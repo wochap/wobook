@@ -1,0 +1,20 @@
+{
+  "name": "wobook-extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "test": "node esbuild.mjs && playwright test",
+    "lint": "tsc --noEmit && biome check src tests esbuild.mjs playwright.config.ts && node esbuild.mjs && web-ext lint --source-dir dist/firefox",
+    "package:firefox": "node esbuild.mjs && web-ext build --source-dir dist/firefox --artifacts-dir dist/artifacts --overwrite-dest"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@playwright/test": "^1.58.2",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0",
+    "web-ext": "^8.3.0"
+  }
+}

@@ -52,7 +52,7 @@
     in {
       devShells.${system} = {
         default = pkgs.mkShell {
-          packages = with pkgs; [ cargo clippy rustc rustfmt pkg-config sqlite fzf shellcheck jq ];
+          packages = with pkgs; [ cargo clippy rustc rustfmt pkg-config sqlite fzf shellcheck jq nodejs pnpm web-ext ];
         };
         android = androidShell false;
         android-emulator = androidShell true;
