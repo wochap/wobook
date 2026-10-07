@@ -1,0 +1,44 @@
+[package]
+name = "wobook-sync"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Device identity, trust, QR pairing, QUIC transport and discovery for wobook"
+
+[lib]
+name = "wobook_sync"
+path = "src/lib.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+automerge-repo.workspace = true
+wobook-core.workspace = true
+async-trait.workspace = true
+bytes.workspace = true
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+base64 = "0.22"
+data-encoding = "=2.11.1"
+ed25519-dalek = { version = "=2.2.0", default-features = false, features = ["alloc", "pkcs8", "rand_core", "zeroize"] }
+hex = "0.4"
+hkdf = "=0.12.4"
+hmac = "=0.12.1"
+if-addrs = "=0.15.0"
+mdns-sd = "=0.21.2"
+qrcode = { version = "0.14", default-features = false }
+quinn = { version = "=0.11.11", default-features = false, features = ["runtime-tokio", "rustls-ring"] }
+rand = "0.8"
+rcgen = { version = "=0.14.5", default-features = false, features = ["crypto", "ring", "pem"] }
+rustls = { version = "=0.23.45", default-features = false, features = ["ring", "std"] }
+sha2 = "=0.10.9"
+x509-parser = { version = "=0.18.0", default-features = false, features = ["verify"] }
+zeroize = { version = "=1.9.0", features = ["zeroize_derive"] }
+
+[dev-dependencies]
+tempfile.workspace = true

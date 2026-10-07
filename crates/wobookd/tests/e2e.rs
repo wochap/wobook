@@ -77,6 +77,8 @@ impl Daemon {
             .env_remove("WOBOOK_DATA_DIR")
             .env_remove("WOBOOK_SOCKET")
             .env_remove("WOBOOK_HOOKS_DIR")
+            .env("WOBOOK_SYNC_PORT", "0")
+            .env("WOBOOK_DISCOVERY", "off")
             .stdin(Stdio::null())
             .stdout(Stdio::null())
             .stderr(Stdio::piped())

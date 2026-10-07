@@ -105,6 +105,47 @@ pub enum Request {
         url: String,
     },
     Shutdown,
+    #[serde(rename = "pair.start")]
+    PairStart,
+    #[serde(rename = "pair.join")]
+    PairJoin {
+        payload: Value,
+    },
+    #[serde(rename = "pair.pending")]
+    PairPending,
+    #[serde(rename = "pair.confirm")]
+    PairConfirm {
+        session: String,
+    },
+    #[serde(rename = "pair.reject")]
+    PairReject {
+        session: String,
+    },
+    #[serde(rename = "devices.list")]
+    DevicesList,
+    #[serde(rename = "devices.rename")]
+    DevicesRename {
+        id: String,
+        name: String,
+    },
+    #[serde(rename = "devices.revoke")]
+    DevicesRevoke {
+        id: String,
+    },
+    #[serde(rename = "devices.add_endpoint")]
+    DevicesAddEndpoint {
+        id: String,
+        address: String,
+    },
+    #[serde(rename = "sync.status")]
+    SyncStatus,
+    #[serde(rename = "sync.now")]
+    SyncNow,
+    #[serde(rename = "device.name")]
+    DeviceName {
+        #[serde(default)]
+        name: Option<String>,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -117,6 +158,11 @@ pub enum ErrorCode {
     HookRejected,
     Io,
     Internal,
+    PairWindowClosed,
+    PairRateLimited,
+    PairPendingMissing,
+    UnknownDevice,
+    DeviceRevoked,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -211,6 +257,15 @@ mod tests {
             }
         ));
         assert!(serde_json::from_str::<Request>(r#"{"type":"nope"}"#).is_err());
+        let r: Request = serde_json::from_str(r#"{"type":"device.name"}"#).unwrap();
+        assert_eq!(r, Request::DeviceName { name: None });
+        let r: Request = serde_json::from_str(r#"{"type":"pair.confirm","session":"ab"}"#).unwrap();
+        assert_eq!(
+            r,
+            Request::PairConfirm {
+                session: "ab".into()
+            }
+        );
         let line = Response::err(ErrorCode::NotFound, "x").to_line();
         assert!(line.contains(r#""code":"not_found""#));
     }

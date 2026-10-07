@@ -11,6 +11,8 @@ workspace = true
 [dependencies]
 wobook-core.workspace = true
 automerge-repo.workspace = true
+wobook-sync.workspace = true
+async-trait.workspace = true
 automerge.workspace = true
 anyhow.workspace = true
 clap.workspace = true

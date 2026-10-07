@@ -24,8 +24,10 @@ use wobook_core::{
 use crate::hooks::{self, PostJob};
 
 pub struct Daemon {
-    pub repo: Repo,
-    pub handle: DocHandle,
+    /// Swapped when this device joins a mesh (D7).
+    pub store: std::sync::RwLock<(Repo, DocHandle)>,
+    pub joining: std::sync::atomic::AtomicBool,
+    pub sync: Arc<wobook_sync::SyncEngine>,
     pub model: Mutex<ReadModel>,
     pub searcher: Mutex<Searcher>,
     pub writes: AsyncMutex<()>,
@@ -71,13 +73,17 @@ fn change_err(e: doc::DocError) -> automerge_repo::Error {
 }
 
 impl Daemon {
+    pub fn doc(&self) -> DocHandle {
+        self.store.read().expect("store lock").1.clone()
+    }
+
+    pub fn repo(&self) -> Repo {
+        self.store.read().expect("store lock").0.clone()
+    }
+
     /// Rebuilds the read model when the document heads moved.
     pub async fn reconcile(&self) -> Result<()> {
-        let heads = self
-            .handle
-            .read(doc::heads_string)
-            .await
-            .map_err(internal)?;
+        let heads = self.doc().read(doc::heads_string).await.map_err(internal)?;
         let current = self
             .model
             .lock()
@@ -88,7 +94,7 @@ impl Daemon {
             return Ok(());
         }
         let (heads, all) = self
-            .handle
+            .doc()
             .read(|d| (doc::heads_string(d), doc::read_all(d)))
             .await
             .map_err(internal)?;
@@ -102,7 +108,7 @@ impl Daemon {
 
     async fn read(&self, url: &str) -> Result<Option<Bookmark>> {
         let key = url.to_string();
-        self.handle
+        self.doc()
             .read(move |d| doc::read(d, &key))
             .await
             .map_err(internal)?
@@ -120,7 +126,7 @@ impl Daemon {
             + 'static,
     {
         let value = self
-            .handle
+            .doc()
             .change(move |tx| f(tx).map_err(change_err))
             .await
             .map_err(|e| match e {
@@ -130,7 +136,7 @@ impl Daemon {
                 other => internal(other),
             })?
             .value;
-        self.repo
+        self.repo()
             .flush()
             .await
             .map_err(|e| Failure(ErrorCode::Io, e.to_string()))?;
@@ -138,7 +144,7 @@ impl Daemon {
         Ok(value)
     }
 
-    fn post(
+    pub fn post(
         &self,
         event: &'static str,
         origin: &str,
@@ -156,6 +162,7 @@ impl Daemon {
             origin: origin.to_string(),
             url: bookmark.url.clone(),
             payload,
+            peer: None,
         });
     }
 
@@ -314,18 +321,14 @@ impl Daemon {
                 }
             }
             Request::Status => {
-                let heads = self
-                    .handle
-                    .read(doc::heads_string)
-                    .await
-                    .map_err(internal)?;
+                let heads = self.doc().read(doc::heads_string).await.map_err(internal)?;
                 let (live, deleted) = self
                     .model
                     .lock()
                     .map_err(internal)?
                     .counts()
                     .map_err(internal)?;
-                Ok(json!({
+                let mut status = json!({
                     "version": wobook_core::VERSION,
                     "data_dir": self.data_dir,
                     "socket": self.socket,
@@ -334,7 +337,13 @@ impl Daemon {
                     "heads": heads,
                     "uptime_s": self.started.elapsed().as_secs(),
                     "hooks_dir": self.hooks_dir,
-                }))
+                    "device": self.sync.device_json(),
+                    "peers": self.sync.peer_counts(),
+                });
+                if let Some(recovery) = self.recovery_status() {
+                    status["recovery"] = recovery;
+                }
+                Ok(status)
             }
             Request::Hooks => Ok(Value::Array(
                 hooks::list(&self.hooks_dir)
@@ -357,6 +366,7 @@ impl Daemon {
                     origin: "cli",
                     url: &url,
                     data_dir: &self.data_dir,
+                    peer: None,
                 };
                 let outcomes = hooks::run_all(&self.hooks_dir, &ctx, &payload).await;
                 serde_json::to_value(outcomes).map_err(internal)
@@ -365,6 +375,7 @@ impl Daemon {
                 self.shutdown.notify_one();
                 Ok(json!({}))
             }
+            other => self.sync_request(other).await,
         }
     }
 
@@ -401,6 +412,7 @@ impl Daemon {
                 origin,
                 url: &record.url,
                 data_dir: &self.data_dir,
+                peer: None,
             };
             let outcome = hooks::run_one(&hook, &ctx, &payload).await;
             hooks::log_outcome("pre-add", &outcome);
@@ -504,7 +516,7 @@ impl Daemon {
         }))
     }
 
-    async fn import(&self, format: Option<Format>, path: &str) -> Result<Value> {
+    pub async fn import(&self, format: Option<Format>, path: &str) -> Result<Value> {
         let path_buf = PathBuf::from(path);
         let format = format.or_else(|| Format::infer(&path_buf)).ok_or_else(|| {
             Failure(

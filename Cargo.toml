@@ -5,6 +5,7 @@ members = [
     "crates/wobook-core",
     "crates/wobookd",
     "crates/wobook",
+    "crates/wobook-sync",
 ]
 
 [workspace.package]
@@ -19,6 +20,7 @@ unsafe_code = "forbid"
 [workspace.dependencies]
 automerge-repo = { path = "crates/automerge_repo" }
 wobook-core = { path = "crates/wobook-core" }
+wobook-sync = { path = "crates/wobook-sync" }
 anyhow = "1"
 assert_cmd = "2"
 async-trait = "0.1"

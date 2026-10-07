@@ -72,6 +72,8 @@ pub struct Context<'a> {
     pub origin: &'a str,
     pub url: &'a str,
     pub data_dir: &'a Path,
+    /// Peer device name for remote-origin and `post-sync` hooks.
+    pub peer: Option<&'a str>,
 }
 
 pub fn payload(event: &str, origin: &str, bookmark: &Value, previous: Option<&Value>) -> Value {
@@ -95,7 +97,11 @@ pub async fn run_one(path: &Path, ctx: &Context<'_>, payload: &Value) -> Outcome
         stdout: String::new(),
         stderr: message,
     };
-    let mut child = match Command::new(path)
+    let mut command = Command::new(path);
+    if let Some(peer) = ctx.peer {
+        command.env("WOBOOK_PEER", peer);
+    }
+    let mut child = match command
         .env("WOBOOK_EVENT", ctx.event)
         .env("WOBOOK_ORIGIN", ctx.origin)
         .env("WOBOOK_URL", ctx.url)
@@ -160,6 +166,7 @@ pub struct PostJob {
     pub origin: String,
     pub url: String,
     pub payload: Value,
+    pub peer: Option<String>,
 }
 
 /// Sequential background runner for `post-*` hooks.
@@ -172,6 +179,7 @@ pub fn spawn_post_runner(dir: PathBuf, data_dir: PathBuf) -> mpsc::UnboundedSend
                 origin: &job.origin,
                 url: &job.url,
                 data_dir: &data_dir,
+                peer: job.peer.as_deref(),
             };
             for outcome in run_all(&dir, &ctx, &job.payload).await {
                 log_outcome(job.event, &outcome);

@@ -4,7 +4,7 @@ use std::{path::Path, sync::Arc};
 
 use async_trait::async_trait;
 use automerge_repo::{
-    BootstrapStatus, DocHandle, Error, FilesystemStorage, PeerId, Repo, RepoConfig,
+    BootstrapStatus, DocHandle, DocumentId, Error, FilesystemStorage, PeerId, Repo, RepoConfig,
     error::NetworkError,
     network::{NetworkEvent, NetworkTransport},
 };
@@ -50,38 +50,71 @@ impl NetworkTransport for NullTransport {
 pub struct Store {
     pub repo: Repo,
     pub handle: DocHandle,
+    /// The root is still being fetched from a peer (fresh join or recovery).
+    pub joining: bool,
 }
 
 /// Opens the repository under `data_dir`, creating the root document with the
 /// bookmark schema on first run.
 pub async fn open_or_init(data_dir: &Path) -> Result<Store, Error> {
-    open_with_transport(data_dir, NullTransport::new()).await
+    open_with_transport(data_dir, NullTransport::new(), RepoConfig::default()).await
 }
 
+/// Opens the repository. A `Joining` bootstrap (join in progress, or a
+/// missing/corrupt root under recovery) returns at once with `joining` set;
+/// the handle becomes ready after the first sync with a peer.
 pub async fn open_with_transport(
     data_dir: &Path,
     transport: Arc<dyn NetworkTransport>,
+    config: RepoConfig,
 ) -> Result<Store, Error> {
     let storage = Arc::new(FilesystemStorage::open(data_dir).await?);
-    let repo = Repo::open(storage.clone(), storage, transport, RepoConfig::default()).await?;
-    let handle = match repo.bootstrap_status() {
+    let repo = Repo::open(storage.clone(), storage, transport, config).await?;
+    let (handle, joining) = match repo.bootstrap_status() {
         BootstrapStatus::Ready { root } => match repo.get(root).await? {
-            Some(handle) => handle,
-            None => repo.open_document(root).await?,
+            Some(handle) => (handle, false),
+            None => (repo.open_document(root).await?, false),
         },
-        BootstrapStatus::NeedsDecision => repo.initialize_new().await?,
+        BootstrapStatus::NeedsDecision => (repo.initialize_new().await?, false),
+        BootstrapStatus::Joining { root } => match repo.get(root).await? {
+            Some(handle) => (handle, true),
+            None => (repo.open_document(root).await?, true),
+        },
         other => {
             return Err(Error::Config(format!(
                 "repository bootstrap is {other:?}; cannot open locally"
             )));
         }
     };
-    handle.ready().await?;
-    handle
-        .change(|tx| crate::doc::ensure_schema(tx).map_err(|e| Error::Change(e.to_string())))
-        .await?;
-    repo.flush().await?;
-    Ok(Store { repo, handle })
+    if !joining {
+        handle.ready().await?;
+        handle
+            .change(|tx| crate::doc::ensure_schema(tx).map_err(|e| Error::Change(e.to_string())))
+            .await?;
+        repo.flush().await?;
+    }
+    Ok(Store {
+        repo,
+        handle,
+        joining,
+    })
+}
+
+/// Opens a fresh repository (no bootstrap record) and joins `root`.
+pub async fn join_with_transport(
+    data_dir: &Path,
+    transport: Arc<dyn NetworkTransport>,
+    config: RepoConfig,
+    root: DocumentId,
+) -> Result<Store, Error> {
+    let storage = Arc::new(FilesystemStorage::open(data_dir).await?);
+    let repo = Repo::open(storage.clone(), storage, transport, config).await?;
+    let handle = repo.join_existing(root).await?;
+    Ok(Store {
+        repo,
+        handle,
+        joining: true,
+    })
 }
 
 #[cfg(test)]

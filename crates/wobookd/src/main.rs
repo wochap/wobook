@@ -2,6 +2,7 @@
 
 mod hooks;
 mod server;
+mod sync;
 
 use std::{
     fs::{self, File, OpenOptions},
@@ -104,9 +105,29 @@ async fn run() -> Result<()> {
     }
     clear_stale_socket(&socket).context("cannot replace socket")?;
 
-    let opened = store::open_or_init(&data_dir)
-        .await
-        .context("open automerge store")?;
+    // Startup order (D10): control store and identity, QUIC bind, repository,
+    // then discovery and peer supervisors.
+    let engine = wobook_sync::SyncEngine::open(
+        &data_dir,
+        &wobook_sync::identity::FileKeyStore::new(&data_dir),
+    )
+    .context("open sync engine")?;
+    let opened = store::open_with_transport(
+        &data_dir,
+        engine.transport.clone(),
+        automerge_repo::RepoConfig::default(),
+    )
+    .await
+    .map_err(|e| match e {
+        automerge_repo::Error::Bootstrap(
+            ref b @ automerge_repo::error::BootstrapError::RecoveryExhausted { .. },
+        ) => anyhow::anyhow!(
+            "recovery needs_attention: {b}; the quarantined copies are under {}",
+            data_dir.join("quarantine").display()
+        ),
+        other => anyhow::anyhow!(other),
+    })
+    .context("open automerge store")?;
     let model = ReadModel::open_or_recreate(&data_dir.join("read-model.sqlite"))
         .context("open read model")?;
 
@@ -115,9 +136,11 @@ async fn run() -> Result<()> {
     fs::set_permissions(&socket, fs::Permissions::from_mode(0o600))?;
 
     let post = hooks::spawn_post_runner(hooks_dir.clone(), data_dir.clone());
+    let joining = opened.joining;
     let daemon = Arc::new(Daemon {
-        repo: opened.repo,
-        handle: opened.handle,
+        store: std::sync::RwLock::new((opened.repo.clone(), opened.handle.clone())),
+        joining: std::sync::atomic::AtomicBool::new(joining),
+        sync: engine.clone(),
         model: Mutex::new(model),
         searcher: Mutex::new(Searcher::new()),
         writes: AsyncMutex::new(()),
@@ -128,24 +151,25 @@ async fn run() -> Result<()> {
         post,
         shutdown: Notify::new(),
     });
-    daemon
-        .reconcile()
-        .await
-        .map_err(|e| anyhow::anyhow!("initial reconcile: {}", e.1))?;
+    if let Err(e) = daemon.reconcile().await
+        && !joining
+    {
+        anyhow::bail!("initial reconcile: {}", e.1);
+    }
+    daemon.install_store(opened);
+    engine.start(Arc::new(sync::Host(Arc::downgrade(&daemon))));
 
-    // Remote changes (p2p-sync later) refresh the read model too.
-    let mut events = daemon.handle.subscribe();
-    let watcher = daemon.clone();
-    tokio::spawn(async move {
-        while let Ok(_) | Err(tokio::sync::broadcast::error::RecvError::Lagged(_)) =
-            events.recv().await
-        {
-            if let Err(e) = watcher.reconcile().await {
-                eprintln!("wobookd: reconcile failed: {}", e.1);
-            }
+    eprintln!(
+        "wobookd: device {} \"{}\" sync port {}{}",
+        engine.identity.id(),
+        engine.device_name(),
+        engine.transport.port(),
+        if joining {
+            " (fetching document from peers)"
+        } else {
+            ""
         }
-    });
-
+    );
     eprintln!(
         "wobookd {} listening on {} (data {})",
         wobook_core::VERSION,
@@ -171,7 +195,9 @@ async fn run() -> Result<()> {
 
     eprintln!("wobookd: shutting down");
     let _ = fs::remove_file(&socket);
-    daemon.repo.flush().await.context("flush")?;
+    daemon.repo().flush().await.context("flush")?;
+    let _ = daemon.repo().shutdown().await;
+    engine.shutdown().await;
     // Let in-flight replies (the shutdown response) finish writing.
     tokio::time::sleep(std::time::Duration::from_millis(50)).await;
     Ok(())

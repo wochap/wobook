@@ -3,6 +3,7 @@
 mod client;
 mod editor;
 mod output;
+mod sync_cmd;
 
 use std::{
     io::Write,
@@ -153,6 +154,72 @@ enum Command {
     },
     /// Print shell completions.
     Completions { shell: clap_complete::Shell },
+    /// Pair with another device: show a QR code, or join with a payload.
+    Pair {
+        /// Join using the payload JSON from the other device ("-" reads stdin).
+        #[arg(long)]
+        join: Option<String>,
+        /// Trust without prompting (scripted setups; weaker).
+        #[arg(long)]
+        yes: bool,
+        /// Print only the payload JSON.
+        #[arg(long)]
+        json: bool,
+        /// Set this device's name first.
+        #[arg(long)]
+        name: Option<String>,
+    },
+    /// Trusted devices.
+    Devices {
+        #[command(subcommand)]
+        command: DevicesCommand,
+    },
+    /// Synchronization state.
+    Sync {
+        #[command(subcommand)]
+        command: SyncCommand,
+    },
+    /// This device.
+    Device {
+        #[command(subcommand)]
+        command: DeviceCommand,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+enum DevicesCommand {
+    /// List trusted and revoked devices.
+    List {
+        #[arg(long)]
+        json: bool,
+    },
+    /// Rename a device locally.
+    Rename { device: String, name: String },
+    /// Revoke a device permanently.
+    Revoke {
+        device: String,
+        #[arg(long)]
+        yes: bool,
+    },
+    /// Remember an address for a device.
+    AddEndpoint { device: String, address: String },
+}
+
+#[derive(Subcommand, Debug)]
+enum SyncCommand {
+    /// Per-peer reachability and last sync.
+    Status {
+        #[arg(long)]
+        json: bool,
+    },
+    /// Connect to every trusted device now.
+    Now,
+}
+
+#[derive(Subcommand, Debug)]
+enum DeviceCommand {
+    /// Show or set this device's name.
+    Name { name: Option<String> },
 }
 
 #[derive(Subcommand, Debug)]
@@ -163,7 +230,7 @@ enum HooksCommand {
     Run { event: String, url: String },
 }
 
-enum Fail {
+pub(crate) enum Fail {
     Client(ClientError),
     Input(String),
     Internal(String),
@@ -175,14 +242,14 @@ impl From<ClientError> for Fail {
     }
 }
 
-type Result<T> = std::result::Result<T, Fail>;
+pub(crate) type Result<T> = std::result::Result<T, Fail>;
 
-struct Ctx {
+pub(crate) struct Ctx {
     socket: PathBuf,
 }
 
 impl Ctx {
-    fn call(&self, request: &Request) -> Result<Value> {
+    pub(crate) fn call(&self, request: &Request) -> Result<Value> {
         Ok(client::call(&self.socket, request)?)
     }
     fn get(&self, url: &str) -> Result<Bookmark> {
@@ -234,7 +301,7 @@ fn main() -> ExitCode {
     }
 }
 
-fn print(text: &str) {
+pub(crate) fn print(text: &str) {
     let mut out = std::io::stdout().lock();
     let _ = out.write_all(text.as_bytes());
 }
@@ -448,6 +515,45 @@ fn run(ctx: &Ctx, command: Command) -> Result<()> {
         }
         Command::Completions { shell } => {
             clap_complete::generate(shell, &mut Cli::command(), "wobook", &mut std::io::stdout());
+        }
+        Command::Pair {
+            join,
+            yes,
+            json,
+            name,
+        } => sync_cmd::pair(ctx, join, yes, json, name)?,
+        Command::Devices { command } => match command {
+            DevicesCommand::List { json } => sync_cmd::devices_list(ctx, json)?,
+            DevicesCommand::Rename { device, name } => {
+                let r = ctx.call(&Request::DevicesRename { id: device, name })?;
+                print(&format!(
+                    "renamed {} to {}\n",
+                    r["id"].as_str().unwrap_or(""),
+                    r["name"].as_str().unwrap_or("")
+                ));
+            }
+            DevicesCommand::Revoke { device, yes } => sync_cmd::devices_revoke(ctx, device, yes)?,
+            DevicesCommand::AddEndpoint { device, address } => {
+                ctx.call(&Request::DevicesAddEndpoint {
+                    id: device,
+                    address: address.clone(),
+                })?;
+                print(&format!("added {address}\n"));
+            }
+        },
+        Command::Sync {
+            command: SyncCommand::Status { json },
+        } => sync_cmd::sync_status(ctx, json)?,
+        Command::Sync {
+            command: SyncCommand::Now,
+        } => {
+            ctx.call(&Request::SyncNow)?;
+        }
+        Command::Device {
+            command: DeviceCommand::Name { name },
+        } => {
+            let r = ctx.call(&Request::DeviceName { name })?;
+            print(&format!("{}\n", r["name"].as_str().unwrap_or("")));
         }
     }
     Ok(())
