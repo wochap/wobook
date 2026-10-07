@@ -225,3 +225,6 @@ e2e (`crates/wobookd/tests/sync_e2e.rs`): two or three daemons on `127.0.0.1` wi
 ## Open Questions
 
 - None blocking. Whether the phone should also be reachable as an inbound peer (listening) or only dial out is decided in `android-app`; the transport supports both.
+
+### Environment
+- `WOBOOK_DEVICE_NAME` overrides the stored device name at daemon start (nix-module sets it); `wobook device name` persists to control.sqlite and wins when set explicitly.
