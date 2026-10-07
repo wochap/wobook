@@ -48,8 +48,29 @@
   --ctp-subtext0:#6c6f85; --ctp-subtext1:#5c5f77; --ctp-text:#4c4f69;
   --ctp-blue:#1e66f5; --ctp-lavender:#7287fd; --ctp-sapphire:#209fb5;
   --ctp-red:#d20f39; --ctp-green:#40a02b; --ctp-yellow:#df8e1d; --ctp-peach:#fe640b;
-  --wb-on-accent:var(--ctp-base);
+  /* Roles → Compose colorScheme (see readme.md) */
+  --wb-bg:var(--ctp-base);                 /* background / surface */
+  --wb-bg-low:var(--ctp-mantle);           /* surfaceContainerLow — keyboard, sheets' ground */
+  --wb-bg-lowest:var(--ctp-crust);         /* surfaceContainerLowest — scrim-adjacent */
+  --wb-surface:var(--ctp-surface0);        /* surfaceContainer — chips, fields */
+  --wb-surface-high:var(--ctp-surface1);   /* surfaceContainerHigh — pressed, keys */
+  --wb-outline:var(--ctp-surface2);        /* outline */
+  --wb-outline-variant:var(--ctp-surface1);/* outlineVariant — dividers */
+  --wb-text:var(--ctp-text);               /* onSurface */
+  --wb-text-muted:var(--ctp-subtext0);     /* onSurfaceVariant */
+  --wb-text-faint:var(--ctp-overlay1);     /* hints, disabled text */
+  --wb-accent:var(--ctp-blue);             /* primary */
+  --wb-on-accent:var(--ctp-base);         /* onPrimary */
+  --wb-accent-container:color-mix(in srgb, var(--ctp-blue) 16%, transparent); /* primaryContainer */
+  --wb-error:var(--ctp-red);               /* error */
+  --wb-success:var(--ctp-green);
+  --wb-warning:var(--ctp-yellow);
+  --wb-tailscale:var(--ctp-lavender);
   --wb-scrim:rgba(76,79,105,.4);
+  --wb-inverse-surface:var(--ctp-text);    /* snackbar */
+  --wb-inverse-text:var(--ctp-base);
+
+
   --wb-shadow-1:0 0 0 1px var(--ctp-surface0);
   --wb-shadow-2:0 1px 2px rgba(76,79,105,.12), 0 6px 18px rgba(76,79,105,.14);
   --wb-shadow-3:0 2px 4px rgba(76,79,105,.14), 0 16px 40px rgba(76,79,105,.2);

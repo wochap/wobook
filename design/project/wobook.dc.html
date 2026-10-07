@@ -126,7 +126,7 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
       <span style="height:32px;padding:0 10px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">+3</span>
       <span style="height:20px;padding:0 7px;border-radius:var(--wb-r-sm);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">tiny · row</span>
     </div>
-    <div style="font:var(--wb-t-label);color:var(--wb-text-faint);margin-top:-8px">default · selected · removable (editor) · overflow +N · row-size</div>
+    <div style="font:var(--wb-t-label);color:var(--wb-text-faint);margin-top:-8px">default · selected · removable (editor) · overflow +N · row-size · editor: comma or Enter commits, space is part of the tag (“ui library”)</div>
     <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 8px 0 16px;gap:12px;box-shadow:inset 0 0 0 1px var(--wb-accent)">
       <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
       <span style="flex:1;font:var(--wb-t-body-lg)">shcn ui<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
@@ -181,7 +181,7 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
 <div class="wb-h"><h2>1 · Search / Home</h2><span>default screen · keyboard opens on launch</span></div>
 <div class="wb-grid">
 
-<div class="wb-fr" id="home-results"><div class="wb-lbl"><b>Home-Results</b>typing “shcn ui”, keyboard up, one chip active</div>
+<div class="wb-fr" id="home-results"><div class="wb-lbl"><b>Home-Results</b>typing “shcn ui”, keyboard up, one chip active · Add FAB intentionally hidden while the keyboard is up (Add lives on Home-Idle and inline in No-results)</div>
 <div class="phone" data-screen-label="Home-Results">
   <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
   <div style="padding:8px 16px 0;display:flex;flex-direction:column;gap:12px">
@@ -235,6 +235,134 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
         <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--wb-accent);font-weight:600">S</span>witc<span style="color:var(--wb-accent);font-weight:600">h</span>ing from Chakra to <span style="color:var(--wb-accent);font-weight:600">c</span>va a<span style="color:var(--wb-accent);font-weight:600">n</span>d Tailwind <span style="color:var(--wb-accent);font-weight:600">UI</span></div>
         <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">blog.example.dev/2025/chakra-to-cva</div>
         <div style="display:flex;gap:4px;height:20px"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">blog</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="padding:8px 16px 0;font:var(--wb-t-label);color:var(--wb-text-faint)">4 of 1,284 · filtered by react</div>
+  </div>
+  <div style="flex:none;margin-top:auto">{{ keyboard }}</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="home-results-light"><div class="wb-lbl"><b>Home-Results-Light</b>Latte · same tokens, data-theme="light"</div>
+<div class="phone" data-theme="light" data-screen-label="Home-Results-Light">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="padding:8px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 4px 0 16px;gap:12px;box-shadow:inset 0 0 0 1px var(--wb-accent)">
+      <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
+      <span style="flex:1;font:var(--wb-t-body-lg)">shcn ui<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
+      <i class="ph ph-x" style="font-size:20px;color:var(--wb-text-muted);width:44px;height:44px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="display:flex;gap:8px;overflow:hidden;margin:0 -16px;padding:0 16px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-accent-container);color:var(--wb-accent);box-shadow:inset 0 0 0 1px var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:6px;flex:none"><i class="ph ph-check" style="font-size:14px"></i>react</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">ui library</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">security</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+    </div>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:8px 0 0;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--wb-accent);font-weight:600">sh</span>ad<span style="color:var(--wb-accent);font-weight:600">cn</span>/<span style="color:var(--wb-accent);font-weight:600">ui</span> — Build your component library</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ui.shadcn.com/docs</div>
+        <div style="display:flex;gap:4px;height:20px"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">ui library</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">tailwind</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--wb-accent);font-weight:600">sh</span>ad<span style="color:var(--wb-accent);font-weight:600">cn</span>-<span style="color:var(--wb-accent);font-weight:600">ui</span>/ui: Accessible components · GitHub</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">github.com/shadcn-ui/ui</div>
+        <div style="display:flex;gap:4px;height:20px"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">github</span><span style="height:20px;padding:0 6px;border-radius:4px;border:1px solid var(--wb-outline);color:var(--wb-text-faint);font:var(--wb-t-label);display:inline-flex;align-items:center">+3</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Radix Primitives — <span style="color:var(--wb-accent);font-weight:600">s</span>tyling <span style="color:var(--wb-accent);font-weight:600">h</span>eadless <span style="color:var(--wb-accent);font-weight:600">c</span>ompo<span style="color:var(--wb-accent);font-weight:600">n</span>ents <span style="color:var(--wb-accent);font-weight:600">ui</span></div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">radix-ui.com/primitives/docs/guides/styling</div>
+        <div style="display:flex;gap:4px;height:20px"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">a11y</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--wb-accent);font-weight:600">S</span>witc<span style="color:var(--wb-accent);font-weight:600">h</span>ing from Chakra to <span style="color:var(--wb-accent);font-weight:600">c</span>va a<span style="color:var(--wb-accent);font-weight:600">n</span>d Tailwind <span style="color:var(--wb-accent);font-weight:600">UI</span></div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">blog.example.dev/2025/chakra-to-cva</div>
+        <div style="display:flex;gap:4px;height:20px"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">blog</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="padding:8px 16px 0;font:var(--wb-t-label);color:var(--wb-text-faint)">4 of 1,284 · filtered by react</div>
+  </div>
+  <div style="flex:none;margin-top:auto">{{ keyboard }}</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="home-results-130"><div class="wb-lbl"><b>Home-Results-130%</b>font scale 1.3 · rows grow (min-height), title + url still 1 line, tag line clipped, trailing buttons stay 48dp</div>
+<div class="phone" data-screen-label="Home-Results-130" style="--wb-t-display:500 36px/44px var(--wb-font);--wb-t-title:500 26px/34px var(--wb-font);--wb-t-title-sm:500 21px/29px var(--wb-font);--wb-t-body-lg:400 21px/31px var(--wb-font);--wb-t-body:400 18px/26px var(--wb-font);--wb-t-body-md:500 18px/26px var(--wb-font);--wb-t-label:400 15.5px/21px var(--wb-font);--wb-t-label-md:500 15.5px/21px var(--wb-font);--wb-t-mono:400 17px/23px var(--wb-mono);">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="padding:8px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 4px 0 16px;gap:12px;box-shadow:inset 0 0 0 1px var(--wb-accent)">
+      <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
+      <span style="flex:1;font:var(--wb-t-body-lg)">shcn ui<span style="display:inline-block;width:2px;height:26px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
+      <i class="ph ph-x" style="font-size:20px;color:var(--wb-text-muted);width:44px;height:44px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="display:flex;gap:8px;overflow:hidden;margin:0 -16px;padding:0 16px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-accent-container);color:var(--wb-accent);box-shadow:inset 0 0 0 1px var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:6px;flex:none"><i class="ph ph-check" style="font-size:14px"></i>react</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">ui library</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">security</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+    </div>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:8px 0 0;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:29px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--wb-accent);font-weight:600">sh</span>ad<span style="color:var(--wb-accent);font-weight:600">cn</span>/<span style="color:var(--wb-accent);font-weight:600">ui</span> — Build your component library</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ui.shadcn.com/docs</div>
+        <div style="display:flex;gap:4px;height:24px;overflow:hidden"><span style="height:24px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:24px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">ui library</span><span style="height:24px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">tailwind</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:29px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--wb-accent);font-weight:600">sh</span>ad<span style="color:var(--wb-accent);font-weight:600">cn</span>-<span style="color:var(--wb-accent);font-weight:600">ui</span>/ui: Accessible components · GitHub</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">github.com/shadcn-ui/ui</div>
+        <div style="display:flex;gap:4px;height:24px;overflow:hidden"><span style="height:24px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:24px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">github</span><span style="height:24px;padding:0 6px;border-radius:4px;border:1px solid var(--wb-outline);color:var(--wb-text-faint);font:var(--wb-t-label);display:inline-flex;align-items:center">+3</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:29px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Radix Primitives — <span style="color:var(--wb-accent);font-weight:600">s</span>tyling <span style="color:var(--wb-accent);font-weight:600">h</span>eadless <span style="color:var(--wb-accent);font-weight:600">c</span>ompo<span style="color:var(--wb-accent);font-weight:600">n</span>ents <span style="color:var(--wb-accent);font-weight:600">ui</span></div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">radix-ui.com/primitives/docs/guides/styling</div>
+        <div style="display:flex;gap:4px;height:24px;overflow:hidden"><span style="height:24px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:24px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">a11y</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:29px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--wb-accent);font-weight:600">S</span>witc<span style="color:var(--wb-accent);font-weight:600">h</span>ing from Chakra to <span style="color:var(--wb-accent);font-weight:600">c</span>va a<span style="color:var(--wb-accent);font-weight:600">n</span>d Tailwind <span style="color:var(--wb-accent);font-weight:600">UI</span></div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">blog.example.dev/2025/chakra-to-cva</div>
+        <div style="display:flex;gap:4px;height:24px;overflow:hidden"><span style="height:24px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:24px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">blog</span></div>
       </div>
       <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
       <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
@@ -418,8 +546,48 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
   <div class="gest"></div>
 </div></div>
 
+<div class="wb-fr" id="home-tablet"><div class="wb-lbl"><b>Home-Tablet</b>800×1280 · rule: one column, content max-width 640dp centered; chips, list and FAB share that column — no second pane, no grid</div>
+<div class="phone" data-screen-label="Home-Tablet" style="width:800px;height:1280px;border-radius:24px">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="width:100%;max-width:640px;margin:0 auto;flex:1;min-height:0;display:flex;flex-direction:column;position:relative">
+  <div style="padding:8px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 4px 0 16px;gap:12px">
+      <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
+      <span style="flex:1;font:var(--wb-t-body-lg);color:var(--wb-text-faint)">Search bookmarks</span>
+      <i class="ph ph-gear-six" style="font-size:22px;color:var(--wb-text-muted);width:44px;height:44px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="display:flex;gap:8px;overflow:hidden;margin:0 -16px;padding:0 16px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">react</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">ui library</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">security</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">crdt</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">android</span>
+    </div>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:8px 0 0;display:flex;flex-direction:column">
+    <div style="padding:4px 16px 6px;font:var(--wb-t-label);color:var(--wb-text-faint)">Recent · 1,284 bookmarks</div>
+    <sc-for list="{{ recentTablet }}" as="r" hint-placeholder-count="16">
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.title }}</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.url }}</div>
+        <div style="display:flex;gap:4px;height:20px"><sc-for list="{{ r.tags }}" as="t" hint-placeholder-count="2"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">{{ t }}</span></sc-for></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    </sc-for>
+  </div>
+  <div style="position:absolute;right:16px;bottom:40px;height:56px;padding:0 20px 0 16px;border-radius:var(--wb-r-lg);background:var(--wb-bg);border:1px solid var(--wb-accent);color:var(--wb-accent);display:flex;align-items:center;gap:8px;font:var(--wb-t-body-md);box-shadow:var(--wb-shadow-2)"><i class="ph ph-plus" style="font-size:22px"></i>Add</div>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
 </div>
-<p style="margin:22px 0 0;font:400 12px/1.6 Inter,system-ui;color:#7f849c;max-width:900px">Offline-with-local-data is intentionally identical to Home-Idle: no banner, no icon. Sync state lives in Devices/Settings. Swipe-right on a row copies the URL (same icon as the trailing Copy button, revealed on a surface ground).</p>
+<p style="margin:22px 0 0;font:400 12px/1.6 Inter,system-ui;color:#7f849c;max-width:900px">Large screens: the app stays single-column; content clamps to 640dp and centers, gutters are plain background. Offline-with-local-data is intentionally identical to Home-Idle: no banner, no icon. Sync state lives in Devices/Settings. Swipe-right on a row copies the URL (same icon as the trailing Copy button, revealed on a surface ground).</p>
 </section>
 
 
@@ -429,6 +597,37 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
 
 <div class="wb-fr" id="detail"><div class="wb-lbl"><b>Detail</b>default</div>
 <div class="phone" data-screen-label="Detail">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <i class="ph ph-arrow-left" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1"></span>
+    <i class="ph ph-pencil-simple" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--wb-text-muted)"></i>
+    <i class="ph ph-trash" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--wb-text-muted)"></i>
+  </div>
+  <div style="flex:1;padding:8px 20px 0;display:flex;flex-direction:column;gap:20px">
+    <div style="font:var(--wb-t-title);text-wrap:pretty">Arch Wiki — systemd/Timers</div>
+    <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);word-break:break-all;padding:12px 14px;border-radius:var(--wb-r-md);background:var(--wb-surface);user-select:all">https://wiki.archlinux.org/title/Systemd/Timers#Realtime_timer</div>
+    <div style="font:var(--wb-t-body-lg);color:var(--wb-text);text-wrap:pretty">Timers are systemd unit files whose name ends in .timer that control .service files or events. An alternative to cron with calendar and monotonic time.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">systemd</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">docs</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font:var(--wb-t-label);color:var(--wb-text-faint);padding-top:4px">
+      <div>Saved 14 Mar 2026, 21:07</div>
+      <div>Last changed on <span style="color:var(--wb-text-muted)">gdesktop</span> · 2 days ago</div>
+    </div>
+  </div>
+  <div style="padding:16px 20px 40px;display:flex;gap:8px">
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-arrow-square-out" style="font-size:20px"></i>Open</span>
+    <span style="width:48px;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);display:inline-flex;align-items:center;justify-content:center"><i class="ph ph-copy" style="font-size:22px"></i></span>
+    <span style="width:48px;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);display:inline-flex;align-items:center;justify-content:center"><i class="ph ph-share-network" style="font-size:22px"></i></span>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="detail-light"><div class="wb-lbl"><b>Detail-Light</b>Latte · same tokens, data-theme="light"</div>
+<div class="phone" data-theme="light" data-screen-label="Detail-Light">
   <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
   <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
     <i class="ph ph-arrow-left" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
@@ -527,7 +726,7 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
       <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">kotlin</span>
     </div>
   </div>
-  <div style="padding:8px 16px 8px;display:flex;align-items:center;gap:12px;background:var(--wb-bg)"><span style="font:var(--wb-t-label);color:var(--wb-text-faint);flex:1">Space or comma adds a tag</span><span style="height:40px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Save</span></div>
+  <div style="padding:8px 16px 8px;display:flex;align-items:center;gap:12px;background:var(--wb-bg)"><span style="font:var(--wb-t-label);color:var(--wb-text-faint);flex:1">Comma or Enter adds a tag · spaces are allowed</span><span style="height:40px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Save</span></div>
   <div style="flex:none">{{ keyboard }}</div>
   <div class="gest"></div>
 </div></div>
@@ -590,7 +789,7 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
   <div class="gest"></div>
 </div></div>
 
-<div class="wb-fr" id="form-edit"><div class="wb-lbl"><b>Form-AlreadySaved</b>URL exists → becomes Edit with a banner</div>
+<div class="wb-fr" id="form-edit"><div class="wb-lbl"><b>Form-AlreadySaved</b>URL exists → becomes Edit with a banner · URL is identity, read-only until “Change”</div>
 <div class="phone" data-screen-label="Form-AlreadySaved">
   <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
   <div style="height:56px;display:flex;align-items:center;padding:0 12px 0 4px;gap:4px">
@@ -600,7 +799,7 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
   </div>
   <div style="flex:1;min-height:0;overflow:hidden;padding:4px 16px 0;display:flex;flex-direction:column;gap:12px">
     <div style="padding:10px 14px;border-radius:var(--wb-r-md);background:var(--wb-accent-container);color:var(--wb-text);font:var(--wb-t-body);display:flex;align-items:center;gap:10px"><i class="ph ph-bookmark-simple" style="font-size:18px;color:var(--wb-accent);flex:none"></i><span>Already saved on <b style="font-weight:500">2 Jan 2026</b>, editing it</span></div>
-    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">URL</span><span style="font:var(--wb-t-mono);color:var(--wb-text);word-break:break-all">https://github.com/jarun/buku</span></div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);background:var(--wb-surface);padding:6px 4px 6px 14px;display:flex;align-items:center;gap:8px"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">URL · read-only</span><span style="font:var(--wb-t-mono);color:var(--wb-text-muted);word-break:break-all">https://github.com/jarun/buku</span></div><span style="height:40px;padding:0 12px;border-radius:var(--wb-r-md);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">Change</span></div>
     <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Title</span><span style="font:var(--wb-t-body-lg)">buku — bookmark manager like a text-based mind</span></div>
     <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Description</span><span style="font:var(--wb-t-body)">Personal mini-web, in the terminal. The CLI this app replaces on the phone.</span></div>
     <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px">
@@ -617,9 +816,16 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
       <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">tools</span>
     </div>
   </div>
-  <div style="padding:8px 16px 8px;display:flex;align-items:center;gap:12px"><span style="font:var(--wb-t-label);color:var(--wb-text-faint);flex:1">Space or comma adds a tag</span><span style="height:40px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Save</span></div>
+  <div style="padding:8px 16px 8px;display:flex;align-items:center;gap:12px"><span style="font:var(--wb-t-label);color:var(--wb-text-faint);flex:1">Comma or Enter adds a tag · spaces are allowed</span><span style="height:40px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Save</span></div>
   <div style="flex:none">{{ keyboard }}</div>
   <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="form-change-url"><div class="wb-lbl"><b>Form-ChangeURL</b>inset · after tapping “Change”</div>
+<div data-theme="dark" style="width:412px;padding:16px;background:var(--wb-bg);border-radius:12px;box-shadow:var(--wb-shadow-1);display:flex;flex-direction:column;gap:8px;color:var(--wb-text);font:var(--wb-t-body)">
+  <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-accent)">URL</span><span style="font:var(--wb-t-mono);color:var(--wb-text);word-break:break-all">https://github.com/jarun/buku/wiki<span style="display:inline-block;width:2px;height:18px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span></div>
+  <div style="font:var(--wb-t-label);color:var(--wb-text-muted);margin-left:14px;display:flex;align-items:flex-start;gap:6px;text-wrap:pretty"><i class="ph ph-info" style="font-size:14px;color:var(--wb-accent);margin-top:1px;flex:none"></i>Changing the URL replaces this bookmark; tags and description are kept.</div>
+  <div style="font:var(--wb-t-label);color:var(--wb-text-faint);margin-top:8px">Save writes a tombstone for the old URL and a new record — the CRDT sees delete + create, never an in-place rename.</div>
 </div></div>
 
 </div>
@@ -629,7 +835,7 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
 <div class="wb-h"><h2>4 · Share-sheet receiver</h2><span>bottom sheet over Chrome · tags focused, keyboard up · one tap Save</span></div>
 <div class="wb-grid">
 
-<div class="wb-fr" id="share-fresh"><div class="wb-lbl"><b>Share-Fresh</b>URL + title from the share intent · description fetching</div>
+<div class="wb-fr" id="share-fresh"><div class="wb-lbl"><b>Share-Fresh</b>URL + title from the share intent · description fetching · typing “ui lib” matches “ui library” across the space</div>
 <div class="phone" data-screen-label="Share-Fresh" style="background:var(--wb-bg-lowest)">
   <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
   <div style="flex:1;position:relative;opacity:.5;padding:12px 16px;display:flex;flex-direction:column;gap:10px">
@@ -652,12 +858,89 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
         <span style="font:var(--wb-t-label);color:var(--wb-accent)">Tags</span>
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
           <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">react<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
-          <span style="font:var(--wb-t-body-lg)">ui<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
+          <span style="font:var(--wb-t-body-lg)">ui lib<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
         </div>
       </div>
       <div style="display:flex;gap:8px;overflow:hidden;margin:0 -20px;padding:0 20px">
-        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none"><span style="color:var(--wb-accent);font-weight:600">ui</span><span>&nbsp;library</span></span>
-        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none"><span style="color:var(--wb-accent);font-weight:600">ui</span></span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none"><span style="color:var(--wb-accent);font-weight:600">ui&nbsp;lib</span><span>rary</span></span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">tailwind</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">components</span>
+      </div>
+      <span style="height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:flex;align-items:center;justify-content:center;margin-top:2px">Save</span>
+    </div>
+    {{ keyboard }}
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="share-fresh-light"><div class="wb-lbl"><b>Share-Fresh-Light</b>Latte · same tokens, data-theme="light"</div>
+<div class="phone" data-theme="light" data-screen-label="Share-Fresh-Light" style="background:var(--wb-bg-lowest)">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="flex:1;position:relative;opacity:.5;padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+    <div style="height:40px;border-radius:20px;background:var(--wb-surface);display:flex;align-items:center;padding:0 16px;font:var(--wb-t-mono);color:var(--wb-text-muted)">ui.shadcn.com/docs</div>
+    <div style="height:14px;width:60%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:92%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:85%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:70%;border-radius:4px;background:var(--wb-surface)"></div>
+  </div>
+  <div style="position:absolute;inset:0;background:var(--wb-scrim)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:var(--wb-bg-low);border-radius:var(--wb-r-xl) var(--wb-r-xl) 0 0;box-shadow:var(--wb-shadow-3)">
+    <div style="width:32px;height:4px;border-radius:2px;background:var(--wb-outline);margin:12px auto 8px"></div>
+    <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <div style="font:var(--wb-t-title-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">shadcn/ui — Build your component library</div>
+          <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ui.shadcn.com/docs</div>
+        </div>
+        <span style="height:36px;padding:0 10px;border-radius:var(--wb-r-md);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:4px;flex:none;margin-top:-2px">More<i class="ph ph-caret-up" style="font-size:14px"></i></span>
+      </div>
+      <div style="font:var(--wb-t-label);color:var(--wb-text-faint);display:flex;align-items:center;gap:6px"><i class="ph ph-circle-notch" style="font-size:14px;color:var(--wb-accent)"></i>Fetching description in the background</div>
+      <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px;background:var(--wb-bg)">
+        <span style="font:var(--wb-t-label);color:var(--wb-accent)">Tags</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">react<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+          <span style="font:var(--wb-t-body-lg)">ui lib<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;overflow:hidden;margin:0 -20px;padding:0 20px">
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none"><span style="color:var(--wb-accent);font-weight:600">ui&nbsp;lib</span><span>rary</span></span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">tailwind</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">components</span>
+      </div>
+      <span style="height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:flex;align-items:center;justify-content:center;margin-top:2px">Save</span>
+    </div>
+    {{ keyboard }}
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="share-fresh-130"><div class="wb-lbl"><b>Share-Fresh-130%</b>font scale 1.3 · sheet grows upward · Save stays above the keyboard</div>
+<div class="phone" data-screen-label="Share-Fresh-130" style="--wb-t-display:500 36px/44px var(--wb-font);--wb-t-title:500 26px/34px var(--wb-font);--wb-t-title-sm:500 21px/29px var(--wb-font);--wb-t-body-lg:400 21px/31px var(--wb-font);--wb-t-body:400 18px/26px var(--wb-font);--wb-t-body-md:500 18px/26px var(--wb-font);--wb-t-label:400 15.5px/21px var(--wb-font);--wb-t-label-md:500 15.5px/21px var(--wb-font);--wb-t-mono:400 17px/23px var(--wb-mono);background:var(--wb-bg-lowest)">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="flex:1;position:relative;opacity:.5;padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+    <div style="height:40px;border-radius:20px;background:var(--wb-surface);display:flex;align-items:center;padding:0 16px;font:var(--wb-t-mono);color:var(--wb-text-muted)">ui.shadcn.com/docs</div>
+    <div style="height:14px;width:60%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:92%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:85%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:70%;border-radius:4px;background:var(--wb-surface)"></div>
+  </div>
+  <div style="position:absolute;inset:0;background:var(--wb-scrim)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:var(--wb-bg-low);border-radius:var(--wb-r-xl) var(--wb-r-xl) 0 0;box-shadow:var(--wb-shadow-3)">
+    <div style="width:32px;height:4px;border-radius:2px;background:var(--wb-outline);margin:12px auto 8px"></div>
+    <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <div style="font:var(--wb-t-title-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">shadcn/ui — Build your component library</div>
+          <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ui.shadcn.com/docs</div>
+        </div>
+        <span style="height:36px;padding:0 10px;border-radius:var(--wb-r-md);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:4px;flex:none;margin-top:-2px">More<i class="ph ph-caret-up" style="font-size:14px"></i></span>
+      </div>
+      <div style="font:var(--wb-t-label);color:var(--wb-text-faint);display:flex;align-items:center;gap:6px"><i class="ph ph-circle-notch" style="font-size:14px;color:var(--wb-accent)"></i>Fetching description in the background</div>
+      <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px;background:var(--wb-bg)">
+        <span style="font:var(--wb-t-label);color:var(--wb-accent)">Tags</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">react<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+          <span style="font:var(--wb-t-body-lg)">ui lib<span style="display:inline-block;width:2px;height:26px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;overflow:hidden;margin:0 -20px;padding:0 20px">
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none"><span style="color:var(--wb-accent);font-weight:600">ui&nbsp;lib</span><span>rary</span></span>
         <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">tailwind</span>
         <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
         <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">components</span>
@@ -787,14 +1070,53 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
   <div class="gest"></div>
 </div></div>
 
-<div class="wb-fr" id="share-saved-toast"><div class="wb-lbl"><b>Share-Saved</b>sheet gone · 1.5 s toast over Chrome, then nothing</div>
+<div class="wb-fr" id="share-saved-toast"><div class="wb-lbl"><b>Share-Saved</b>sheet gone · stock Android text toast (12+: text only, no icon, no custom colors)</div>
 <div class="phone" data-screen-label="Share-Saved" style="background:var(--wb-bg-lowest)">
   <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
   <div style="flex:1;position:relative;opacity:.5;padding:12px 16px;display:flex;flex-direction:column;gap:10px">
     <div style="height:40px;border-radius:20px;background:var(--wb-surface);display:flex;align-items:center;padding:0 16px;font:var(--wb-t-mono);color:var(--wb-text-muted)">ui.shadcn.com/docs</div>
     <div style="height:14px;width:60%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:92%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:85%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:70%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:88%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:64%;border-radius:4px;background:var(--wb-surface)"></div>
   </div>
-  <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:72px;height:44px;padding:0 20px;border-radius:var(--wb-r-full);background:var(--wb-inverse-surface);color:var(--wb-inverse-text);display:flex;align-items:center;gap:10px;font:var(--wb-t-body-md);box-shadow:var(--wb-shadow-2);white-space:nowrap"><i class="ph ph-check" style="font-size:18px"></i>Saved to wobook · react, ui library</div>
+  <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:72px;height:48px;padding:0 24px;border-radius:var(--wb-r-full);background:var(--wb-surface-high);color:var(--wb-text);display:flex;align-items:center;font:var(--wb-t-body);box-shadow:var(--wb-shadow-2);white-space:nowrap">Saved to wobook · react, ui library</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="share-saved-inline"><div class="wb-lbl"><b>Share-SavedInline</b>fallback when a system toast isn’t available · 600 ms in the sheet, then dismiss</div>
+<div class="phone" data-screen-label="Share-SavedInline" style="background:var(--wb-bg-lowest)">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="flex:1;position:relative;opacity:.5;padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+    <div style="height:40px;border-radius:20px;background:var(--wb-surface);display:flex;align-items:center;padding:0 16px;font:var(--wb-t-mono);color:var(--wb-text-muted)">ui.shadcn.com/docs</div>
+    <div style="height:14px;width:60%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:92%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:85%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:70%;border-radius:4px;background:var(--wb-surface)"></div>
+  </div>
+  <div style="position:absolute;inset:0;background:var(--wb-scrim)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:var(--wb-bg-low);border-radius:var(--wb-r-xl) var(--wb-r-xl) 0 0;box-shadow:var(--wb-shadow-3)">
+    <div style="width:32px;height:4px;border-radius:2px;background:var(--wb-outline);margin:12px auto 8px"></div>
+    <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <div style="font:var(--wb-t-title-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">shadcn/ui — Build your component library</div>
+          <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ui.shadcn.com/docs</div>
+        </div>
+        <span style="height:36px;padding:0 10px;border-radius:var(--wb-r-md);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:4px;flex:none;margin-top:-2px">More<i class="ph ph-caret-up" style="font-size:14px"></i></span>
+      </div>
+      <div style="font:var(--wb-t-label);color:var(--wb-text-faint);display:flex;align-items:center;gap:6px"><i class="ph ph-check" style="font-size:14px;color:var(--wb-success)"></i>Description fetched</div>
+      <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px;background:var(--wb-bg)">
+        <span style="font:var(--wb-t-label);color:var(--wb-accent)">Tags</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">react<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+          <span style="font:var(--wb-t-body-lg)"></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;overflow:hidden;margin:0 -20px;padding:0 20px">
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none"><span style="color:var(--wb-accent);font-weight:600">ui&nbsp;lib</span><span>rary</span></span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">tailwind</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">components</span>
+      </div>
+      <span style="height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-success);color:var(--wb-success);font:var(--wb-t-body-md);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:2px"><i class="ph ph-check" style="font-size:20px"></i>Saved</span>
+    </div>
+    {{ keyboard }}
+  </div>
   <div class="gest"></div>
 </div></div>
 
@@ -821,7 +1143,7 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
       <span style="position:absolute;left:0;bottom:0;width:36px;height:36px;border-left:3px solid var(--wb-accent);border-bottom:3px solid var(--wb-accent);border-radius:0 0 0 8px"></span>
       <span style="position:absolute;right:0;bottom:0;width:36px;height:36px;border-right:3px solid var(--wb-accent);border-bottom:3px solid var(--wb-accent);border-radius:0 0 8px 0"></span>
     </div>
-    <div style="font:var(--wb-t-body);color:var(--wb-text-muted);text-align:center;max-width:280px">On the other device open Devices → Show my QR</div>
+    <div style="font:var(--wb-t-body);color:var(--wb-text-muted);text-align:center;max-width:320px;text-wrap:pretty">On a desktop run <code style="font:var(--wb-t-mono);color:var(--wb-text);background:var(--wb-surface);padding:1px 6px;border-radius:4px">wobook pair</code>. On a phone open Devices → Show my QR.</div>
   </div>
   <div style="position:relative;padding:0 20px 44px;display:flex;flex-direction:column;gap:8px">
     <span style="height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-clipboard-text" style="font-size:20px"></i>Paste code instead</span>
@@ -883,7 +1205,31 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
     </div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <div style="font:var(--wb-t-label-md);color:var(--wb-text-muted);text-transform:uppercase;letter-spacing:.06em">Fingerprint</div>
-      <div style="font:500 20px/30px var(--wb-mono);letter-spacing:.05em;display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;padding:16px 18px;border-radius:var(--wb-r-md);background:var(--wb-surface)"><span>3fa1c9d2</span><span>77be0041</span><span>9e2c5a10</span><span>b4d7f6e3</span></div>
+      <div style="font:500 18px/26px var(--wb-mono);letter-spacing:.04em;display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;padding:16px 18px;border-radius:var(--wb-r-md);background:var(--wb-surface)"><span>3fa1c9d2</span><span>77be0041</span><span>9e2c5a10</span><span>b4d7f6e3</span></div>
+      <div style="font:var(--wb-t-body);color:var(--wb-text-muted);text-wrap:pretty">gdesktop shows the same four groups. If they differ, someone on the network is in the middle — reject.</div>
+    </div>
+  </div>
+  <div style="padding:16px 20px 44px;display:flex;gap:8px">
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center">Reject</span>
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-shield-check" style="font-size:20px"></i>Trust</span>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="pair-confirm-light"><div class="wb-lbl"><b>Pair-Confirm-Light</b>Latte · same tokens, data-theme="light"</div>
+<div class="phone" data-theme="light" data-screen-label="Pair-Confirm-Light">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <span style="width:48px"></span><span style="flex:1;font:var(--wb-t-title-sm)">Confirm device</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;padding:24px 20px 0;gap:24px">
+    <div style="display:flex;align-items:center;gap:14px">
+      <span style="width:48px;height:48px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:26px;color:var(--wb-text-muted)"></i></span>
+      <div style="display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-title)">gdesktop</div><div style="font:var(--wb-t-body);color:var(--wb-text-muted)">Linux · wants to pair</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:var(--wb-t-label-md);color:var(--wb-text-muted);text-transform:uppercase;letter-spacing:.06em">Fingerprint</div>
+      <div style="font:500 18px/26px var(--wb-mono);letter-spacing:.04em;display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;padding:16px 18px;border-radius:var(--wb-r-md);background:var(--wb-surface)"><span>3fa1c9d2</span><span>77be0041</span><span>9e2c5a10</span><span>b4d7f6e3</span></div>
       <div style="font:var(--wb-t-body);color:var(--wb-text-muted);text-wrap:pretty">gdesktop shows the same four groups. If they differ, someone on the network is in the middle — reject.</div>
     </div>
   </div>
@@ -903,6 +1249,11 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
   </div>
   <div style="height:2px;margin:-2px 16px 0;border-radius:1px;background:var(--wb-surface);overflow:hidden;position:relative">{{ syncBar }}</div>
   <div style="flex:1;display:flex;flex-direction:column;padding-top:8px">
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-device-mobile" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">pixel-8</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted)">This device · Android</div></div>
+    </div>
+    <div style="height:1px;background:var(--wb-outline-variant);margin:0 16px 4px"></div>
     <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--wb-accent-container)">
       <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">gdesktop</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-tailscale)"></span>Tailscale · syncing 1,284 bookmarks…</div></div>
@@ -986,7 +1337,7 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
 <div class="wb-h"><h2>6 · Devices</h2><span>paired peers · reachability dot · revoke is the only confirmation dialog in the app</span></div>
 <div class="wb-grid">
 
-<div class="wb-fr" id="devices"><div class="wb-lbl"><b>Devices</b>list · footer “Up to date”</div>
+<div class="wb-fr" id="devices"><div class="wb-lbl"><b>Devices</b>this device first (no menu) · peers · footer = sync status only</div>
 <div class="phone" data-screen-label="Devices">
   <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
   <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
@@ -994,6 +1345,11 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
     <span style="flex:1;font:var(--wb-t-title-sm)">Devices</span>
   </div>
   <div style="flex:1;display:flex;flex-direction:column;padding-top:8px">
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-device-mobile" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">pixel-8</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted)">This device · Android</div></div>
+    </div>
+    <div style="height:1px;background:var(--wb-outline-variant);margin:0 16px 4px"></div>
     <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
       <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">gdesktop</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-tailscale)"></span>Tailscale · synced 2 min ago</div></div>
@@ -1014,7 +1370,7 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
     <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-scan" style="font-size:20px"></i>Scan QR</span>
     <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-qr-code" style="font-size:20px"></i>Show my QR</span>
   </div>
-  <div style="padding:0 16px 40px;font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:8px"><i class="ph ph-check-circle" style="font-size:16px;color:var(--wb-success)"></i>Up to date · this device is <span style="color:var(--wb-text)">pixel-8</span></div>
+  <div style="padding:0 16px 40px;font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:8px"><i class="ph ph-check-circle" style="font-size:16px;color:var(--wb-success)"></i>Up to date</div>
   <div class="gest"></div>
 </div></div>
 
@@ -1026,6 +1382,11 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
     <span style="flex:1;font:var(--wb-t-title-sm)">Devices</span>
   </div>
   <div style="flex:1;display:flex;flex-direction:column;padding-top:8px;position:relative">
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-device-mobile" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">pixel-8</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted)">This device · Android</div></div>
+    </div>
+    <div style="height:1px;background:var(--wb-outline-variant);margin:0 16px 4px"></div>
     <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
       <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">gdesktop</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-outline)"></span>Unreachable · synced 3 h ago</div></div>
@@ -1041,7 +1402,7 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">old-pixel</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-outline)"></span>Unreachable · synced 11 days ago</div></div>
       <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
     </div>
-    <div style="position:absolute;right:16px;top:176px;width:200px;padding:8px 0;border-radius:var(--wb-r-md);background:var(--wb-bg-low);box-shadow:var(--wb-shadow-3)">
+    <div style="position:absolute;right:16px;top:253px;width:200px;padding:8px 0;border-radius:var(--wb-r-md);background:var(--wb-bg-low);box-shadow:var(--wb-shadow-3)">
       <div style="height:48px;display:flex;align-items:center;gap:12px;padding:0 16px;font:var(--wb-t-body)"><i class="ph ph-pencil-simple" style="font-size:20px;color:var(--wb-text-muted)"></i>Rename</div>
       <div style="height:48px;display:flex;align-items:center;gap:12px;padding:0 16px;font:var(--wb-t-body);color:var(--wb-error)"><i class="ph ph-link-break" style="font-size:20px"></i>Revoke…</div>
     </div>
@@ -1062,6 +1423,11 @@ a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
     <span style="flex:1;font:var(--wb-t-title-sm)">Devices</span>
   </div>
   <div style="flex:1;display:flex;flex-direction:column;padding-top:8px">
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-device-mobile" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">pixel-8</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted)">This device · Android</div></div>
+    </div>
+    <div style="height:1px;background:var(--wb-outline-variant);margin:0 16px 4px"></div>
     <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
       <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">gdesktop</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-tailscale)"></span>Tailscale · synced 2 min ago</div></div>
@@ -1225,6 +1591,7 @@ class Component extends DCLogic {
     return {
       recent,
       recentAfterDelete: recent.slice(1),
+      recentTablet: recent.concat(recent),
       keyboard: this.keyboard(),
       syncBar: this.syncBar(),
       shimmer: this.shimmer('70%'),
