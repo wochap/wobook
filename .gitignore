@@ -10,3 +10,8 @@ RTK.md
 .thumbnail
 target/
 result
+
+design/**/*.webp
+design/**/*.png
+design/**/*.jpg
+.thumbnail

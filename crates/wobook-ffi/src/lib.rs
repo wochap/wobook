@@ -68,9 +68,9 @@ fn from_response(code: ErrorCode, reason: String) -> WobookError {
         ErrorCode::UnknownDevice | ErrorCode::DeviceRevoked => {
             WobookError::UnknownDevice { reason }
         }
-        ErrorCode::PairWindowClosed | ErrorCode::PairRateLimited | ErrorCode::PairPendingMissing => {
-            WobookError::Pairing { reason }
-        }
+        ErrorCode::PairWindowClosed
+        | ErrorCode::PairRateLimited
+        | ErrorCode::PairPendingMissing => WobookError::Pairing { reason },
         _ => WobookError::Internal { reason },
     }
 }
@@ -290,13 +290,33 @@ pub struct PairingConfirmation {
 
 #[derive(Debug, Clone, uniffi::Enum)]
 pub enum PairingEvent {
-    Connecting { session: String, peer: String, via: String, address: String },
-    ConfirmRequired { confirmation: PairingConfirmation },
-    Completed { session: String, device: Device },
-    Expired { session: String },
-    Rejected { session: String },
-    Unreachable { session: String, tried: Vec<String> },
-    Failed { session: String, message: String },
+    Connecting {
+        session: String,
+        peer: String,
+        via: String,
+        address: String,
+    },
+    ConfirmRequired {
+        confirmation: PairingConfirmation,
+    },
+    Completed {
+        session: String,
+        device: Device,
+    },
+    Expired {
+        session: String,
+    },
+    Rejected {
+        session: String,
+    },
+    Unreachable {
+        session: String,
+        tried: Vec<String>,
+    },
+    Failed {
+        session: String,
+        message: String,
+    },
 }
 
 // ---------------------------------------------------------------------------
@@ -363,7 +383,10 @@ impl WobookApp {
     /// Blocking dispatch for fast read-model queries.
     fn call_blocking(&self, request: Request) -> Result<Value, WobookError> {
         let daemon = self.daemon()?;
-        unwrap(self.rt.block_on(async move { daemon.handle(request).await }))
+        unwrap(
+            self.rt
+                .block_on(async move { daemon.handle(request).await }),
+        )
     }
 
     fn sync_status_now(&self) -> Result<SyncStatus, WobookError> {
@@ -419,17 +442,15 @@ impl WobookApp {
             socket: PathBuf::new(),
             hooks_dir: data_dir.join("hooks"),
         };
-        let daemon = rt
-            .block_on(wobookd::open(options, &adapter))
-            .map_err(|e| {
-                if adapter.corrupt() || is_identity_lost(&e) {
-                    WobookError::IdentityLost {
-                        reason: format!("{e:#}"),
-                    }
-                } else {
-                    WobookError::internal(format!("{e:#}"))
+        let daemon = rt.block_on(wobookd::open(options, &adapter)).map_err(|e| {
+            if adapter.corrupt() || is_identity_lost(&e) {
+                WobookError::IdentityLost {
+                    reason: format!("{e:#}"),
                 }
-            })?;
+            } else {
+                WobookError::internal(format!("{e:#}"))
+            }
+        })?;
         if !config.device_name.trim().is_empty()
             && daemon.sync.device_name() != config.device_name.trim()
         {
@@ -699,7 +720,8 @@ impl WobookApp {
     pub fn set_foreground(&self, foreground: bool) -> Result<(), WobookError> {
         let daemon = self.daemon()?;
         let sync = daemon.sync.clone();
-        self.rt.block_on(async move { sync.set_network(foreground) });
+        self.rt
+            .block_on(async move { sync.set_network(foreground) });
         let status = self.sync_status_now()?;
         self.listener.on_sync_status(status);
         Ok(())
@@ -721,11 +743,9 @@ impl WobookApp {
     /// Validates a scanned or pasted payload and starts the joiner side.
     /// Returns the session id; progress arrives as `PairingEvent`s.
     pub fn join_pairing(&self, payload_json: String) -> Result<String, WobookError> {
-        let payload: wobook_sync::pairing::QrPayload =
-            serde_json::from_str(payload_json.trim()).map_err(|e| {
-                WobookError::InvalidRequest {
-                    reason: format!("not a pairing code: {e}"),
-                }
+        let payload: wobook_sync::pairing::QrPayload = serde_json::from_str(payload_json.trim())
+            .map_err(|e| WobookError::InvalidRequest {
+                reason: format!("not a pairing code: {e}"),
             })?;
         let now_s = wobook_core::now_ms() / 1000;
         let valid = payload

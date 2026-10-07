@@ -145,7 +145,10 @@ pub fn sync_status(status: &Value, paused: bool) -> SyncStatus {
         .as_array()
         .map(|a| a.iter().filter(|p| p["revoked"] != true).collect())
         .unwrap_or_default();
-    let last_sync_ms = peers.iter().filter_map(|p| p["last_sync_ms"].as_i64()).max();
+    let last_sync_ms = peers
+        .iter()
+        .filter_map(|p| p["last_sync_ms"].as_i64())
+        .max();
     let state = if paused {
         SyncState::Disabled
     } else if let Some(p) = peers.iter().find(|p| p["in_progress"] == true) {
@@ -185,7 +188,10 @@ mod tests {
     #[test]
     fn display_url_strips_scheme_and_www() {
         assert_eq!(display_url("https://www.example.com/"), "example.com");
-        assert_eq!(display_url("https://ui.shadcn.com/docs/"), "ui.shadcn.com/docs/");
+        assert_eq!(
+            display_url("https://ui.shadcn.com/docs/"),
+            "ui.shadcn.com/docs/"
+        );
         assert_eq!(display_url("http://a.b/c?d=1"), "a.b/c?d=1");
     }
 }

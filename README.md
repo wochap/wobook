@@ -128,3 +128,79 @@ manually.
 `contrib/wobook-fzf.sh` replaces `buku-fzf`: `--select` copies a URL with
 `wl-copy`, `--open` runs `xdg-open`, `--add` opens an empty editor template,
 `--edit` loops over edits.
+
+## Install with Nix
+
+The flake exposes `packages.x86_64-linux.{wobook,wobookd,wobook-fzf,extension-firefox,extension-chromium}`
+(`default` is `wobook`), `overlays.default` (adds `wobook`, `wobookd`, `wobook-fzf`) and
+`homeManagerModules.wobook`.
+
+```sh
+nix run github:wochap/wobook -- --version
+nix build github:wochap/wobook#wobookd
+```
+
+```nix
+# flake.nix
+inputs.wobook.url = "github:wochap/wobook";
+inputs.wobook.inputs.nixpkgs.follows = "nixpkgs";
+inputs.wobook.inputs.home-manager.follows = "home-manager"; # only used by checks
+
+# home-manager config
+imports = [ inputs.wobook.homeManagerModules.wobook ];
+programs.wobook = {
+  enable = true;
+  fzf.enable = true;
+  deviceName = "gdesktop";
+  hooks."pre-add.strip-utm" = "${inputs.wobook}/contrib/hooks/pre-add.strip-utm";
+  browsers = {
+    firefox.enable = true;
+    brave.enable = true;
+    chromiumExtensionIds = [ "<id from chrome://extensions>" ];
+  };
+};
+```
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `enable` | `false` | install `wobook` (and `wobook-native-host`) |
+| `package` / `daemonPackage` | flake packages | override the CLI / daemon |
+| `deviceName` | `null` | `WOBOOK_DEVICE_NAME` for the service and session |
+| `dataDir` | `null` | `WOBOOK_DATA_DIR` for the service and session |
+| `daemon.enable` | `true` | `wobookd` systemd user service, `WantedBy=default.target` |
+| `daemon.extraArgs` | `[]` | extra `wobookd` arguments |
+| `hooks` | `{}` | name -> text or path, installed executable in `~/.config/wobook/hooks/` |
+| `fzf.enable` | `false` | install `wobook-fzf` (bundles fzf, wl-clipboard, xdg-utils) |
+| `shellCompletions.enable` | `true` | zsh/fish/bash completions; `false` installs `bin/` only |
+| `browsers.{firefox,googleChrome,brave}.enable` | `false` | native messaging host manifest `dev.wochap.wobook.json` |
+| `browsers.firefoxExtensionId` | `wobook@wochap.dev` | Firefox `allowed_extensions` |
+| `browsers.chromiumExtensionIds` | `[]` | Chromium `allowed_origins`; required when a Chromium browser is enabled |
+| `browsers.extraChromiumDirs` | `[]` | extra dirs under `~/.config` (e.g. `chromium`) |
+
+Overlay: `import nixpkgs { overlays = [ inputs.wobook.overlays.default ]; }` gives `pkgs.wobook`.
+
+Extension bundles are unsigned. `nix build .#extension-firefox` produces
+`result/wobook-<version>.xpi`; load it from `about:debugging` → This Firefox → Load Temporary
+Add-on (permanent install needs Developer Edition/Nightly with
+`xpinstall.signatures.required = false`). `nix build .#extension-chromium` produces an unpacked
+directory for `chrome://extensions` → Developer mode → Load unpacked; copy the shown id into
+`browsers.chromiumExtensionIds`.
+
+`nix flake check` runs fmt, clippy (`-D warnings`), the test suite and a home-manager evaluation
+of the module.
+
+## Migrate from buku
+
+1. Add the `wobook` flake input and the module (see `contrib/nix-config/wobook/default.nix`
+   for a `_custom.programs.wobook` wrapper in the buku module shape).
+2. On one host set `_custom.programs.wobook.enable = true;`, rebuild, check
+   `systemctl --user status wobookd`.
+3. `wobook import ~/Sync/.config/buku/bookmarks.db`; compare `wobook list | wc -l` with buku's count.
+4. In the kitty launcher `tui-bookmarks.sh` swap `buku-fzf {}` for `wobook-fzf {}`.
+5. Set `_custom.programs.buku.enable = false;` on that host. The buku DB is untouched, so
+   re-enabling buku rolls back.
+6. On every other host: enable wobook, `wobook pair`, then disable buku.
+
+Hooks that call `notify-send` run under the `wobookd` user service, which inherits the user
+D-Bus (`DBUS_SESSION_BUS_ADDRESS`) from systemd; if notifications do not show, run
+`systemctl --user import-environment DBUS_SESSION_BUS_ADDRESS` from your session startup.

@@ -134,7 +134,10 @@ fn smoke() {
     assert_eq!(payload["v"], 1);
     assert!(payload["ep"].as_array().is_some_and(|e| !e.is_empty()));
     let ahead = offer.expires_at_ms - wobook_core::now_ms();
-    assert!((100_000..=121_000).contains(&ahead), "expires in {ahead} ms");
+    assert!(
+        (100_000..=121_000).contains(&ahead),
+        "expires in {ahead} ms"
+    );
     assert!(matches!(
         app.join_pairing("hello".into()),
         Err(WobookError::InvalidRequest { .. })

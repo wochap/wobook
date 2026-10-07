@@ -96,7 +96,8 @@ pub fn spawn(
         rt.spawn(async move {
             let mut last: Option<SyncStatus> = None;
             while !state.stopped() {
-                let status = convert::sync_status(&daemon.sync.sync_status(), daemon.sync.is_paused());
+                let status =
+                    convert::sync_status(&daemon.sync.sync_status(), daemon.sync.is_paused());
                 if last.as_ref() != Some(&status) {
                     if tx.send(Event::Status(status.clone())).is_err() {
                         break;
@@ -120,10 +121,10 @@ pub fn spawn(
                     }
                     seen.insert(p.session.clone(), key);
                     let value = serde_json::to_value(&p).unwrap_or(Value::Null);
-                    if let Some(event) = pairing_event(&daemon, &state, &value) {
-                        if tx.send(Event::Pairing(event)).is_err() {
-                            return;
-                        }
+                    if let Some(event) = pairing_event(&daemon, &state, &value)
+                        && tx.send(Event::Pairing(event)).is_err()
+                    {
+                        return;
                     }
                 }
             }

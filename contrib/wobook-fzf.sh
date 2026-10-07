@@ -7,21 +7,21 @@ pick() {
     cut -f 1
 }
 
-if [[ "$1" == "--select" ]]; then
+if [[ "${1:-}" == "--select" ]]; then
   selected=$(pick)
 
   if [[ -n "$selected" ]]; then
     echo -n "$selected" | wl-copy --trim-newline
   fi
-elif [[ "$1" == "--open" ]]; then
+elif [[ "${1:-}" == "--open" ]]; then
   selected=$(pick)
 
   if [[ -n "$selected" ]]; then
     xdg-open "$selected" >/dev/null 2>&1
   fi
-elif [[ "$1" == "--add" ]]; then
+elif [[ "${1:-}" == "--add" ]]; then
   wobook edit --new
-elif [[ "$1" == "--edit" ]]; then
+elif [[ "${1:-}" == "--edit" ]]; then
   while true; do
     selected=$(pick)
 

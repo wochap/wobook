@@ -49,8 +49,6 @@ impl SyncKeyStore for KeyStoreAdapter {
             .map_err(|e| self.map(e))
     }
     fn remove(&self, kind: &str) -> Result<(), IdentityError> {
-        self.inner
-            .remove(kind.to_string())
-            .map_err(|e| self.map(e))
+        self.inner.remove(kind.to_string()).map_err(|e| self.map(e))
     }
 }

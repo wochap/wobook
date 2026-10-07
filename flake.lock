@@ -1,5 +1,40 @@
 {
   "nodes": {
+    "crane": {
+      "locked": {
+        "lastModified": 1790899423,
+        "narHash": "sha256-THGtz65UGJU+sonZidRboyCMk+9DclpMF7pwL4uDV4M=",
+        "owner": "ipetkov",
+        "repo": "crane",
+        "rev": "47b6b27ed9a3a9181415e4367d0c30ab2a0e0250",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ipetkov",
+        "repo": "crane",
+        "type": "github"
+      }
+    },
+    "home-manager": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791306979,
+        "narHash": "sha256-KuLePuhwJM9NLt/gTLHzXaOoSZKGoB3m7NfXjiQ98HY=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "fae6e9e42c3b762ab47635cddcfaf6f52374a61b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1783389287,
@@ -18,6 +53,8 @@
     },
     "root": {
       "inputs": {
+        "crane": "crane",
+        "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "rust-overlay": "rust-overlay"
       }

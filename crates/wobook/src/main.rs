@@ -26,7 +26,7 @@ use crate::{
 };
 
 #[derive(Parser, Debug)]
-#[command(name = "wobook", version, about = "Local-first bookmarks")]
+#[command(name = "wobook", version = env!("WOBOOK_VERSION"), about = "Local-first bookmarks")]
 struct Cli {
     /// Daemon socket (default: $WOBOOK_SOCKET or $XDG_RUNTIME_DIR/wobook/wobookd.sock).
     #[arg(long, global = true)]

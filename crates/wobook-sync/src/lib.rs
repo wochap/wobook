@@ -234,7 +234,8 @@ impl SyncEngine {
                 d.shutdown();
             }
             for device in self.transport.connected() {
-                self.transport.close_device(device, transport::CLOSE_SHUTDOWN);
+                self.transport
+                    .close_device(device, transport::CLOSE_SHUTDOWN);
             }
         }
     }

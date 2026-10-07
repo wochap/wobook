@@ -154,7 +154,10 @@ fn proxies_frames_to_the_daemon() {
     let log = d.root.path().join("origin.txt");
     std::fs::write(
         d.root.path().join("hooks/post-add.origin"),
-        format!("#!/bin/sh\nprintf '%s' \"$WOBOOK_ORIGIN\" > '{}'\n", log.display()),
+        format!(
+            "#!/bin/sh\nprintf '%s' \"$WOBOOK_ORIGIN\" > '{}'\n",
+            log.display()
+        ),
     )
     .unwrap();
     let mut host = Host::spawn(&d.socket);
@@ -187,8 +190,7 @@ fn proxies_frames_to_the_daemon() {
 
     let hits = host.call(json!({"type":"search","query":"shcn ui","limit":50}));
     assert_eq!(
-        hits["result"][0]["bookmark"]["url"],
-        "https://ui.shadcn.com/docs",
+        hits["result"][0]["bookmark"]["url"], "https://ui.shadcn.com/docs",
         "{hits}"
     );
 
@@ -202,7 +204,10 @@ fn proxies_frames_to_the_daemon() {
 
     host.send_raw(b"{not json");
     assert_eq!(host.recv()["error"]["code"], "invalid_request");
-    assert_eq!(host.call(json!({"type":"nope"}))["error"]["code"], "invalid_request");
+    assert_eq!(
+        host.call(json!({"type":"nope"}))["error"]["code"],
+        "invalid_request"
+    );
 
     d.stop();
     let down = host.call(json!({"type":"get","url":"https://ui.shadcn.com/docs"}));

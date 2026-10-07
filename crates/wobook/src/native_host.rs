@@ -114,7 +114,10 @@ fn handle(socket: &Path, body: &[u8]) -> String {
         Err(e) => return Response::err_json(ErrorCode::InvalidRequest, e.to_string()),
     };
     if let Some(obj) = value.as_object_mut()
-        && matches!(obj.get("type").and_then(Value::as_str), Some("add" | "update"))
+        && matches!(
+            obj.get("type").and_then(Value::as_str),
+            Some("add" | "update")
+        )
         && !obj.contains_key("origin")
     {
         obj.insert("origin".into(), json!("extension"));

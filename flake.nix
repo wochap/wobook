@@ -6,11 +6,23 @@
     url = "github:oxalica/rust-overlay";
     inputs.nixpkgs.follows = "nixpkgs";
   };
+  inputs.crane.url = "github:ipetkov/crane";
+  inputs.home-manager = {
+    url = "github:nix-community/home-manager";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
-  outputs = { self, nixpkgs, rust-overlay }:
+  outputs = { self, nixpkgs, rust-overlay, crane, home-manager }:
     let
+      systems = [ "x86_64-linux" ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
+
+      wobookPackages = pkgs: rust:
+        pkgs.lib.filterAttrs (_: pkgs.lib.isDerivation)
+          (pkgs.callPackage ./nix/package.nix { inherit rust; });
+      rustFor = pkgs: import ./nix/rust.nix { inherit pkgs crane self; };
 
       androidPkgs = import nixpkgs {
         inherit system;
@@ -50,6 +62,28 @@
           GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${sdkRoot}/build-tools/${androidBuildTools}/aapt2";
         };
     in {
+      packages = forAllSystems (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          rust = rustFor pkgs;
+          rustPkgs = wobookPackages pkgs rust;
+        in rustPkgs // import ./nix/extension.nix { inherit (pkgs) lib runCommand esbuild jq zip; } // {
+          default = rustPkgs.wobook;
+        });
+
+      overlays.default = final: prev:
+        wobookPackages final (rustFor final);
+
+      homeManagerModules.wobook = import ./nix/hm-module.nix { inherit self; };
+      homeManagerModules.default = self.homeManagerModules.wobook;
+
+      checks = forAllSystems (system:
+        import ./nix/checks.nix {
+          inherit self home-manager;
+          pkgs = nixpkgs.legacyPackages.${system};
+          rust = rustFor nixpkgs.legacyPackages.${system};
+        });
+
       devShells.${system} = {
         default = pkgs.mkShell {
           packages = with pkgs; [ cargo clippy rustc rustfmt pkg-config sqlite fzf shellcheck jq nodejs pnpm web-ext ];
