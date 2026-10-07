@@ -1,0 +1,23 @@
+# Fuzzy search an abbreviation, check the top hit, open it in the browser.
+appId: dev.wochap.wobook
+---
+- launchApp
+- extendedWaitUntil:
+    visible: { id: "search-field" }
+    timeout: 10000
+# Library arrives from the fixture after pairing.
+- extendedWaitUntil:
+    visible: "Arch Wiki — systemd/Timers"
+    timeout: 30000
+- tapOn: { id: "search-field" }
+- inputText: "shcn ui"
+- extendedWaitUntil:
+    visible: { id: "home-results" }
+    timeout: 5000
+- assertVisible: { id: "row-ui.shadcn.com" }
+- assertVisible:
+    id: "result-count"
+- tapOn: "ui.shadcn.com"
+- assertVisible: { id: "detail" }
+- tapOn: { id: "detail-open" }
+- assertNotVisible: { id: "detail" }

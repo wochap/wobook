@@ -93,10 +93,23 @@ pub fn system_interfaces() -> Vec<InterfaceAddr> {
 }
 
 /// `WOBOOK_SYNC_LOOPBACK=1` advertises 127.0.0.1 too.
+/// `WOBOOK_SYNC_ADVERTISE=ip:port,...` puts extra addresses first (e.g.
+/// `10.0.2.2:<port>` for an Android emulator reaching the host).
 #[must_use]
 pub fn current_hints(port: u16) -> Vec<SocketAddr> {
     let loopback = std::env::var("WOBOOK_SYNC_LOOPBACK").is_ok_and(|v| v == "1");
-    endpoint_hints(&system_interfaces(), port, loopback)
+    let mut hints: Vec<SocketAddr> = std::env::var("WOBOOK_SYNC_ADVERTISE")
+        .unwrap_or_default()
+        .split(',')
+        .filter_map(|a| a.trim().parse().ok())
+        .collect();
+    for addr in endpoint_hints(&system_interfaces(), port, loopback) {
+        if !hints.contains(&addr) {
+            hints.push(addr);
+        }
+    }
+    hints.truncate(16);
+    hints
 }
 
 /// Jittered exponential backoff: 1 s doubling to 30 s.

@@ -1,0 +1,19 @@
+# e2e.sh already sent ACTION_SEND for https://react.dev/learn.
+# Type a multi-word tag, save, and find it on Home.
+appId: dev.wochap.wobook
+---
+- extendedWaitUntil:
+    visible: { id: "share-save" }
+    timeout: 20000
+- assertVisible: { id: "share-url" }
+- tapOn: { id: "tag-input" }
+- inputText: "ui library,"
+- assertVisible: { id: "editor-chip-ui library" }
+- inputText: "react,"
+- tapOn: { id: "share-save" }
+- assertNotVisible: { id: "share-sheet" }
+- launchApp
+- extendedWaitUntil:
+    visible: "react.dev/learn"
+    timeout: 10000
+- assertVisible: { id: "chip-ui library" }

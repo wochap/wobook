@@ -37,6 +37,8 @@ pub struct Daemon {
     pub started: Instant,
     pub post: mpsc::UnboundedSender<PostJob>,
     pub shutdown: Notify,
+    /// Bumped whenever the read model is rebuilt (local or remote change).
+    pub changes: tokio::sync::watch::Sender<u64>,
 }
 
 pub struct Failure(pub ErrorCode, pub String);
@@ -103,7 +105,9 @@ impl Daemon {
             .lock()
             .map_err(internal)?
             .rebuild(&all, &heads)
-            .map_err(internal)
+            .map_err(internal)?;
+        self.changes.send_modify(|n| *n = n.wrapping_add(1));
+        Ok(())
     }
 
     async fn read(&self, url: &str) -> Result<Option<Bookmark>> {

@@ -1,0 +1,7 @@
+# e2e.sh added https://conv.example/ on the fixture; it must reach Home in 30 s.
+appId: dev.wochap.wobook
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "conv.example"
+    timeout: 30000

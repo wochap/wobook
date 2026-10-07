@@ -1,0 +1,26 @@
+# Pair with the desktop fixture by pasting its `wobook pair --json` payload.
+# The fixture side runs with --yes; the phone confirms the fingerprint.
+appId: dev.wochap.wobook
+---
+# Maestro cannot type JSON, so the payload arrives URL-encoded through the
+# wobook://pair link, which opens Scan in paste mode with the code filled in.
+- launchApp
+- extendedWaitUntil:
+    visible: { id: "open-settings" }
+    timeout: 10000
+- openLink: "wobook://pair?code=${PAYLOAD}"
+- tapOn:
+    text: "Don.t allow"
+    optional: true
+- assertVisible: { id: "paste-input" }
+- tapOn: { id: "paste-connect" }
+- extendedWaitUntil:
+    visible: { id: "pair-confirm" }
+    timeout: 30000
+- assertVisible: "fixture-desktop"
+- assertVisible: { id: "fingerprint" }
+- tapOn: { id: "confirm-trust" }
+- extendedWaitUntil:
+    visible: { id: "devices" }
+    timeout: 30000
+- assertVisible: "fixture-desktop"

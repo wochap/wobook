@@ -1,16 +1,11 @@
 //! wobookd: single-writer daemon owning the Automerge document and read model.
 
-mod hooks;
-mod server;
-mod sync;
-
 use std::{
     fs::{self, File, OpenOptions},
     io,
     os::unix::fs::{DirBuilderExt, PermissionsExt},
     path::{Path, PathBuf},
-    sync::{Arc, Mutex},
-    time::Instant,
+    sync::Arc,
 };
 
 use anyhow::{Context, Result};
@@ -19,17 +14,12 @@ use fs2::FileExt;
 use tokio::{
     io::{AsyncWriteExt, BufReader},
     net::{UnixListener, UnixStream},
-    sync::{Mutex as AsyncMutex, Notify},
 };
 use wobook_core::{
     paths,
-    projection::ReadModel,
     protocol::{self, ErrorCode, Request, Response},
-    search::Searcher,
-    store,
 };
-
-use crate::server::Daemon;
+use wobookd::Daemon;
 
 #[derive(Parser, Debug)]
 #[command(name = "wobookd", version, about = "wobook bookmark daemon")]
@@ -105,59 +95,20 @@ async fn run() -> Result<()> {
     }
     clear_stale_socket(&socket).context("cannot replace socket")?;
 
-    // Startup order (D10): control store and identity, QUIC bind, repository,
-    // then discovery and peer supervisors.
-    let engine = wobook_sync::SyncEngine::open(
-        &data_dir,
+    let daemon = wobookd::open(
+        wobookd::OpenOptions {
+            data_dir: data_dir.clone(),
+            socket: socket.clone(),
+            hooks_dir,
+        },
         &wobook_sync::identity::FileKeyStore::new(&data_dir),
     )
-    .context("open sync engine")?;
-    let opened = store::open_with_transport(
-        &data_dir,
-        engine.transport.clone(),
-        automerge_repo::RepoConfig::default(),
-    )
-    .await
-    .map_err(|e| match e {
-        automerge_repo::Error::Bootstrap(
-            ref b @ automerge_repo::error::BootstrapError::RecoveryExhausted { .. },
-        ) => anyhow::anyhow!(
-            "recovery needs_attention: {b}; the quarantined copies are under {}",
-            data_dir.join("quarantine").display()
-        ),
-        other => anyhow::anyhow!(other),
-    })
-    .context("open automerge store")?;
-    let model = ReadModel::open_or_recreate(&data_dir.join("read-model.sqlite"))
-        .context("open read model")?;
-
+    .await?;
+    let engine = daemon.sync.clone();
+    let joining = daemon.joining.load(std::sync::atomic::Ordering::Acquire);
     let listener =
         UnixListener::bind(&socket).with_context(|| format!("bind {}", socket.display()))?;
     fs::set_permissions(&socket, fs::Permissions::from_mode(0o600))?;
-
-    let post = hooks::spawn_post_runner(hooks_dir.clone(), data_dir.clone());
-    let joining = opened.joining;
-    let daemon = Arc::new(Daemon {
-        store: std::sync::RwLock::new((opened.repo.clone(), opened.handle.clone())),
-        joining: std::sync::atomic::AtomicBool::new(joining),
-        sync: engine.clone(),
-        model: Mutex::new(model),
-        searcher: Mutex::new(Searcher::new()),
-        writes: AsyncMutex::new(()),
-        data_dir: data_dir.clone(),
-        socket: socket.clone(),
-        hooks_dir,
-        started: Instant::now(),
-        post,
-        shutdown: Notify::new(),
-    });
-    if let Err(e) = daemon.reconcile().await
-        && !joining
-    {
-        anyhow::bail!("initial reconcile: {}", e.1);
-    }
-    daemon.install_store(opened);
-    engine.start(Arc::new(sync::Host(Arc::downgrade(&daemon))));
 
     eprintln!(
         "wobookd: device {} \"{}\" sync port {}{}",
@@ -195,9 +146,7 @@ async fn run() -> Result<()> {
 
     eprintln!("wobookd: shutting down");
     let _ = fs::remove_file(&socket);
-    daemon.repo().flush().await.context("flush")?;
-    let _ = daemon.repo().shutdown().await;
-    engine.shutdown().await;
+    wobookd::close(&daemon).await?;
     // Let in-flight replies (the shutdown response) finish writing.
     tokio::time::sleep(std::time::Duration::from_millis(50)).await;
     Ok(())

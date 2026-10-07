@@ -1,0 +1,10 @@
+# e2e.sh already sent ACTION_SEND; save as is.
+appId: dev.wochap.wobook
+---
+- extendedWaitUntil:
+    visible: { id: "share-save" }
+    timeout: 20000
+- tapOn: { id: "tag-input" }
+- inputText: "phone,"
+- tapOn: { id: "share-save" }
+- assertNotVisible: { id: "share-sheet" }

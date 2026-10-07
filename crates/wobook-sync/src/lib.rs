@@ -26,7 +26,7 @@ use crate::{
     control::{EndpointKind, SqliteControlStore, TrustState},
     discovery::Discovery,
     identity::{DeviceId, DeviceIdentity, SecureKeyStore},
-    pairing::{MeshHost, PairingEvent, PairingManager, manager::PLATFORM},
+    pairing::{MeshHost, PairingEvent, PairingManager, manager::platform},
     rotation::{ControlMessage, GroupWire},
     transport::{CLOSE_REVOKED, QuinnTransport, SessionEvent},
 };
@@ -68,6 +68,8 @@ pub struct SyncEngine {
     status: Mutex<HashMap<DeviceId, PeerStatus>>,
     supervised: Mutex<HashSet<DeviceId>>,
     wake: Arc<Notify>,
+    /// Networking paused (Android background): no discovery, no dialing.
+    paused: std::sync::atomic::AtomicBool,
 }
 
 /// Valid device name: non-empty after trimming, at most 64 characters.
@@ -88,7 +90,7 @@ impl SyncEngine {
         let control_path = data_dir.join("control.sqlite");
         let store = Arc::new(SqliteControlStore::open(&control_path)?);
         let recorded = store.local_identity()?;
-        if key_store.load()?.is_none()
+        if key_store.load_seed()?.is_none()
             && let Some((id, _)) = recorded
         {
             return Err(EngineError::IdentityLost(
@@ -127,6 +129,7 @@ impl SyncEngine {
             status: Mutex::new(HashMap::new()),
             supervised: Mutex::new(HashSet::new()),
             wake: Arc::new(Notify::new()),
+            paused: std::sync::atomic::AtomicBool::new(false),
         }))
     }
 
@@ -139,15 +142,8 @@ impl SyncEngine {
             host,
         );
         *self.pairing.lock().expect("pairing lock") = Some(pairing);
-        if discovery::enabled() {
-            match Discovery::start(
-                self.identity.id(),
-                self.transport.port(),
-                self.store.clone(),
-            ) {
-                Ok(d) => *self.discovery.lock().expect("discovery lock") = Some(d),
-                Err(e) => eprintln!("wobook-sync: discovery disabled: {e}"),
-            }
+        if !self.is_paused() {
+            self.start_discovery();
         }
         let engine = self.clone();
         tokio::spawn(async move {
@@ -194,6 +190,52 @@ impl SyncEngine {
         });
         for peer in self.store.trusted_peers().unwrap_or_default() {
             self.supervise(peer.device_id);
+        }
+    }
+
+    fn start_discovery(&self) {
+        if !discovery::enabled() {
+            return;
+        }
+        let Ok(mut slot) = self.discovery.lock() else {
+            return;
+        };
+        if slot.is_some() {
+            return;
+        }
+        match Discovery::start(
+            self.identity.id(),
+            self.transport.port(),
+            self.store.clone(),
+        ) {
+            Ok(d) => *slot = Some(d),
+            Err(e) => eprintln!("wobook-sync: discovery disabled: {e}"),
+        }
+    }
+
+    #[must_use]
+    pub fn is_paused(&self) -> bool {
+        self.paused.load(std::sync::atomic::Ordering::Acquire)
+    }
+
+    /// Pauses (`false`) or resumes (`true`) networking: discovery, dialing and
+    /// open peer connections. The QUIC socket stays bound.
+    pub fn set_network(self: &Arc<Self>, enabled: bool) {
+        self.paused
+            .store(!enabled, std::sync::atomic::Ordering::Release);
+        if enabled {
+            self.start_discovery();
+            for peer in self.store.trusted_peers().unwrap_or_default() {
+                self.supervise(peer.device_id);
+            }
+            self.wake.notify_waiters();
+        } else {
+            if let Some(d) = self.discovery.lock().ok().and_then(|mut d| d.take()) {
+                d.shutdown();
+            }
+            for device in self.transport.connected() {
+                self.transport.close_device(device, transport::CLOSE_SHUTDOWN);
+            }
         }
     }
 
@@ -286,6 +328,13 @@ impl SyncEngine {
                 }
                 continue;
             }
+            if self.is_paused() {
+                tokio::select! {
+                    () = self.wake.notified() => {},
+                    () = tokio::time::sleep(Duration::from_secs(30)) => {},
+                }
+                continue;
+            }
             let endpoints: Vec<SocketAddr> = self
                 .store
                 .endpoints(device)
@@ -342,7 +391,7 @@ impl SyncEngine {
         let group = self.store.ensure_discovery_group().ok();
         ControlMessage::Hello {
             name: self.store.device_name().unwrap_or_default(),
-            platform: PLATFORM.into(),
+            platform: platform().into(),
             epoch: group.as_ref().map_or(0, |g| g.epoch),
             group: group.as_ref().map(GroupWire::from),
             endpoints: endpoints::current_hints(self.transport.port())

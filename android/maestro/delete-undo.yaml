@@ -1,0 +1,20 @@
+# Long-press → Delete → Undo restores the bookmark with its tags.
+appId: dev.wochap.wobook
+---
+- launchApp
+- tapOn: { id: "search-field" }
+- inputText: "buku"
+- extendedWaitUntil:
+    visible: "github.com/jarun/buku"
+    timeout: 5000
+- longPressOn: "github.com/jarun/buku"
+- tapOn: "Delete"
+- extendedWaitUntil:
+    visible: "Undo"
+    timeout: 5000
+- assertNotVisible: "github.com/jarun/buku"
+- tapOn: "Undo"
+- extendedWaitUntil:
+    visible: "github.com/jarun/buku"
+    timeout: 5000
+- assertVisible: "cli"

@@ -1,0 +1,16 @@
+# Devices lists this device first, then the fixture with a row menu.
+appId: dev.wochap.wobook
+---
+- launchApp
+- tapOn: { id: "open-settings" }
+- assertVisible: { id: "settings" }
+- tapOn: { id: "settings-devices" }
+- assertVisible: { id: "device-this" }
+- assertVisible: "This device · Android"
+- assertVisible: { id: "device-fixture-desktop" }
+- assertVisible: { id: "sync-footer" }
+- tapOn: { id: "device-menu-fixture-desktop" }
+- assertVisible: "Rename"
+- assertVisible: "Revoke…"
+- pressKey: back
+- assertVisible: { id: "devices" }

@@ -14,7 +14,7 @@ use std::{
 use ed25519_dalek::{SigningKey, VerifyingKey};
 use rand::rngs::OsRng;
 use sha2::{Digest, Sha256};
-use zeroize::{Zeroize, Zeroizing};
+use zeroize::Zeroizing;
 
 #[derive(Debug, thiserror::Error)]
 pub enum IdentityError {
@@ -176,83 +176,115 @@ impl DeviceIdentity {
     }
 }
 
-/// Where the 32-byte identity seed lives. Android supplies a Keystore-backed one.
+/// Secret kinds kept behind a `SecureKeyStore`.
+pub const KIND_DEVICE_KEY: &str = "device_key";
+pub const KIND_DISCOVERY_SECRET: &str = "discovery_secret";
+pub const KIND_DISCOVERY_SECRET_PREV: &str = "discovery_secret_prev";
+
+/// Where secrets live, by kind (`device_key`, `discovery_secret`,
+/// `discovery_secret_prev`). Linux uses files; Android supplies a
+/// Keystore-backed one through the FFI.
 pub trait SecureKeyStore: Send + Sync + 'static {
-    fn load(&self) -> Result<Option<Zeroizing<[u8; 32]>>, IdentityError>;
-    fn store(&self, seed: &[u8; 32]) -> Result<(), IdentityError>;
+    fn load(&self, kind: &str) -> Result<Option<Zeroizing<Vec<u8>>>, IdentityError>;
+    fn store(&self, kind: &str, bytes: &[u8]) -> Result<(), IdentityError>;
+    fn remove(&self, kind: &str) -> Result<(), IdentityError>;
+
+    /// The 32-byte identity seed, if stored.
+    fn load_seed(&self) -> Result<Option<Zeroizing<[u8; 32]>>, IdentityError> {
+        match self.load(KIND_DEVICE_KEY)? {
+            None => Ok(None),
+            Some(bytes) => {
+                let seed: [u8; 32] = bytes
+                    .as_slice()
+                    .try_into()
+                    .map_err(|_| IdentityError::Malformed)?;
+                Ok(Some(Zeroizing::new(seed)))
+            }
+        }
+    }
 
     /// Loads the identity, creating and storing one when none exists.
     fn load_or_create(&self) -> Result<(DeviceIdentity, bool), IdentityError> {
-        if let Some(seed) = self.load()? {
+        if let Some(seed) = self.load_seed()? {
             return Ok((
                 DeviceIdentity::from_private(PrivateDeviceKey::from_seed(&seed)),
                 false,
             ));
         }
         let key = PrivateDeviceKey::generate();
-        self.store(&key.seed())?;
+        self.store(KIND_DEVICE_KEY, key.seed().as_slice())?;
         Ok((DeviceIdentity::from_private(key), true))
     }
 }
 
 #[derive(Default)]
-pub struct InMemorySecureKeyStore(Mutex<Option<Zeroizing<[u8; 32]>>>);
+pub struct InMemorySecureKeyStore(Mutex<std::collections::HashMap<String, Zeroizing<Vec<u8>>>>);
 
 impl SecureKeyStore for InMemorySecureKeyStore {
-    fn load(&self) -> Result<Option<Zeroizing<[u8; 32]>>, IdentityError> {
+    fn load(&self, kind: &str) -> Result<Option<Zeroizing<Vec<u8>>>, IdentityError> {
         Ok(self
             .0
             .lock()
             .map_err(|_| IdentityError::Store("poisoned".into()))?
-            .clone())
+            .get(kind)
+            .cloned())
     }
-    fn store(&self, seed: &[u8; 32]) -> Result<(), IdentityError> {
-        *self
-            .0
+    fn store(&self, kind: &str, bytes: &[u8]) -> Result<(), IdentityError> {
+        self.0
             .lock()
-            .map_err(|_| IdentityError::Store("poisoned".into()))? = Some(Zeroizing::new(*seed));
+            .map_err(|_| IdentityError::Store("poisoned".into()))?
+            .insert(kind.to_string(), Zeroizing::new(bytes.to_vec()));
+        Ok(())
+    }
+    fn remove(&self, kind: &str) -> Result<(), IdentityError> {
+        self.0
+            .lock()
+            .map_err(|_| IdentityError::Store("poisoned".into()))?
+            .remove(kind);
         Ok(())
     }
 }
 
-/// `<data_dir>/identity.key`: raw 32-byte seed, mode 0600.
+/// Files under `<data_dir>`, mode 0600: `identity.key` for the device key
+/// (raw 32-byte seed), `<kind>.key` for anything else.
 pub struct FileKeyStore {
-    path: PathBuf,
+    dir: PathBuf,
 }
 
 impl FileKeyStore {
     #[must_use]
     pub fn new(data_dir: &Path) -> Self {
         Self {
-            path: data_dir.join("identity.key"),
+            dir: data_dir.to_path_buf(),
         }
     }
+    /// Path of the identity seed.
     #[must_use]
-    pub fn path(&self) -> &Path {
-        &self.path
+    pub fn path(&self) -> PathBuf {
+        self.path_for(KIND_DEVICE_KEY)
+    }
+    fn path_for(&self, kind: &str) -> PathBuf {
+        if kind == KIND_DEVICE_KEY {
+            self.dir.join("identity.key")
+        } else {
+            self.dir.join(format!("{kind}.key"))
+        }
     }
 }
 
 impl SecureKeyStore for FileKeyStore {
-    fn load(&self) -> Result<Option<Zeroizing<[u8; 32]>>, IdentityError> {
-        let mut bytes = match fs::read(&self.path) {
-            Ok(bytes) => bytes,
-            Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
-            Err(e) => {
-                return Err(IdentityError::Store(format!(
-                    "{}: {e}",
-                    self.path.display()
-                )));
-            }
-        };
-        let seed: Result<[u8; 32], _> = bytes.as_slice().try_into();
-        bytes.zeroize();
-        seed.map(|s| Some(Zeroizing::new(s)))
-            .map_err(|_| IdentityError::Malformed)
+    fn load(&self, kind: &str) -> Result<Option<Zeroizing<Vec<u8>>>, IdentityError> {
+        let path = self.path_for(kind);
+        match fs::read(&path) {
+            Ok(bytes) => Ok(Some(Zeroizing::new(bytes))),
+            Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(None),
+            Err(e) => Err(IdentityError::Store(format!("{}: {e}", path.display()))),
+        }
     }
-    fn store(&self, seed: &[u8; 32]) -> Result<(), IdentityError> {
-        let err = |e: io::Error| IdentityError::Store(format!("{}: {e}", self.path.display()));
-        let tmp = self.path.with_extension("key.tmp");
+    fn store(&self, kind: &str, bytes: &[u8]) -> Result<(), IdentityError> {
+        let path = self.path_for(kind);
+        let err = |e: io::Error| IdentityError::Store(format!("{}: {e}", path.display()));
+        let tmp = path.with_extension("key.tmp");
         let mut file = OpenOptions::new()
             .create(true)
             .truncate(true)
@@ -260,10 +292,18 @@ impl SecureKeyStore for FileKeyStore {
             .mode(0o600)
             .open(&tmp)
             .map_err(err)?;
-        file.write_all(seed).map_err(err)?;
+        file.write_all(bytes).map_err(err)?;
         file.sync_all().map_err(err)?;
         fs::set_permissions(&tmp, fs::Permissions::from_mode(0o600)).map_err(err)?;
-        fs::rename(&tmp, &self.path).map_err(err)
+        fs::rename(&tmp, &path).map_err(err)
+    }
+    fn remove(&self, kind: &str) -> Result<(), IdentityError> {
+        let path = self.path_for(kind);
+        match fs::remove_file(&path) {
+            Ok(()) => Ok(()),
+            Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(()),
+            Err(e) => Err(IdentityError::Store(format!("{}: {e}", path.display()))),
+        }
     }
 }
 

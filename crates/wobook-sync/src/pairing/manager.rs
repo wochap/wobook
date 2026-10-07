@@ -33,6 +33,19 @@ const MAX_LINE: usize = 64 * 1024;
 const KEEP_FINISHED: Duration = Duration::from_secs(60);
 pub const PLATFORM: &str = "linux";
 
+static PLATFORM_OVERRIDE: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+
+/// Overrides the advertised platform (`android` on phones). First call wins.
+pub fn set_platform(platform: &str) {
+    let _ = PLATFORM_OVERRIDE.set(platform.to_string());
+}
+
+/// Platform sent in pairing and hello messages.
+#[must_use]
+pub fn platform() -> &'static str {
+    PLATFORM_OVERRIDE.get().map_or(PLATFORM, String::as_str)
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(tag = "type")]
 pub enum PairMessage {
@@ -711,7 +724,7 @@ impl Inner {
                 let hints = endpoints::current_hints(self.transport.port());
                 wire.send(&PairMessage::Begin {
                     name: self.local_name(),
-                    platform: PLATFORM.into(),
+                    platform: platform().into(),
                     endpoints: hints.iter().map(ToString::to_string).collect(),
                 })
                 .await
@@ -720,7 +733,7 @@ impl Inner {
                 wire.send(&PairMessage::Nonce {
                     nonce: URL_SAFE_NO_PAD.encode(ctx.nonce),
                     name: self.local_name(),
-                    platform: PLATFORM.into(),
+                    platform: platform().into(),
                 })
                 .await
             }

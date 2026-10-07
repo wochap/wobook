@@ -1,0 +1,22 @@
+# Detail → Edit → add a multi-word tag → Save lands on Detail with the chip.
+appId: dev.wochap.wobook
+---
+- launchApp
+- tapOn: { id: "search-field" }
+- inputText: "arch timers"
+- extendedWaitUntil:
+    visible: "Arch Wiki — systemd/Timers"
+    timeout: 5000
+- tapOn: "Arch Wiki — systemd/Timers"
+- assertVisible: { id: "detail" }
+- tapOn: { id: "detail-edit" }
+- assertVisible: { id: "form-edit" }
+- assertVisible: { id: "url-readonly" }
+- tapOn: { id: "tag-input" }
+- inputText: "cron jobs,"
+- assertVisible: { id: "editor-chip-cron jobs" }
+- tapOn: { id: "form-save-top" }
+- extendedWaitUntil:
+    visible: { id: "detail" }
+    timeout: 5000
+- assertVisible: "cron jobs"

@@ -6,6 +6,7 @@ members = [
     "crates/wobookd",
     "crates/wobook",
     "crates/wobook-sync",
+    "crates/wobook-ffi",
 ]
 
 [workspace.package]
