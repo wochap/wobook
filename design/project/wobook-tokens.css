@@ -1,0 +1,80 @@
+/* wobook — design tokens. Catppuccin Mocha (dark, default) and Latte (light).
+   Variables only. Screens reference var(--wb-*) exclusively. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root, [data-theme="dark"] {
+  color-scheme: dark;
+  /* Catppuccin Mocha */
+  --ctp-base:#1e1e2e; --ctp-mantle:#181825; --ctp-crust:#11111b;
+  --ctp-surface0:#313244; --ctp-surface1:#45475a; --ctp-surface2:#585b70;
+  --ctp-overlay0:#6c7086; --ctp-overlay1:#7f849c; --ctp-overlay2:#9399b2;
+  --ctp-subtext0:#a6adc8; --ctp-subtext1:#bac2de; --ctp-text:#cdd6f4;
+  --ctp-blue:#89b4fa; --ctp-lavender:#b4befe; --ctp-sapphire:#74c7ec;
+  --ctp-red:#f38ba8; --ctp-green:#a6e3a1; --ctp-yellow:#f9e2af; --ctp-peach:#fab387;
+
+  /* Roles → Compose colorScheme (see readme.md) */
+  --wb-bg:var(--ctp-base);                 /* background / surface */
+  --wb-bg-low:var(--ctp-mantle);           /* surfaceContainerLow — keyboard, sheets' ground */
+  --wb-bg-lowest:var(--ctp-crust);         /* surfaceContainerLowest — scrim-adjacent */
+  --wb-surface:var(--ctp-surface0);        /* surfaceContainer — chips, fields */
+  --wb-surface-high:var(--ctp-surface1);   /* surfaceContainerHigh — pressed, keys */
+  --wb-outline:var(--ctp-surface2);        /* outline */
+  --wb-outline-variant:var(--ctp-surface1);/* outlineVariant — dividers */
+  --wb-text:var(--ctp-text);               /* onSurface */
+  --wb-text-muted:var(--ctp-subtext0);     /* onSurfaceVariant */
+  --wb-text-faint:var(--ctp-overlay1);     /* hints, disabled text */
+  --wb-accent:var(--ctp-blue);             /* primary */
+  --wb-on-accent:var(--ctp-crust);         /* onPrimary */
+  --wb-accent-container:color-mix(in srgb, var(--ctp-blue) 16%, transparent); /* primaryContainer */
+  --wb-error:var(--ctp-red);               /* error */
+  --wb-success:var(--ctp-green);
+  --wb-warning:var(--ctp-yellow);
+  --wb-tailscale:var(--ctp-lavender);
+  --wb-scrim:rgba(17,17,27,.6);
+  --wb-inverse-surface:var(--ctp-text);    /* snackbar */
+  --wb-inverse-text:var(--ctp-base);
+
+  --wb-shadow-1:0 0 0 1px var(--ctp-surface0);
+  --wb-shadow-2:0 0 0 1px var(--ctp-surface1), 0 6px 18px rgba(0,0,0,.45);
+  --wb-shadow-3:0 0 0 1px var(--ctp-surface2), 0 16px 40px rgba(0,0,0,.6);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  /* Catppuccin Latte */
+  --ctp-base:#eff1f5; --ctp-mantle:#e6e9ef; --ctp-crust:#dce0e8;
+  --ctp-surface0:#ccd0da; --ctp-surface1:#bcc0cc; --ctp-surface2:#acb0be;
+  --ctp-overlay0:#9ca0b0; --ctp-overlay1:#8c8fa1; --ctp-overlay2:#7c7f93;
+  --ctp-subtext0:#6c6f85; --ctp-subtext1:#5c5f77; --ctp-text:#4c4f69;
+  --ctp-blue:#1e66f5; --ctp-lavender:#7287fd; --ctp-sapphire:#209fb5;
+  --ctp-red:#d20f39; --ctp-green:#40a02b; --ctp-yellow:#df8e1d; --ctp-peach:#fe640b;
+  --wb-on-accent:var(--ctp-base);
+  --wb-scrim:rgba(76,79,105,.4);
+  --wb-shadow-1:0 0 0 1px var(--ctp-surface0);
+  --wb-shadow-2:0 1px 2px rgba(76,79,105,.12), 0 6px 18px rgba(76,79,105,.14);
+  --wb-shadow-3:0 2px 4px rgba(76,79,105,.14), 0 16px 40px rgba(76,79,105,.2);
+}
+
+:root {
+  /* Type — Inter; JetBrains Mono for URLs and fingerprints */
+  --wb-font:"Inter", system-ui, sans-serif;
+  --wb-mono:"JetBrains Mono", ui-monospace, monospace;
+  --wb-t-display:500 28px/34px var(--wb-font);   /* headlineMedium */
+  --wb-t-title:500 20px/26px var(--wb-font);     /* titleLarge */
+  --wb-t-title-sm:500 16px/22px var(--wb-font);  /* titleMedium */
+  --wb-t-body-lg:400 16px/24px var(--wb-font);   /* bodyLarge */
+  --wb-t-body:400 14px/20px var(--wb-font);      /* bodyMedium */
+  --wb-t-body-md:500 14px/20px var(--wb-font);   /* labelLarge */
+  --wb-t-label:400 12px/16px var(--wb-font);     /* labelMedium */
+  --wb-t-label-md:500 12px/16px var(--wb-font);  /* labelMedium, emphasised */
+  --wb-t-mono:400 13px/18px var(--wb-mono);      /* bodySmall mono */
+
+  /* Spacing — 4dp grid */
+  --wb-s1:4px; --wb-s2:8px; --wb-s3:12px; --wb-s4:16px; --wb-s5:20px; --wb-s6:24px; --wb-s8:32px;
+
+  /* Radii */
+  --wb-r-sm:4px; --wb-r-md:8px; --wb-r-lg:12px; --wb-r-xl:20px; --wb-r-full:999px;
+
+  /* Sizes */
+  --wb-tap:48px; --wb-row:64px; --wb-chip:32px; --wb-field:52px; --wb-appbar:56px;
+}

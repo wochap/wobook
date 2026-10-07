@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="wobook-tokens.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#11111b;color:#cdd6f4;font-family:"Inter",system-ui,sans-serif}
+a{color:#89b4fa;text-decoration:none}a:hover{color:#b4befe}
+*,*::before,*::after{box-sizing:border-box}
+.wb-sec{padding:40px 44px 32px;border-bottom:1px solid #313244;scroll-margin-top:16px}
+.wb-h{display:flex;align-items:baseline;gap:12px;margin:0 0 24px}
+.wb-h h2{margin:0;font:500 18px/1.2 "Inter",system-ui;color:#cdd6f4}
+.wb-h span{font:400 13px/1.4 "Inter",system-ui;color:#a6adc8}
+.wb-grid{display:flex;flex-wrap:wrap;gap:36px 28px;align-items:flex-start}
+.wb-fr{flex:none;display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px}
+.wb-lbl{display:flex;align-items:baseline;gap:8px;font:400 12px/1.3 "Inter",system-ui;color:#a6adc8}
+.wb-lbl b{font:500 11px ui-monospace,Menlo,monospace;padding:3px 7px;background:#313244;color:#cdd6f4;border-radius:5px}
+.wb-fr:target .wb-lbl b{background:#89b4fa;color:#11111b}
+.phone{width:412px;height:915px;flex:none;position:relative;overflow:hidden;background:var(--wb-bg);color:var(--wb-text);font:var(--wb-t-body);border-radius:28px;box-shadow:0 0 0 1px #45475a,0 0 0 9px #181825,0 0 0 10px #313244,0 24px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
+.phone>.sb{flex:none;height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font:var(--wb-t-label-md)}
+.phone>.sb i{font-size:14px;margin-left:4px}
+.phone>.gest{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:108px;height:4px;border-radius:2px;background:var(--wb-text);opacity:.55;pointer-events:none;z-index:9}
+.ph{line-height:1}
+@keyframes wb-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes wb-sync{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+</style>
+</helmet>
+
+<section class="wb-sec" id="flows">
+<div class="wb-h"><h2>wobook · Android</h2><span>Catppuccin Mocha (dark, primary) · Latte (light) · Inter · Phosphor · 412×915dp</span></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;max-width:1100px">
+  <div style="padding:16px 18px;border:1px solid #313244;border-radius:8px;display:flex;flex-direction:column;gap:10px">
+    <div style="font:500 13px/1.3 Inter,system-ui;color:#cdd6f4">Journey A — save from the browser (&lt;5 s)</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;font:400 12px/1.4 Inter,system-ui;color:#a6adc8">
+      <span>Chrome share sheet</span><i class="ph ph-arrow-right"></i><a href="#share-fresh">Share · fresh URL</a><i class="ph ph-arrow-right"></i><span>type tags, Save</span><i class="ph ph-arrow-right"></i><a href="#share-saved-toast">Saved toast</a><i class="ph ph-arrow-right"></i><span>back in Chrome</span>
+    </div>
+    <div style="font:400 12px/1.5 Inter,system-ui;color:#7f849c">Branches: <a href="#share-dup">already saved</a> · <a href="#share-failed">fetch failed</a> · <a href="#share-offline">offline</a> · <a href="#form-fetched">More → full form</a></div>
+  </div>
+  <div style="padding:16px 18px;border:1px solid #313244;border-radius:8px;display:flex;flex-direction:column;gap:10px">
+    <div style="font:500 13px/1.3 Inter,system-ui;color:#cdd6f4">Journey B — search, then open</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;font:400 12px/1.4 Inter,system-ui;color:#a6adc8">
+      <span>Launch</span><i class="ph ph-arrow-right"></i><a href="#home-results">Home · keyboard up, fuzzy results</a><i class="ph ph-arrow-right"></i><a href="#home-sheet">long-press sheet</a> / <a href="#detail">Detail</a><i class="ph ph-arrow-right"></i><span>Open in browser</span>
+    </div>
+    <div style="font:400 12px/1.5 Inter,system-ui;color:#7f849c">Branches: <a href="#home-empty">empty library</a> · <a href="#home-none">no results</a> · <a href="#home-sync">syncing</a> · <a href="#detail-undo">delete + undo</a> · <a href="#form-edit">edit</a></div>
+  </div>
+</div>
+<div style="margin-top:18px;font:400 12px/1.6 Inter,system-ui;color:#7f849c;max-width:900px">Setup: <a href="#onb-1">Onboarding</a> → <a href="#pair-scan">Scan</a> / <a href="#pair-qr">Show my QR</a> → <a href="#pair-confirm">Confirm fingerprint</a> → <a href="#devices">Devices</a>. Rare: <a href="#settings">Settings</a>. Jump: <a href="#ds">design system</a>.</div>
+</section>
+
+<section class="wb-sec" id="ds">
+<div class="wb-h"><h2>Design system</h2><span>tokens live in <code>wobook-tokens.css</code> — screens use only <code>var(--wb-*)</code></span></div>
+<div class="wb-grid">
+  <div class="wb-fr" id="ds-color"><div class="wb-lbl"><b>DS-1</b>Color roles — Mocha / Latte</div>
+  <div style="display:flex;gap:16px">
+    <div data-theme="dark" style="width:300px;padding:16px;background:var(--wb-bg);border-radius:12px;box-shadow:var(--wb-shadow-1);display:flex;flex-direction:column;gap:8px;font:var(--wb-t-label);color:var(--wb-text)">
+      <div style="font:var(--wb-t-label-md);color:var(--wb-text-muted);margin-bottom:4px">Mocha · dark (default)</div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-bg);box-shadow:0 0 0 1px var(--wb-outline)"></span>--wb-bg · background <span style="margin-left:auto;color:var(--wb-text-faint)">#1e1e2e</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-bg-low)"></span>--wb-bg-low · sheets, keyboard <span style="margin-left:auto;color:var(--wb-text-faint)">#181825</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-surface)"></span>--wb-surface · chips, fields <span style="margin-left:auto;color:var(--wb-text-faint)">#313244</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-surface-high)"></span>--wb-surface-high · pressed <span style="margin-left:auto;color:var(--wb-text-faint)">#45475a</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-outline)"></span>--wb-outline <span style="margin-left:auto;color:var(--wb-text-faint)">#585b70</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-text)"></span>--wb-text · onSurface <span style="margin-left:auto;color:var(--wb-text-faint)">#cdd6f4</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-text-muted)"></span>--wb-text-muted <span style="margin-left:auto;color:var(--wb-text-faint)">#a6adc8</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-accent)"></span>--wb-accent · primary <span style="margin-left:auto;color:var(--wb-text-faint)">#89b4fa</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-accent-container);box-shadow:inset 0 0 0 1px var(--wb-accent)"></span>--wb-accent-container · 16% <span style="margin-left:auto;color:var(--wb-text-faint)">mix</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-error)"></span>--wb-error <span style="margin-left:auto;color:var(--wb-text-faint)">#f38ba8</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-success)"></span>--wb-success · LAN <span style="margin-left:auto;color:var(--wb-text-faint)">#a6e3a1</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-tailscale)"></span>--wb-tailscale <span style="margin-left:auto;color:var(--wb-text-faint)">#b4befe</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-warning)"></span>--wb-warning <span style="margin-left:auto;color:var(--wb-text-faint)">#f9e2af</span></div>
+    </div>
+    <div data-theme="light" style="width:300px;padding:16px;background:var(--wb-bg);border-radius:12px;box-shadow:var(--wb-shadow-1);display:flex;flex-direction:column;gap:8px;font:var(--wb-t-label);color:var(--wb-text)">
+      <div style="font:var(--wb-t-label-md);color:var(--wb-text-muted);margin-bottom:4px">Latte · light (follows system)</div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-bg);box-shadow:0 0 0 1px var(--wb-outline)"></span>--wb-bg <span style="margin-left:auto;color:var(--wb-text-faint)">#eff1f5</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-bg-low)"></span>--wb-bg-low <span style="margin-left:auto;color:var(--wb-text-faint)">#e6e9ef</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-surface)"></span>--wb-surface <span style="margin-left:auto;color:var(--wb-text-faint)">#ccd0da</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-surface-high)"></span>--wb-surface-high <span style="margin-left:auto;color:var(--wb-text-faint)">#bcc0cc</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-outline)"></span>--wb-outline <span style="margin-left:auto;color:var(--wb-text-faint)">#acb0be</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-text)"></span>--wb-text <span style="margin-left:auto;color:var(--wb-text-faint)">#4c4f69</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-text-muted)"></span>--wb-text-muted <span style="margin-left:auto;color:var(--wb-text-faint)">#6c6f85</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-accent)"></span>--wb-accent <span style="margin-left:auto;color:var(--wb-text-faint)">#1e66f5</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-accent-container);box-shadow:inset 0 0 0 1px var(--wb-accent)"></span>--wb-accent-container <span style="margin-left:auto;color:var(--wb-text-faint)">mix</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-error)"></span>--wb-error <span style="margin-left:auto;color:var(--wb-text-faint)">#d20f39</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-success)"></span>--wb-success <span style="margin-left:auto;color:var(--wb-text-faint)">#40a02b</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-tailscale)"></span>--wb-tailscale <span style="margin-left:auto;color:var(--wb-text-faint)">#7287fd</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:6px;background:var(--wb-warning)"></span>--wb-warning <span style="margin-left:auto;color:var(--wb-text-faint)">#df8e1d</span></div>
+    </div>
+  </div></div>
+
+  <div class="wb-fr" id="ds-type"><div class="wb-lbl"><b>DS-2</b>Type, spacing, radii, elevation</div>
+  <div data-theme="dark" style="width:380px;padding:20px;background:var(--wb-bg);border-radius:12px;box-shadow:var(--wb-shadow-1);display:flex;flex-direction:column;gap:14px;color:var(--wb-text)">
+    <div style="font:var(--wb-t-display)">Display 28 <span style="font:var(--wb-t-label);color:var(--wb-text-faint)">--wb-t-display · headlineMedium</span></div>
+    <div style="font:var(--wb-t-title)">Title 20 <span style="font:var(--wb-t-label);color:var(--wb-text-faint)">--wb-t-title · titleLarge</span></div>
+    <div style="font:var(--wb-t-title-sm)">Title small 16 <span style="font:var(--wb-t-label);color:var(--wb-text-faint)">titleMedium</span></div>
+    <div style="font:var(--wb-t-body-lg)">Body large 16 <span style="font:var(--wb-t-label);color:var(--wb-text-faint)">bodyLarge · result title</span></div>
+    <div style="font:var(--wb-t-body)">Body 14 — the default. <span style="font:var(--wb-t-label);color:var(--wb-text-faint)">bodyMedium</span></div>
+    <div style="font:var(--wb-t-body-md)">Label large 14 · buttons <span style="font:var(--wb-t-label);color:var(--wb-text-faint)">labelLarge</span></div>
+    <div style="font:var(--wb-t-label);color:var(--wb-text-muted)">Label 12 · chips, meta <span style="color:var(--wb-text-faint)">labelMedium</span></div>
+    <div style="font:var(--wb-t-mono);color:var(--wb-text-muted)">mono 13 · github.com/shadcn-ui/ui <span style="font:var(--wb-t-label);color:var(--wb-text-faint)">--wb-t-mono</span></div>
+    <div style="height:1px;background:var(--wb-outline-variant)"></div>
+    <div style="display:flex;align-items:flex-end;gap:8px;font:var(--wb-t-label);color:var(--wb-text-faint)">
+      <span style="width:4px;height:4px;background:var(--wb-accent)"></span><span style="width:8px;height:8px;background:var(--wb-accent)"></span><span style="width:12px;height:12px;background:var(--wb-accent)"></span><span style="width:16px;height:16px;background:var(--wb-accent)"></span><span style="width:24px;height:24px;background:var(--wb-accent)"></span><span style="width:32px;height:32px;background:var(--wb-accent)"></span><span style="margin-left:8px">--wb-s1…s8 · 4 8 12 16 24 32</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;font:var(--wb-t-label);color:var(--wb-text-faint)">
+      <span style="width:36px;height:36px;border:1px solid var(--wb-outline);border-radius:var(--wb-r-sm)"></span><span style="width:36px;height:36px;border:1px solid var(--wb-outline);border-radius:var(--wb-r-md)"></span><span style="width:36px;height:36px;border:1px solid var(--wb-outline);border-radius:var(--wb-r-lg)"></span><span style="width:36px;height:36px;border:1px solid var(--wb-outline);border-radius:var(--wb-r-xl)"></span><span style="width:60px;height:36px;border:1px solid var(--wb-outline);border-radius:var(--wb-r-full)"></span><span>4 · 8 · 12 · 20 · full</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;font:var(--wb-t-label);color:var(--wb-text-faint);padding-top:8px">
+      <span style="width:72px;height:44px;border-radius:8px;background:var(--wb-bg);box-shadow:var(--wb-shadow-1)"></span><span style="width:72px;height:44px;border-radius:8px;background:var(--wb-bg);box-shadow:var(--wb-shadow-2)"></span><span style="width:72px;height:44px;border-radius:8px;background:var(--wb-bg);box-shadow:var(--wb-shadow-3)"></span><span>elevation 1 · 2 · 3 — hairline + ambient, no stacked shadows</span>
+    </div>
+  </div></div>
+
+  <div class="wb-fr" id="ds-chips"><div class="wb-lbl"><b>DS-3</b>Tag chip · search field · result row</div>
+  <div data-theme="dark" style="width:412px;padding:20px;background:var(--wb-bg);border-radius:12px;box-shadow:var(--wb-shadow-1);display:flex;flex-direction:column;gap:18px;color:var(--wb-text)">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-accent-container);color:var(--wb-accent);box-shadow:inset 0 0 0 1px var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:6px"><i class="ph ph-check" style="font-size:14px"></i>security</span>
+      <span style="height:32px;padding:0 6px 0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:4px">ui library<i class="ph ph-x" style="font-size:16px;padding:4px;color:var(--wb-text-muted)"></i></span>
+      <span style="height:32px;padding:0 10px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">+3</span>
+      <span style="height:20px;padding:0 7px;border-radius:var(--wb-r-sm);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">tiny · row</span>
+    </div>
+    <div style="font:var(--wb-t-label);color:var(--wb-text-faint);margin-top:-8px">default · selected · removable (editor) · overflow +N · row-size</div>
+    <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 8px 0 16px;gap:12px;box-shadow:inset 0 0 0 1px var(--wb-accent)">
+      <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
+      <span style="flex:1;font:var(--wb-t-body-lg)">shcn ui<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
+      <i class="ph ph-x" style="font-size:20px;color:var(--wb-text-muted);padding:10px"></i>
+    </div>
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px;border-radius:var(--wb-r-md)">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--wb-accent);font-weight:600">sh</span>ad<span style="color:var(--wb-accent);font-weight:600">cn</span>/<span style="color:var(--wb-accent);font-weight:600">ui</span> — Build your component library</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ui.shadcn.com/docs</div>
+        <div style="display:flex;gap:4px;overflow:hidden;height:20px"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">ui library</span><span style="height:20px;padding:0 6px;border-radius:4px;border:1px solid var(--wb-outline);color:var(--wb-text-faint);font:var(--wb-t-label);display:inline-flex;align-items:center">+2</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="font:var(--wb-t-label);color:var(--wb-text-faint);margin-top:-10px">result row: favicon slot (empty = surface square) · 1-line title with matched chars in accent 600 · host+path mono · tags max 1 line · trailing Copy + Open (48dp)</div>
+  </div></div>
+
+  <div class="wb-fr" id="ds-misc"><div class="wb-lbl"><b>DS-4</b>Buttons · snackbar · fingerprint · sync · shimmer · QR</div>
+  <div data-theme="dark" style="width:412px;padding:20px;background:var(--wb-bg);border-radius:12px;box-shadow:var(--wb-shadow-1);display:flex;flex-direction:column;gap:18px;color:var(--wb-text)">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span style="height:40px;padding:0 18px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Primary · outlined</span>
+      <span style="height:40px;padding:0 18px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Secondary</span>
+      <span style="height:40px;padding:0 12px;border-radius:var(--wb-r-md);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Text</span>
+      <span style="height:40px;padding:0 18px;border-radius:var(--wb-r-md);border:1px solid var(--wb-error);color:var(--wb-error);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Destructive</span>
+    </div>
+    <div style="height:48px;border-radius:var(--wb-r-md);background:var(--wb-inverse-surface);color:var(--wb-inverse-text);display:flex;align-items:center;padding:0 8px 0 16px;gap:8px;font:var(--wb-t-body)"><span style="flex:1">Bookmark deleted</span><span style="font:var(--wb-t-body-md);padding:0 12px;height:36px;display:inline-flex;align-items:center;color:var(--ctp-blue);filter:saturate(1.2) brightness(.7)">Undo</span></div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font:500 18px/26px var(--wb-mono);letter-spacing:.04em;display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;padding:14px 16px;border-radius:var(--wb-r-md);background:var(--wb-surface)"><span>3fa1c9d2</span><span>77be0041</span><span>9e2c5a10</span><span>b4d7f6e3</span></div>
+      <div style="font:var(--wb-t-label);color:var(--wb-text-faint)">fingerprint: 4 × 8 hex, mono 18, 2×2 grid, surface ground</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+        <div style="height:2px;background:var(--wb-surface);border-radius:1px;overflow:hidden;position:relative"><span style="position:absolute;top:0;left:0;height:100%;width:33%;background:var(--wb-accent);border-radius:1px"></span></div>
+        <div style="font:var(--wb-t-label);color:var(--wb-text-faint)">sync in progress: 2dp line under the app bar (indeterminate)</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;font:var(--wb-t-label);color:var(--wb-text-muted)"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-success)"></span>LAN<span style="width:8px;height:8px;border-radius:50%;background:var(--wb-tailscale)"></span>Tailscale<span style="width:8px;height:8px;border-radius:50%;background:var(--wb-outline)"></span>off</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:6px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Title</span><span style="height:14px;width:70%;border-radius:4px;background:linear-gradient(90deg,var(--wb-surface) 25%,var(--wb-surface-high) 50%,var(--wb-surface) 75%);background-size:200% 100%;animation:wb-shimmer 1.4s linear infinite"></span></div>
+      <div style="font:var(--wb-t-label);color:var(--wb-text-faint)">field · fetching state: label stays, value row shimmers surface→surface-high</div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:center">
+      <div style="width:120px;height:120px;padding:8px;background:var(--ctp-text);border-radius:var(--wb-r-md)">{{ qrSmall }}</div>
+      <div style="font:var(--wb-t-label);color:var(--wb-text-faint);flex:1">QR frame: modules in text color on a light tile (QR must stay high-contrast even in dark theme), 8dp quiet zone, radius 8. Icons: Phosphor Regular 22–24dp in rows/app bars, 16dp inside chips, Fill variant only for the active nav/state.</div>
+    </div>
+  </div></div>
+</div>
+</section>
+
+<section class="wb-sec" id="home">
+<div class="wb-h"><h2>1 · Search / Home</h2><span>default screen · keyboard opens on launch</span></div>
+<div class="wb-grid">
+
+<div class="wb-fr" id="home-results"><div class="wb-lbl"><b>Home-Results</b>typing “shcn ui”, keyboard up, one chip active</div>
+<div class="phone" data-screen-label="Home-Results">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="padding:8px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 4px 0 16px;gap:12px;box-shadow:inset 0 0 0 1px var(--wb-accent)">
+      <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
+      <span style="flex:1;font:var(--wb-t-body-lg)">shcn ui<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
+      <i class="ph ph-x" style="font-size:20px;color:var(--wb-text-muted);width:44px;height:44px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="display:flex;gap:8px;overflow:hidden;margin:0 -16px;padding:0 16px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-accent-container);color:var(--wb-accent);box-shadow:inset 0 0 0 1px var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:6px;flex:none"><i class="ph ph-check" style="font-size:14px"></i>react</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">ui library</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">security</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+    </div>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:8px 0 0;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--wb-accent);font-weight:600">sh</span>ad<span style="color:var(--wb-accent);font-weight:600">cn</span>/<span style="color:var(--wb-accent);font-weight:600">ui</span> — Build your component library</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ui.shadcn.com/docs</div>
+        <div style="display:flex;gap:4px;height:20px"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">ui library</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">tailwind</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--wb-accent);font-weight:600">sh</span>ad<span style="color:var(--wb-accent);font-weight:600">cn</span>-<span style="color:var(--wb-accent);font-weight:600">ui</span>/ui: Accessible components · GitHub</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">github.com/shadcn-ui/ui</div>
+        <div style="display:flex;gap:4px;height:20px"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">github</span><span style="height:20px;padding:0 6px;border-radius:4px;border:1px solid var(--wb-outline);color:var(--wb-text-faint);font:var(--wb-t-label);display:inline-flex;align-items:center">+3</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Radix Primitives — <span style="color:var(--wb-accent);font-weight:600">s</span>tyling <span style="color:var(--wb-accent);font-weight:600">h</span>eadless <span style="color:var(--wb-accent);font-weight:600">c</span>ompo<span style="color:var(--wb-accent);font-weight:600">n</span>ents <span style="color:var(--wb-accent);font-weight:600">ui</span></div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">radix-ui.com/primitives/docs/guides/styling</div>
+        <div style="display:flex;gap:4px;height:20px"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">a11y</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--wb-accent);font-weight:600">S</span>witc<span style="color:var(--wb-accent);font-weight:600">h</span>ing from Chakra to <span style="color:var(--wb-accent);font-weight:600">c</span>va a<span style="color:var(--wb-accent);font-weight:600">n</span>d Tailwind <span style="color:var(--wb-accent);font-weight:600">UI</span></div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">blog.example.dev/2025/chakra-to-cva</div>
+        <div style="display:flex;gap:4px;height:20px"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">react</span><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">blog</span></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    <div style="padding:8px 16px 0;font:var(--wb-t-label);color:var(--wb-text-faint)">4 of 1,284 · filtered by react</div>
+  </div>
+  <div style="flex:none;margin-top:auto">{{ keyboard }}</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="home-idle"><div class="wb-lbl"><b>Home-Idle</b>keyboard dismissed · browse by chip · Add FAB</div>
+<div class="phone" data-screen-label="Home-Idle">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="padding:8px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 4px 0 16px;gap:12px">
+      <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
+      <span style="flex:1;font:var(--wb-t-body-lg);color:var(--wb-text-faint)">Search bookmarks</span>
+      <i class="ph ph-gear-six" style="font-size:22px;color:var(--wb-text-muted);width:44px;height:44px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="display:flex;gap:8px;overflow:hidden;margin:0 -16px;padding:0 16px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">react</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">ui library</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">security</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+    </div>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:8px 0 0;display:flex;flex-direction:column">
+    <div style="padding:4px 16px 6px;font:var(--wb-t-label);color:var(--wb-text-faint)">Recent · 1,284 bookmarks</div>
+    <sc-for list="{{ recent }}" as="r" hint-placeholder-count="8">
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.title }}</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.url }}</div>
+        <div style="display:flex;gap:4px;height:20px"><sc-for list="{{ r.tags }}" as="t" hint-placeholder-count="2"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">{{ t }}</span></sc-for></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    </sc-for>
+  </div>
+  <div style="position:absolute;right:16px;bottom:40px;height:56px;padding:0 20px 0 16px;border-radius:var(--wb-r-lg);background:var(--wb-bg);border:1px solid var(--wb-accent);color:var(--wb-accent);display:flex;align-items:center;gap:8px;font:var(--wb-t-body-md);box-shadow:var(--wb-shadow-2)"><i class="ph ph-plus" style="font-size:22px"></i>Add</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="home-empty"><div class="wb-lbl"><b>Home-Empty</b>first launch · explains share-sheet saving and pairing</div>
+<div class="phone" data-screen-label="Home-Empty">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="padding:8px 16px 0">
+    <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 4px 0 16px;gap:12px">
+      <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
+      <span style="flex:1;font:var(--wb-t-body-lg);color:var(--wb-text-faint)">Search bookmarks</span>
+      <i class="ph ph-gear-six" style="font-size:22px;color:var(--wb-text-muted);width:44px;height:44px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 32px 80px;gap:28px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font:var(--wb-t-title)">No bookmarks yet</div>
+      <div style="font:var(--wb-t-body);color:var(--wb-text-muted)">Two ways to fill this up.</div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start">
+      <i class="ph ph-share-network" style="font-size:24px;color:var(--wb-accent);margin-top:2px;flex:none"></i>
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font:var(--wb-t-title-sm)">Share a link from any app</div><div style="font:var(--wb-t-body);color:var(--wb-text-muted)">In Chrome, tap Share → wobook. Add tags, Save. You're back in the browser in a second.</div></div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start">
+      <i class="ph ph-qr-code" style="font-size:24px;color:var(--wb-accent);margin-top:2px;flex:none"></i>
+      <div style="display:flex;flex-direction:column;gap:10px"><div style="font:var(--wb-t-title-sm)">Pair with your desktop</div><div style="font:var(--wb-t-body);color:var(--wb-text-muted)">Your library syncs directly between devices on the same network or tailnet. No account, no cloud.</div>
+        <div style="display:flex;gap:8px"><span style="height:40px;padding:0 16px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:8px"><i class="ph ph-scan" style="font-size:18px"></i>Scan QR</span><span style="height:40px;padding:0 12px;border-radius:var(--wb-r-md);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Show my QR</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="position:absolute;right:16px;bottom:40px;height:56px;padding:0 20px 0 16px;border-radius:var(--wb-r-lg);background:var(--wb-bg);border:1px solid var(--wb-accent);color:var(--wb-accent);display:flex;align-items:center;gap:8px;font:var(--wb-t-body-md);box-shadow:var(--wb-shadow-2)"><i class="ph ph-plus" style="font-size:22px"></i>Add</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="home-none"><div class="wb-lbl"><b>Home-NoResults</b>keyboard up · offer Add with the query as URL</div>
+<div class="phone" data-screen-label="Home-NoResults">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="padding:8px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 4px 0 16px;gap:12px;box-shadow:inset 0 0 0 1px var(--wb-accent)">
+      <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
+      <span style="flex:1;font:var(--wb-t-body-lg)">zig allocators<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
+      <i class="ph ph-x" style="font-size:20px;color:var(--wb-text-muted);width:44px;height:44px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="display:flex;gap:8px;overflow:hidden;margin:0 -16px;padding:0 16px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">react</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">ui library</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">security</span>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:flex-start;padding:48px 32px 0;gap:12px">
+    <div style="font:var(--wb-t-title-sm)">Nothing matches “zig allocators”</div>
+    <div style="font:var(--wb-t-body);color:var(--wb-text-muted)">Fuzzy search looks at titles, URLs, descriptions and tags. Try fewer letters.</div>
+    <span style="margin-top:8px;height:40px;padding:0 16px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:8px"><i class="ph ph-plus" style="font-size:18px"></i>Add a bookmark</span>
+  </div>
+  <div style="flex:none;margin-top:auto">{{ keyboard }}</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="home-sync"><div class="wb-lbl"><b>Home-Syncing</b>2dp indeterminate line under the search field · never blocks</div>
+<div class="phone" data-screen-label="Home-Syncing">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="padding:8px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 4px 0 16px;gap:12px">
+      <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
+      <span style="flex:1;font:var(--wb-t-body-lg);color:var(--wb-text-faint)">Search bookmarks</span>
+      <i class="ph ph-arrows-clockwise" style="font-size:22px;color:var(--wb-accent);width:44px;height:44px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="height:2px;margin:-8px 8px 0;border-radius:1px;background:var(--wb-surface);overflow:hidden;position:relative">{{ syncBar }}</div>
+    <div style="display:flex;gap:8px;overflow:hidden;margin:0 -16px;padding:0 16px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">react</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">ui library</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">security</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+    </div>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:8px 0 0;display:flex;flex-direction:column">
+    <div style="padding:4px 16px 6px;font:var(--wb-t-label);color:var(--wb-text-faint)">Recent · 1,284 bookmarks</div>
+    <sc-for list="{{ recent }}" as="r" hint-placeholder-count="8">
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.title }}</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.url }}</div>
+        <div style="display:flex;gap:4px;height:20px"><sc-for list="{{ r.tags }}" as="t" hint-placeholder-count="2"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">{{ t }}</span></sc-for></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    </sc-for>
+  </div>
+  <div style="position:absolute;right:16px;bottom:40px;height:56px;padding:0 20px 0 16px;border-radius:var(--wb-r-lg);background:var(--wb-bg);border:1px solid var(--wb-accent);color:var(--wb-accent);display:flex;align-items:center;gap:8px;font:var(--wb-t-body-md);box-shadow:var(--wb-shadow-2)"><i class="ph ph-plus" style="font-size:22px"></i>Add</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="home-sheet"><div class="wb-lbl"><b>Home-ActionSheet</b>long press on a row · bottom action sheet</div>
+<div class="phone" data-screen-label="Home-ActionSheet">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="padding:8px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 4px 0 16px;gap:12px">
+      <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
+      <span style="flex:1;font:var(--wb-t-body-lg);color:var(--wb-text-faint)">Search bookmarks</span>
+      <i class="ph ph-gear-six" style="font-size:22px;color:var(--wb-text-muted);width:44px;height:44px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="display:flex;gap:8px;overflow:hidden;margin:0 -16px;padding:0 16px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">react</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">ui library</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">security</span>
+    </div>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:8px 0 0;display:flex;flex-direction:column">
+    <div style="padding:4px 16px 6px;font:var(--wb-t-label);color:var(--wb-text-faint)">Recent · 1,284 bookmarks</div>
+    <sc-for list="{{ recent }}" as="r" hint-placeholder-count="8">
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px;background:{{ r.pressedBg }}">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.title }}</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.url }}</div>
+        <div style="display:flex;gap:4px;height:20px"><sc-for list="{{ r.tags }}" as="t" hint-placeholder-count="2"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">{{ t }}</span></sc-for></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    </sc-for>
+  </div>
+  <div style="position:absolute;inset:0;background:var(--wb-scrim)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;background:var(--wb-bg-low);border-radius:var(--wb-r-xl) var(--wb-r-xl) 0 0;box-shadow:var(--wb-shadow-3);padding:8px 0 32px">
+    <div style="width:32px;height:4px;border-radius:2px;background:var(--wb-outline);margin:4px auto 12px"></div>
+    <div style="padding:4px 24px 12px;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-title-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Arch Wiki — systemd/Timers</div><div style="font:var(--wb-t-mono);color:var(--wb-text-muted)">wiki.archlinux.org/title/Systemd/Timers</div></div>
+    <div style="height:1px;background:var(--wb-outline-variant);margin:0 24px 4px"></div>
+    <div style="height:52px;display:flex;align-items:center;gap:16px;padding:0 24px;font:var(--wb-t-body-lg)"><i class="ph ph-arrow-square-out" style="font-size:24px;color:var(--wb-text-muted)"></i>Open in browser</div>
+    <div style="height:52px;display:flex;align-items:center;gap:16px;padding:0 24px;font:var(--wb-t-body-lg)"><i class="ph ph-copy" style="font-size:24px;color:var(--wb-text-muted)"></i>Copy URL</div>
+    <div style="height:52px;display:flex;align-items:center;gap:16px;padding:0 24px;font:var(--wb-t-body-lg)"><i class="ph ph-share-network" style="font-size:24px;color:var(--wb-text-muted)"></i>Share</div>
+    <div style="height:52px;display:flex;align-items:center;gap:16px;padding:0 24px;font:var(--wb-t-body-lg)"><i class="ph ph-pencil-simple" style="font-size:24px;color:var(--wb-text-muted)"></i>Edit</div>
+    <div style="height:52px;display:flex;align-items:center;gap:16px;padding:0 24px;font:var(--wb-t-body-lg);color:var(--wb-error)"><i class="ph ph-trash" style="font-size:24px"></i>Delete</div>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+</div>
+<p style="margin:22px 0 0;font:400 12px/1.6 Inter,system-ui;color:#7f849c;max-width:900px">Offline-with-local-data is intentionally identical to Home-Idle: no banner, no icon. Sync state lives in Devices/Settings. Swipe-right on a row copies the URL (same icon as the trailing Copy button, revealed on a surface ground).</p>
+</section>
+
+
+<section class="wb-sec" id="detail-sec">
+<div class="wb-h"><h2>2 · Bookmark detail</h2><span>Open · Copy · Share primary · Edit, Delete secondary · delete undoes via snackbar</span></div>
+<div class="wb-grid">
+
+<div class="wb-fr" id="detail"><div class="wb-lbl"><b>Detail</b>default</div>
+<div class="phone" data-screen-label="Detail">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <i class="ph ph-arrow-left" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1"></span>
+    <i class="ph ph-pencil-simple" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--wb-text-muted)"></i>
+    <i class="ph ph-trash" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--wb-text-muted)"></i>
+  </div>
+  <div style="flex:1;padding:8px 20px 0;display:flex;flex-direction:column;gap:20px">
+    <div style="font:var(--wb-t-title);text-wrap:pretty">Arch Wiki — systemd/Timers</div>
+    <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);word-break:break-all;padding:12px 14px;border-radius:var(--wb-r-md);background:var(--wb-surface);user-select:all">https://wiki.archlinux.org/title/Systemd/Timers#Realtime_timer</div>
+    <div style="font:var(--wb-t-body-lg);color:var(--wb-text);text-wrap:pretty">Timers are systemd unit files whose name ends in .timer that control .service files or events. An alternative to cron with calendar and monotonic time.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">systemd</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">docs</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;font:var(--wb-t-label);color:var(--wb-text-faint);padding-top:4px">
+      <div>Saved 14 Mar 2026, 21:07</div>
+      <div>Last changed on <span style="color:var(--wb-text-muted)">gdesktop</span> · 2 days ago</div>
+    </div>
+  </div>
+  <div style="padding:16px 20px 40px;display:flex;gap:8px">
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-arrow-square-out" style="font-size:20px"></i>Open</span>
+    <span style="width:48px;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);display:inline-flex;align-items:center;justify-content:center"><i class="ph ph-copy" style="font-size:22px"></i></span>
+    <span style="width:48px;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);display:inline-flex;align-items:center;justify-content:center"><i class="ph ph-share-network" style="font-size:22px"></i></span>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="detail-undo"><div class="wb-lbl"><b>Detail-Deleted</b>after Delete: back on Home, snackbar with Undo (6 s), no dialog</div>
+<div class="phone" data-screen-label="Detail-Deleted">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="padding:8px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="height:52px;border-radius:var(--wb-r-lg);background:var(--wb-surface);display:flex;align-items:center;padding:0 4px 0 16px;gap:12px">
+      <i class="ph ph-magnifying-glass" style="font-size:22px;color:var(--wb-text-muted)"></i>
+      <span style="flex:1;font:var(--wb-t-body-lg);color:var(--wb-text-faint)">Search bookmarks</span>
+      <i class="ph ph-gear-six" style="font-size:22px;color:var(--wb-text-muted);width:44px;height:44px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="display:flex;gap:8px;overflow:hidden;margin:0 -16px;padding:0 16px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">react</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">linux</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">ui library</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">security</span>
+    </div>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:8px 0 0;display:flex;flex-direction:column">
+    <div style="padding:4px 16px 6px;font:var(--wb-t-label);color:var(--wb-text-faint)">Recent · 1,283 bookmarks</div>
+    <sc-for list="{{ recentAfterDelete }}" as="r" hint-placeholder-count="7">
+    <div style="display:flex;align-items:center;min-height:64px;padding:10px 4px 10px 16px;gap:12px">
+      <span style="width:20px;height:20px;border-radius:4px;flex:none;background:var(--wb-surface)"></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+        <div style="font:var(--wb-t-body-lg);line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.title }}</div>
+        <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.url }}</div>
+        <div style="display:flex;gap:4px;height:20px"><sc-for list="{{ r.tags }}" as="t" hint-placeholder-count="2"><span style="height:20px;padding:0 7px;border-radius:4px;background:var(--wb-surface);color:var(--wb-text-muted);font:var(--wb-t-label);display:inline-flex;align-items:center">{{ t }}</span></sc-for></div>
+      </div>
+      <i class="ph ph-copy" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none"></i>
+      <i class="ph ph-arrow-square-out" style="font-size:22px;color:var(--wb-accent);width:48px;height:48px;display:flex;align-items:center;justify-content:center;flex:none;margin-left:-8px"></i>
+    </div>
+    </sc-for>
+  </div>
+  <div style="position:absolute;left:16px;right:16px;bottom:36px;height:48px;border-radius:var(--wb-r-md);background:var(--wb-inverse-surface);color:var(--wb-inverse-text);display:flex;align-items:center;padding:0 8px 0 16px;gap:8px;font:var(--wb-t-body);box-shadow:var(--wb-shadow-2)"><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Deleted “Arch Wiki — systemd/Timers”</span><span style="font:var(--wb-t-body-md);padding:0 12px;height:36px;display:inline-flex;align-items:center;color:var(--ctp-blue);filter:brightness(.7) saturate(1.3)">Undo</span></div>
+  <div class="gest"></div>
+</div></div>
+
+</div>
+</section>
+
+<section class="wb-sec" id="form-sec">
+<div class="wb-h"><h2>3 · Add / Edit bookmark</h2><span>same form, two entry points · Save in the app bar and above the keyboard</span></div>
+<div class="wb-grid">
+
+<div class="wb-fr" id="form-fetching"><div class="wb-lbl"><b>Form-Fetching</b>URL pasted · title + description shimmer · tags field focused</div>
+<div class="phone" data-screen-label="Form-Fetching">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 12px 0 4px;gap:4px">
+    <i class="ph ph-x" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">Add bookmark</span>
+    <span style="height:40px;padding:0 16px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Save</span>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:4px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">URL</span><span style="font:var(--wb-t-mono);color:var(--wb-text);word-break:break-all">https://developer.android.com/develop/ui/compose/side-effects</span></div>
+    <div style="height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:6px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Title</span>{{ shimmer }}</div>
+    <div style="height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:6px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Description</span>{{ shimmerLong }}</div>
+    <div style="font:var(--wb-t-label);color:var(--wb-text-faint);margin:-6px 0 0 14px;display:flex;align-items:center;gap:6px"><i class="ph ph-circle-notch" style="font-size:14px;color:var(--wb-accent)"></i>Fetching page details…</div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px">
+      <span style="font:var(--wb-t-label);color:var(--wb-accent)">Tags</span>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">android<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+        <span style="font:var(--wb-t-body-lg);color:var(--wb-text)">comp<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;padding:0 2px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center"><span style="color:var(--wb-accent);font-weight:600">comp</span>ose</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center"><span style="color:var(--wb-accent);font-weight:600">comp</span>onents</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">docs</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">kotlin</span>
+    </div>
+  </div>
+  <div style="padding:8px 16px 8px;display:flex;align-items:center;gap:12px;background:var(--wb-bg)"><span style="font:var(--wb-t-label);color:var(--wb-text-faint);flex:1">Space or comma adds a tag</span><span style="height:40px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Save</span></div>
+  <div style="flex:none">{{ keyboard }}</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="form-fetched"><div class="wb-lbl"><b>Form-Fetched</b>auto-filled · keyboard dismissed</div>
+<div class="phone" data-screen-label="Form-Fetched">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 12px 0 4px;gap:4px">
+    <i class="ph ph-x" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">Add bookmark</span>
+    <span style="height:40px;padding:0 16px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Save</span>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:4px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">URL</span><span style="font:var(--wb-t-mono);color:var(--wb-text);word-break:break-all">https://developer.android.com/develop/ui/compose/side-effects</span></div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Title</span><span style="font:var(--wb-t-body-lg)">Side-effects in Compose · Jetpack Compose</span></div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Description</span><span style="font:var(--wb-t-body);text-wrap:pretty">A side-effect is a change to the state of the app that happens outside the scope of a composable function. LaunchedEffect, rememberCoroutineScope, DisposableEffect and friends.</span></div>
+    <div style="font:var(--wb-t-label);color:var(--wb-text-faint);margin:-6px 0 0 14px;display:flex;align-items:center;gap:6px"><i class="ph ph-check" style="font-size:14px;color:var(--wb-success)"></i>Filled from the page · edit anything</div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px">
+      <span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Tags</span>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">android<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+        <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">compose<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+        <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">docs<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+        <span style="font:var(--wb-t-body-lg);color:var(--wb-text-faint)">Add tag</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;padding:0 2px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">kotlin</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">ui</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">reference</span>
+    </div>
+  </div>
+  <div style="padding:16px 16px 40px"><span style="height:48px;width:100%;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:flex;align-items:center;justify-content:center">Save</span></div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="form-failed"><div class="wb-lbl"><b>Form-FetchFailed</b>inline note · fields stay editable</div>
+<div class="phone" data-screen-label="Form-FetchFailed">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 12px 0 4px;gap:4px">
+    <i class="ph ph-x" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">Add bookmark</span>
+    <span style="height:40px;padding:0 16px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Save</span>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:4px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">URL</span><span style="font:var(--wb-t-mono);color:var(--wb-text);word-break:break-all">https://intranet.local/wiki/runbooks/db-failover</span></div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-accent)">Title</span><span style="font:var(--wb-t-body-lg)">DB failover runbook<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span></div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Description</span><span style="font:var(--wb-t-body-lg);color:var(--wb-text-faint)">Optional</span></div>
+    <div style="font:var(--wb-t-label);color:var(--wb-text-muted);margin:-6px 0 0 14px;display:flex;align-items:center;gap:6px"><i class="ph ph-warning-circle" style="font-size:14px;color:var(--wb-warning)"></i>Couldn't reach the page — fill in the title yourself <span style="color:var(--wb-accent);margin-left:4px">Retry</span></div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px">
+      <span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Tags</span>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">work<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+        <span style="font:var(--wb-t-body-lg);color:var(--wb-text-faint)">Add tag</span>
+      </div>
+    </div>
+  </div>
+  <div style="padding:8px 16px 8px;display:flex;align-items:center;gap:12px"><span style="flex:1"></span><span style="height:40px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Save</span></div>
+  <div style="flex:none">{{ keyboard }}</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="form-edit"><div class="wb-lbl"><b>Form-AlreadySaved</b>URL exists → becomes Edit with a banner</div>
+<div class="phone" data-screen-label="Form-AlreadySaved">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 12px 0 4px;gap:4px">
+    <i class="ph ph-x" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">Edit bookmark</span>
+    <span style="height:40px;padding:0 16px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Save</span>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;padding:4px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div style="padding:10px 14px;border-radius:var(--wb-r-md);background:var(--wb-accent-container);color:var(--wb-text);font:var(--wb-t-body);display:flex;align-items:center;gap:10px"><i class="ph ph-bookmark-simple" style="font-size:18px;color:var(--wb-accent);flex:none"></i><span>Already saved on <b style="font-weight:500">2 Jan 2026</b>, editing it</span></div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">URL</span><span style="font:var(--wb-t-mono);color:var(--wb-text);word-break:break-all">https://github.com/jarun/buku</span></div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Title</span><span style="font:var(--wb-t-body-lg)">buku — bookmark manager like a text-based mind</span></div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline-variant);padding:6px 14px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-text-muted)">Description</span><span style="font:var(--wb-t-body)">Personal mini-web, in the terminal. The CLI this app replaces on the phone.</span></div>
+    <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px">
+      <span style="font:var(--wb-t-label);color:var(--wb-accent)">Tags</span>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">linux<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+        <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">cli<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+        <span style="font:var(--wb-t-body-lg)"><span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px"></span></span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;padding:0 2px">
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">bookmarks</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">python</span>
+      <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center">tools</span>
+    </div>
+  </div>
+  <div style="padding:8px 16px 8px;display:flex;align-items:center;gap:12px"><span style="font:var(--wb-t-label);color:var(--wb-text-faint);flex:1">Space or comma adds a tag</span><span style="height:40px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Save</span></div>
+  <div style="flex:none">{{ keyboard }}</div>
+  <div class="gest"></div>
+</div></div>
+
+</div>
+</section>
+
+<section class="wb-sec" id="share-sec">
+<div class="wb-h"><h2>4 · Share-sheet receiver</h2><span>bottom sheet over Chrome · tags focused, keyboard up · one tap Save</span></div>
+<div class="wb-grid">
+
+<div class="wb-fr" id="share-fresh"><div class="wb-lbl"><b>Share-Fresh</b>URL + title from the share intent · description fetching</div>
+<div class="phone" data-screen-label="Share-Fresh" style="background:var(--wb-bg-lowest)">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="flex:1;position:relative;opacity:.5;padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+    <div style="height:40px;border-radius:20px;background:var(--wb-surface);display:flex;align-items:center;padding:0 16px;font:var(--wb-t-mono);color:var(--wb-text-muted)">ui.shadcn.com/docs</div>
+    <div style="height:14px;width:60%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:92%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:85%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:70%;border-radius:4px;background:var(--wb-surface)"></div>
+  </div>
+  <div style="position:absolute;inset:0;background:var(--wb-scrim)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:var(--wb-bg-low);border-radius:var(--wb-r-xl) var(--wb-r-xl) 0 0;box-shadow:var(--wb-shadow-3)">
+    <div style="width:32px;height:4px;border-radius:2px;background:var(--wb-outline);margin:12px auto 8px"></div>
+    <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <div style="font:var(--wb-t-title-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">shadcn/ui — Build your component library</div>
+          <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ui.shadcn.com/docs</div>
+        </div>
+        <span style="height:36px;padding:0 10px;border-radius:var(--wb-r-md);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:4px;flex:none;margin-top:-2px">More<i class="ph ph-caret-up" style="font-size:14px"></i></span>
+      </div>
+      <div style="font:var(--wb-t-label);color:var(--wb-text-faint);display:flex;align-items:center;gap:6px"><i class="ph ph-circle-notch" style="font-size:14px;color:var(--wb-accent)"></i>Fetching description in the background</div>
+      <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px;background:var(--wb-bg)">
+        <span style="font:var(--wb-t-label);color:var(--wb-accent)">Tags</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">react<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+          <span style="font:var(--wb-t-body-lg)">ui<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;overflow:hidden;margin:0 -20px;padding:0 20px">
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none"><span style="color:var(--wb-accent);font-weight:600">ui</span><span>&nbsp;library</span></span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none"><span style="color:var(--wb-accent);font-weight:600">ui</span></span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">tailwind</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">components</span>
+      </div>
+      <span style="height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:flex;align-items:center;justify-content:center;margin-top:2px">Save</span>
+    </div>
+    {{ keyboard }}
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="share-dup"><div class="wb-lbl"><b>Share-AlreadySaved</b>offers “Update tags”, never a duplicate</div>
+<div class="phone" data-screen-label="Share-AlreadySaved" style="background:var(--wb-bg-lowest)">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="flex:1;position:relative;opacity:.5;padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+    <div style="height:40px;border-radius:20px;background:var(--wb-surface);display:flex;align-items:center;padding:0 16px;font:var(--wb-t-mono);color:var(--wb-text-muted)">github.com/jarun/buku</div>
+    <div style="height:14px;width:60%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:92%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:85%;border-radius:4px;background:var(--wb-surface)"></div>
+  </div>
+  <div style="position:absolute;inset:0;background:var(--wb-scrim)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:var(--wb-bg-low);border-radius:var(--wb-r-xl) var(--wb-r-xl) 0 0;box-shadow:var(--wb-shadow-3)">
+    <div style="width:32px;height:4px;border-radius:2px;background:var(--wb-outline);margin:12px auto 8px"></div>
+    <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:10px">
+      <div style="padding:10px 14px;border-radius:var(--wb-r-md);background:var(--wb-accent-container);color:var(--wb-text);font:var(--wb-t-body);display:flex;align-items:center;gap:10px"><i class="ph ph-bookmark-simple" style="font-size:18px;color:var(--wb-accent);flex:none"></i><span>Already saved on <b style="font-weight:500">2 Jan 2026</b></span></div>
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <div style="font:var(--wb-t-title-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">buku — bookmark manager like a text-based mind</div>
+          <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">github.com/jarun/buku</div>
+        </div>
+        <span style="height:36px;padding:0 10px;border-radius:var(--wb-r-md);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:4px;flex:none;margin-top:-2px">Edit<i class="ph ph-caret-up" style="font-size:14px"></i></span>
+      </div>
+      <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px;background:var(--wb-bg)">
+        <span style="font:var(--wb-t-label);color:var(--wb-accent)">Tags</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">linux<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+          <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">cli<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+          <span style="font:var(--wb-t-body-lg)"><span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px"></span></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;overflow:hidden;margin:0 -20px;padding:0 20px">
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">bookmarks</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">python</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">tools</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+      </div>
+      <span style="height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:flex;align-items:center;justify-content:center;margin-top:2px">Update tags</span>
+    </div>
+    {{ keyboard }}
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="share-failed"><div class="wb-lbl"><b>Share-FetchFailed</b>title from the share text is kept · note only</div>
+<div class="phone" data-screen-label="Share-FetchFailed" style="background:var(--wb-bg-lowest)">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="flex:1;position:relative;opacity:.5;padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+    <div style="height:40px;border-radius:20px;background:var(--wb-surface);display:flex;align-items:center;padding:0 16px;font:var(--wb-t-mono);color:var(--wb-text-muted)">intranet.local/wiki/runbooks</div>
+    <div style="height:14px;width:60%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:92%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:85%;border-radius:4px;background:var(--wb-surface)"></div>
+  </div>
+  <div style="position:absolute;inset:0;background:var(--wb-scrim)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:var(--wb-bg-low);border-radius:var(--wb-r-xl) var(--wb-r-xl) 0 0;box-shadow:var(--wb-shadow-3)">
+    <div style="width:32px;height:4px;border-radius:2px;background:var(--wb-outline);margin:12px auto 8px"></div>
+    <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <div style="font:var(--wb-t-title-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">DB failover runbook</div>
+          <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">intranet.local/wiki/runbooks/db-failover</div>
+        </div>
+        <span style="height:36px;padding:0 10px;border-radius:var(--wb-r-md);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:4px;flex:none;margin-top:-2px">More<i class="ph ph-caret-up" style="font-size:14px"></i></span>
+      </div>
+      <div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><i class="ph ph-warning-circle" style="font-size:14px;color:var(--wb-warning)"></i>Couldn't fetch a description — saving without one</div>
+      <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px;background:var(--wb-bg)">
+        <span style="font:var(--wb-t-label);color:var(--wb-accent)">Tags</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">work<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+          <span style="font:var(--wb-t-body-lg)"><span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px"></span></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;overflow:hidden;margin:0 -20px;padding:0 20px">
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">ops</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">runbook</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">postgres</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">docs</span>
+      </div>
+      <span style="height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:flex;align-items:center;justify-content:center;margin-top:2px">Save</span>
+    </div>
+    {{ keyboard }}
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="share-offline"><div class="wb-lbl"><b>Share-Offline</b>no network: skip fetch, say it once, save locally</div>
+<div class="phone" data-screen-label="Share-Offline" style="background:var(--wb-bg-lowest)">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-airplane"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="flex:1;position:relative;opacity:.5;padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+    <div style="height:40px;border-radius:20px;background:var(--wb-surface);display:flex;align-items:center;padding:0 16px;font:var(--wb-t-mono);color:var(--wb-text-muted)">vlcn.io/blog/intro-to-crdts</div>
+    <div style="height:14px;width:60%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:92%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:85%;border-radius:4px;background:var(--wb-surface)"></div>
+  </div>
+  <div style="position:absolute;inset:0;background:var(--wb-scrim)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:var(--wb-bg-low);border-radius:var(--wb-r-xl) var(--wb-r-xl) 0 0;box-shadow:var(--wb-shadow-3)">
+    <div style="width:32px;height:4px;border-radius:2px;background:var(--wb-outline);margin:12px auto 8px"></div>
+    <div style="padding:0 20px 12px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <div style="font:var(--wb-t-title-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">A Gentle Introduction to CRDTs</div>
+          <div style="font:var(--wb-t-mono);color:var(--wb-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">vlcn.io/blog/intro-to-crdts</div>
+        </div>
+        <span style="height:36px;padding:0 10px;border-radius:var(--wb-r-md);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:4px;flex:none;margin-top:-2px">More<i class="ph ph-caret-up" style="font-size:14px"></i></span>
+      </div>
+      <div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><i class="ph ph-cloud-slash" style="font-size:14px;color:var(--wb-text-faint)"></i>Offline — saved on this device, syncs later</div>
+      <div style="min-height:52px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px 8px;display:flex;flex-direction:column;gap:6px;background:var(--wb-bg)">
+        <span style="font:var(--wb-t-label);color:var(--wb-accent)">Tags</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="height:28px;padding:0 4px 0 10px;border-radius:var(--wb-r-full);background:var(--wb-surface);color:var(--wb-text);font:var(--wb-t-label-md);display:inline-flex;align-items:center;gap:2px">crdt<i class="ph ph-x" style="font-size:14px;padding:5px;color:var(--wb-text-muted)"></i></span>
+          <span style="font:var(--wb-t-body-lg)">sy<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;overflow:hidden;margin:0 -20px;padding:0 20px">
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none"><span style="color:var(--wb-accent);font-weight:600">sy</span>nc</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none"><span style="color:var(--wb-accent);font-weight:600">sy</span>stemd</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">distributed</span>
+        <span style="height:32px;padding:0 12px;border-radius:var(--wb-r-full);border:1px solid var(--wb-outline);color:var(--wb-text-muted);font:var(--wb-t-body-md);display:inline-flex;align-items:center;flex:none">blog</span>
+      </div>
+      <span style="height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:flex;align-items:center;justify-content:center;margin-top:2px">Save</span>
+    </div>
+    {{ keyboard }}
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="share-saved-toast"><div class="wb-lbl"><b>Share-Saved</b>sheet gone · 1.5 s toast over Chrome, then nothing</div>
+<div class="phone" data-screen-label="Share-Saved" style="background:var(--wb-bg-lowest)">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="flex:1;position:relative;opacity:.5;padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+    <div style="height:40px;border-radius:20px;background:var(--wb-surface);display:flex;align-items:center;padding:0 16px;font:var(--wb-t-mono);color:var(--wb-text-muted)">ui.shadcn.com/docs</div>
+    <div style="height:14px;width:60%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:92%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:85%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:70%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:88%;border-radius:4px;background:var(--wb-surface)"></div><div style="height:10px;width:64%;border-radius:4px;background:var(--wb-surface)"></div>
+  </div>
+  <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:72px;height:44px;padding:0 20px;border-radius:var(--wb-r-full);background:var(--wb-inverse-surface);color:var(--wb-inverse-text);display:flex;align-items:center;gap:10px;font:var(--wb-t-body-md);box-shadow:var(--wb-shadow-2);white-space:nowrap"><i class="ph ph-check" style="font-size:18px"></i>Saved to wobook · react, ui library</div>
+  <div class="gest"></div>
+</div></div>
+
+</div>
+</section>
+
+<section class="wb-sec" id="pair-sec">
+<div class="wb-h"><h2>5 · Pairing</h2><span>symmetric · QR carries fingerprint + endpoints + 120 s one-time secret</span></div>
+<div class="wb-grid">
+
+<div class="wb-fr" id="pair-scan"><div class="wb-lbl"><b>Pair-Scan</b>camera · framing square · torch · paste fallback</div>
+<div class="phone" data-screen-label="Pair-Scan" style="background:var(--wb-bg-lowest)">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,var(--ctp-surface0) 0%,var(--ctp-crust) 70%)"></div>
+  <div style="position:relative;height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <i class="ph ph-x" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">Scan a device's code</span>
+    <i class="ph ph-flashlight" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--wb-text-muted)"></i>
+  </div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding-bottom:40px">
+    <div style="width:260px;height:260px;position:relative">
+      <span style="position:absolute;left:0;top:0;width:36px;height:36px;border-left:3px solid var(--wb-accent);border-top:3px solid var(--wb-accent);border-radius:8px 0 0 0"></span>
+      <span style="position:absolute;right:0;top:0;width:36px;height:36px;border-right:3px solid var(--wb-accent);border-top:3px solid var(--wb-accent);border-radius:0 8px 0 0"></span>
+      <span style="position:absolute;left:0;bottom:0;width:36px;height:36px;border-left:3px solid var(--wb-accent);border-bottom:3px solid var(--wb-accent);border-radius:0 0 0 8px"></span>
+      <span style="position:absolute;right:0;bottom:0;width:36px;height:36px;border-right:3px solid var(--wb-accent);border-bottom:3px solid var(--wb-accent);border-radius:0 0 8px 0"></span>
+    </div>
+    <div style="font:var(--wb-t-body);color:var(--wb-text-muted);text-align:center;max-width:280px">On the other device open Devices → Show my QR</div>
+  </div>
+  <div style="position:relative;padding:0 20px 44px;display:flex;flex-direction:column;gap:8px">
+    <span style="height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-clipboard-text" style="font-size:20px"></i>Paste code instead</span>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="pair-connecting"><div class="wb-lbl"><b>Pair-Connecting</b>on decode · short state, 2dp line</div>
+<div class="phone" data-screen-label="Pair-Connecting" style="background:var(--wb-bg-lowest)">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,var(--ctp-surface0) 0%,var(--ctp-crust) 70%)"></div>
+  <div style="position:relative;height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <i class="ph ph-x" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">Scan a device's code</span>
+  </div>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding-bottom:40px">
+    <div style="width:260px;height:260px;position:relative;border-radius:8px;box-shadow:inset 0 0 0 3px var(--wb-accent);display:flex;align-items:center;justify-content:center;background:var(--wb-accent-container)">
+      <div style="width:200px;height:2px;background:var(--wb-surface);border-radius:1px;overflow:hidden;position:relative">{{ syncBar }}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;align-items:center"><div style="font:var(--wb-t-title-sm)">Connecting to gdesktop…</div><div style="font:var(--wb-t-body);color:var(--wb-text-muted)">via Tailscale · 100.84.12.7</div></div>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="pair-qr"><div class="wb-lbl"><b>Pair-ShowQR</b>large QR · device name · 120 s ring · copy as text</div>
+<div class="phone" data-screen-label="Pair-ShowQR">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <i class="ph ph-arrow-left" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">My pairing code</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:0 20px 56px">
+    <div style="position:relative;width:300px;height:300px;display:flex;align-items:center;justify-content:center">
+      <svg width="300" height="300" viewBox="0 0 300 300" style="position:absolute;inset:0;transform:rotate(-90deg)"><circle cx="150" cy="150" r="146" fill="none" stroke="var(--wb-surface)" stroke-width="3"></circle><circle cx="150" cy="150" r="146" fill="none" stroke="var(--wb-accent)" stroke-width="3" stroke-linecap="round" stroke-dasharray="917" stroke-dashoffset="245"></circle></svg>
+      <div style="padding:10px;background:var(--ctp-text);border-radius:var(--wb-r-md)">{{ qrLarge }}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+      <div style="font:var(--wb-t-title)">pixel-8</div>
+      <div style="font:var(--wb-t-body);color:var(--wb-text-muted)">Code expires in <span style="color:var(--wb-text);font-variant-numeric:tabular-nums">1:28</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+      <span style="height:40px;padding:0 16px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:8px"><i class="ph ph-copy" style="font-size:18px"></i>Copy as text</span>
+      <div style="font:var(--wb-t-label);color:var(--wb-text-faint);text-align:center">Paste it into “Paste code instead” on the other phone</div>
+    </div>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="pair-confirm"><div class="wb-lbl"><b>Pair-Confirm</b>same fingerprint on both devices · Trust / Reject</div>
+<div class="phone" data-screen-label="Pair-Confirm">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <span style="width:48px"></span><span style="flex:1;font:var(--wb-t-title-sm)">Confirm device</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;padding:24px 20px 0;gap:24px">
+    <div style="display:flex;align-items:center;gap:14px">
+      <span style="width:48px;height:48px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:26px;color:var(--wb-text-muted)"></i></span>
+      <div style="display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-title)">gdesktop</div><div style="font:var(--wb-t-body);color:var(--wb-text-muted)">Linux · wants to pair</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:var(--wb-t-label-md);color:var(--wb-text-muted);text-transform:uppercase;letter-spacing:.06em">Fingerprint</div>
+      <div style="font:500 20px/30px var(--wb-mono);letter-spacing:.05em;display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;padding:16px 18px;border-radius:var(--wb-r-md);background:var(--wb-surface)"><span>3fa1c9d2</span><span>77be0041</span><span>9e2c5a10</span><span>b4d7f6e3</span></div>
+      <div style="font:var(--wb-t-body);color:var(--wb-text-muted);text-wrap:pretty">gdesktop shows the same four groups. If they differ, someone on the network is in the middle — reject.</div>
+    </div>
+  </div>
+  <div style="padding:16px 20px 44px;display:flex;gap:8px">
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center">Reject</span>
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-shield-check" style="font-size:20px"></i>Trust</span>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="pair-success"><div class="wb-lbl"><b>Pair-Success</b>back on Devices · new peer syncing · snackbar</div>
+<div class="phone" data-screen-label="Pair-Success">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <i class="ph ph-arrow-left" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">Devices</span>
+  </div>
+  <div style="height:2px;margin:-2px 16px 0;border-radius:1px;background:var(--wb-surface);overflow:hidden;position:relative">{{ syncBar }}</div>
+  <div style="flex:1;display:flex;flex-direction:column;padding-top:8px">
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--wb-accent-container)">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">gdesktop</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-tailscale)"></span>Tailscale · syncing 1,284 bookmarks…</div></div>
+      <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">thinkpad</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-success)"></span>LAN · synced 2 min ago</div></div>
+      <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+  </div>
+  <div style="padding:0 16px 16px;display:flex;gap:8px">
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-scan" style="font-size:20px"></i>Scan QR</span>
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-qr-code" style="font-size:20px"></i>Show my QR</span>
+  </div>
+  <div style="padding:0 16px 40px;font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:8px"><i class="ph ph-arrows-clockwise" style="font-size:16px;color:var(--wb-accent)"></i>Syncing with gdesktop</div>
+  <div style="position:absolute;left:16px;right:16px;bottom:36px;height:48px;border-radius:var(--wb-r-md);background:var(--wb-inverse-surface);color:var(--wb-inverse-text);display:flex;align-items:center;padding:0 16px;gap:8px;font:var(--wb-t-body);box-shadow:var(--wb-shadow-2)">Paired with gdesktop</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="pair-expired"><div class="wb-lbl"><b>Pair-Expired</b>code older than 120 s</div>
+<div class="phone" data-screen-label="Pair-Expired">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px"><i class="ph ph-x" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i><span style="flex:1;font:var(--wb-t-title-sm)">Pairing</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 32px 80px;gap:12px">
+    <i class="ph ph-timer" style="font-size:32px;color:var(--wb-text-muted)"></i>
+    <div style="font:var(--wb-t-title)">This code has expired</div>
+    <div style="font:var(--wb-t-body);color:var(--wb-text-muted);text-wrap:pretty">Pairing codes are valid for two minutes. Ask gdesktop to show a fresh one and scan again.</div>
+    <span style="margin-top:12px;height:48px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px;align-self:flex-start"><i class="ph ph-scan" style="font-size:20px"></i>Scan again</span>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="pair-rejected"><div class="wb-lbl"><b>Pair-Rejected</b>other side declined</div>
+<div class="phone" data-screen-label="Pair-Rejected">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px"><i class="ph ph-x" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i><span style="flex:1;font:var(--wb-t-title-sm)">Pairing</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 32px 80px;gap:12px">
+    <i class="ph ph-hand-palm" style="font-size:32px;color:var(--wb-text-muted)"></i>
+    <div style="font:var(--wb-t-title)">gdesktop rejected the pairing</div>
+    <div style="font:var(--wb-t-body);color:var(--wb-text-muted);text-wrap:pretty">Nothing was shared. If you didn't expect this, check that the fingerprints matched on both screens.</div>
+    <span style="margin-top:12px;height:48px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;align-self:flex-start">Back to Devices</span>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="pair-unreachable"><div class="wb-lbl"><b>Pair-Unreachable</b>decoded, but no endpoint answers</div>
+<div class="phone" data-screen-label="Pair-Unreachable">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px"><i class="ph ph-x" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i><span style="flex:1;font:var(--wb-t-title-sm)">Pairing</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 32px 80px;gap:12px">
+    <i class="ph ph-wifi-slash" style="font-size:32px;color:var(--wb-text-muted)"></i>
+    <div style="font:var(--wb-t-title)">Can't reach gdesktop</div>
+    <div style="font:var(--wb-t-body);color:var(--wb-text-muted);text-wrap:pretty">Tried 192.168.1.40 and 100.84.12.7. Both devices need to be on the same Wi-Fi or in the same tailnet.</div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <span style="height:48px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center">Retry</span>
+      <span style="height:48px;padding:0 16px;border-radius:var(--wb-r-md);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center">Cancel</span>
+    </div>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="pair-camera"><div class="wb-lbl"><b>Pair-CameraDenied</b>permission denied · paste fallback stays</div>
+<div class="phone" data-screen-label="Pair-CameraDenied">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px"><i class="ph ph-x" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i><span style="flex:1;font:var(--wb-t-title-sm)">Scan a device's code</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 32px;gap:12px">
+    <i class="ph ph-camera-slash" style="font-size:32px;color:var(--wb-text-muted)"></i>
+    <div style="font:var(--wb-t-title)">Camera access is off</div>
+    <div style="font:var(--wb-t-body);color:var(--wb-text-muted);text-wrap:pretty">wobook only uses the camera to read pairing codes. Allow it in system settings, or paste the code as text.</div>
+    <span style="margin-top:12px;height:48px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;align-self:flex-start">Open settings</span>
+  </div>
+  <div style="padding:0 20px 44px"><span style="height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-clipboard-text" style="font-size:20px"></i>Paste code instead</span></div>
+  <div class="gest"></div>
+</div></div>
+
+</div>
+</section>
+
+<section class="wb-sec" id="devices-sec">
+<div class="wb-h"><h2>6 · Devices</h2><span>paired peers · reachability dot · revoke is the only confirmation dialog in the app</span></div>
+<div class="wb-grid">
+
+<div class="wb-fr" id="devices"><div class="wb-lbl"><b>Devices</b>list · footer “Up to date”</div>
+<div class="phone" data-screen-label="Devices">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <i class="ph ph-arrow-left" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">Devices</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;padding-top:8px">
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">gdesktop</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-tailscale)"></span>Tailscale · synced 2 min ago</div></div>
+      <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">thinkpad</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-success)"></span>LAN · synced just now</div></div>
+      <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-android-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">old-pixel</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-outline)"></span>Unreachable · synced 11 days ago</div></div>
+      <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+  </div>
+  <div style="padding:0 16px 16px;display:flex;gap:8px">
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-scan" style="font-size:20px"></i>Scan QR</span>
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-qr-code" style="font-size:20px"></i>Show my QR</span>
+  </div>
+  <div style="padding:0 16px 40px;font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:8px"><i class="ph ph-check-circle" style="font-size:16px;color:var(--wb-success)"></i>Up to date · this device is <span style="color:var(--wb-text)">pixel-8</span></div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="devices-menu"><div class="wb-lbl"><b>Devices-RowMenu</b>rename / revoke · footer “No device reachable”</div>
+<div class="phone" data-screen-label="Devices-RowMenu">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <i class="ph ph-arrow-left" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">Devices</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;padding-top:8px;position:relative">
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">gdesktop</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-outline)"></span>Unreachable · synced 3 h ago</div></div>
+      <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">thinkpad</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-outline)"></span>Unreachable · synced 3 h ago</div></div>
+      <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--wb-surface)">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface-high);display:flex;align-items:center;justify-content:center"><i class="ph ph-android-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">old-pixel</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-outline)"></span>Unreachable · synced 11 days ago</div></div>
+      <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="position:absolute;right:16px;top:176px;width:200px;padding:8px 0;border-radius:var(--wb-r-md);background:var(--wb-bg-low);box-shadow:var(--wb-shadow-3)">
+      <div style="height:48px;display:flex;align-items:center;gap:12px;padding:0 16px;font:var(--wb-t-body)"><i class="ph ph-pencil-simple" style="font-size:20px;color:var(--wb-text-muted)"></i>Rename</div>
+      <div style="height:48px;display:flex;align-items:center;gap:12px;padding:0 16px;font:var(--wb-t-body);color:var(--wb-error)"><i class="ph ph-link-break" style="font-size:20px"></i>Revoke…</div>
+    </div>
+  </div>
+  <div style="padding:0 16px 16px;display:flex;gap:8px">
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-scan" style="font-size:20px"></i>Scan QR</span>
+    <span style="flex:1;height:48px;border-radius:var(--wb-r-md);border:1px solid var(--wb-outline);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-qr-code" style="font-size:20px"></i>Show my QR</span>
+  </div>
+  <div style="padding:0 16px 40px;font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:8px"><i class="ph ph-cloud-slash" style="font-size:16px;color:var(--wb-text-faint)"></i>No device reachable — changes saved locally</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="devices-revoke"><div class="wb-lbl"><b>Devices-Revoke</b>destructive, not undoable → dialog</div>
+<div class="phone" data-screen-label="Devices-Revoke">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <i class="ph ph-arrow-left" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">Devices</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;padding-top:8px">
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">gdesktop</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-tailscale)"></span>Tailscale · synced 2 min ago</div></div>
+      <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-linux-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">thinkpad</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-success)"></span>LAN · synced just now</div></div>
+      <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+    <div style="min-height:72px;display:flex;align-items:center;gap:14px;padding:12px 16px">
+      <span style="width:40px;height:40px;border-radius:var(--wb-r-md);background:var(--wb-surface);display:flex;align-items:center;justify-content:center"><i class="ph ph-android-logo" style="font-size:22px;color:var(--wb-text-muted)"></i></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">old-pixel</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted);display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--wb-outline)"></span>Unreachable · synced 11 days ago</div></div>
+      <i class="ph ph-dots-three-vertical" style="font-size:22px;color:var(--wb-text-muted);width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    </div>
+  </div>
+  <div style="position:absolute;inset:0;background:var(--wb-scrim);display:flex;align-items:center;justify-content:center;padding:32px">
+    <div style="width:100%;padding:24px;border-radius:var(--wb-r-xl);background:var(--wb-bg-low);box-shadow:var(--wb-shadow-3);display:flex;flex-direction:column;gap:16px">
+      <div style="font:var(--wb-t-title)">Revoke old-pixel?</div>
+      <div style="font:var(--wb-t-body);color:var(--wb-text-muted);text-wrap:pretty">It will stop syncing with every device and must be paired again from scratch. Its local copy of your bookmarks is not deleted. This can't be undone.</div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:4px">
+        <span style="height:40px;padding:0 16px;border-radius:var(--wb-r-md);color:var(--wb-text);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Cancel</span>
+        <span style="height:40px;padding:0 16px;border-radius:var(--wb-r-md);border:1px solid var(--wb-error);color:var(--wb-error);font:var(--wb-t-body-md);display:inline-flex;align-items:center">Revoke</span>
+      </div>
+    </div>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+</div>
+</section>
+
+<section class="wb-sec" id="settings-sec">
+<div class="wb-h"><h2>7 · Settings</h2><span>device · sync · data · behaviour · about</span></div>
+<div class="wb-grid">
+
+<div class="wb-fr" id="settings"><div class="wb-lbl"><b>Settings</b>single scrolling page</div>
+<div class="phone" data-screen-label="Settings">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;gap:4px">
+    <i class="ph ph-arrow-left" style="font-size:24px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"></i>
+    <span style="flex:1;font:var(--wb-t-title-sm)">Settings</span>
+  </div>
+  <div style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding-bottom:24px">
+    <div style="padding:12px 16px 4px;font:var(--wb-t-label-md);color:var(--wb-accent);text-transform:uppercase;letter-spacing:.06em">This device</div>
+    <div style="min-height:56px;display:flex;align-items:center;gap:14px;padding:8px 16px"><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">Device name</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted)">pixel-8 · shown to peers when pairing</div></div><i class="ph ph-pencil-simple" style="font-size:22px;color:var(--wb-text-muted)"></i></div>
+    <div style="min-height:56px;display:flex;align-items:center;gap:14px;padding:8px 16px"><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">Devices</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted)">3 paired · up to date</div></div><i class="ph ph-caret-right" style="font-size:20px;color:var(--wb-text-muted)"></i></div>
+    <div style="padding:16px 16px 4px;font:var(--wb-t-label-md);color:var(--wb-accent);text-transform:uppercase;letter-spacing:.06em">Sync</div>
+    <div style="min-height:56px;display:flex;align-items:center;gap:14px;padding:8px 16px"><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">Background sync</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted)">Every 15 min on Wi-Fi</div></div><span style="width:52px;height:32px;border-radius:16px;background:var(--wb-accent);position:relative;flex:none"><span style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:var(--wb-on-accent);display:flex;align-items:center;justify-content:center"><i class="ph ph-check" style="font-size:14px;color:var(--wb-accent)"></i></span></span></div>
+    <div style="min-height:56px;display:flex;align-items:center;gap:14px;padding:8px 16px"><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">Sync now</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted)">Last sync 2 min ago with thinkpad</div></div><i class="ph ph-arrows-clockwise" style="font-size:22px;color:var(--wb-accent)"></i></div>
+    <div style="padding:16px 16px 4px;font:var(--wb-t-label-md);color:var(--wb-accent);text-transform:uppercase;letter-spacing:.06em">Data</div>
+    <div style="min-height:56px;display:flex;align-items:center;gap:14px;padding:8px 16px"><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">Import</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted)">JSONL · Netscape HTML · buku database</div></div><i class="ph ph-download-simple" style="font-size:22px;color:var(--wb-text-muted)"></i></div>
+    <div style="min-height:56px;display:flex;align-items:center;gap:14px;padding:8px 16px"><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">Export</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted)">JSONL · Netscape HTML</div></div><i class="ph ph-upload-simple" style="font-size:22px;color:var(--wb-text-muted)"></i></div>
+    <div style="padding:8px 16px 0;font:var(--wb-t-label);color:var(--wb-text-faint)">1,284 bookmarks · 2.1 MB · last change 2 min ago on thinkpad</div>
+    <div style="padding:16px 16px 4px;font:var(--wb-t-label-md);color:var(--wb-accent);text-transform:uppercase;letter-spacing:.06em">Behaviour</div>
+    <div style="min-height:56px;display:flex;align-items:center;gap:14px;padding:8px 16px"><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="font:var(--wb-t-body-lg)">Tapping a result</div><div style="display:inline-flex;border:1px solid var(--wb-outline);border-radius:var(--wb-r-md);overflow:hidden;align-self:flex-start"><span style="height:36px;padding:0 16px;display:inline-flex;align-items:center;font:var(--wb-t-body-md);background:var(--wb-accent-container);color:var(--wb-accent);gap:6px"><i class="ph ph-check" style="font-size:14px"></i>Shows detail</span><span style="height:36px;padding:0 16px;display:inline-flex;align-items:center;font:var(--wb-t-body-md);color:var(--wb-text-muted);border-left:1px solid var(--wb-outline)">Opens in browser</span></div></div></div>
+    <div style="min-height:56px;display:flex;align-items:center;gap:14px;padding:8px 16px"><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-body-lg)">Auto-fetch title and description</div><div style="font:var(--wb-t-label);color:var(--wb-text-muted)">Loads the page once when you add a URL</div></div><span style="width:52px;height:32px;border-radius:16px;background:var(--wb-accent);position:relative;flex:none"><span style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:var(--wb-on-accent);display:flex;align-items:center;justify-content:center"><i class="ph ph-check" style="font-size:14px;color:var(--wb-accent)"></i></span></span></div>
+    <div style="padding:16px 16px 4px;font:var(--wb-t-label-md);color:var(--wb-accent);text-transform:uppercase;letter-spacing:.06em">About</div>
+    <div style="min-height:48px;display:flex;align-items:center;gap:14px;padding:6px 16px"><div style="flex:1;font:var(--wb-t-body-lg)">wobook 0.4.2 <span style="font:var(--wb-t-label);color:var(--wb-text-muted)">· a0f3c1d</span></div></div>
+    <div style="min-height:48px;display:flex;align-items:center;gap:14px;padding:6px 16px"><div style="flex:1;font:var(--wb-t-body-lg)">Open-source licenses</div><i class="ph ph-caret-right" style="font-size:20px;color:var(--wb-text-muted)"></i></div>
+  </div>
+  <div class="gest"></div>
+</div></div>
+
+</div>
+</section>
+
+<section class="wb-sec" id="onb-sec">
+<div class="wb-h"><h2>8 · Onboarding</h2><span>first launch only · two screens · then the empty Home</span></div>
+<div class="wb-grid">
+
+<div class="wb-fr" id="onb-1"><div class="wb-lbl"><b>Onboarding-Name</b>name this device · keyboard up</div>
+<div class="phone" data-screen-label="Onboarding-Name">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;padding:48px 24px 0;gap:28px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:var(--wb-t-label-md);color:var(--wb-accent);letter-spacing:.06em;text-transform:uppercase">wobook</div>
+      <div style="font:var(--wb-t-display);text-wrap:pretty">Name this device</div>
+      <div style="font:var(--wb-t-body-lg);color:var(--wb-text-muted);text-wrap:pretty">Other devices will see it when you pair and in their sync history.</div>
+    </div>
+    <div style="height:56px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);padding:6px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font:var(--wb-t-label);color:var(--wb-accent)">Device name</span><span style="font:var(--wb-t-body-lg)">pixel-8<span style="display:inline-block;width:2px;height:20px;background:var(--wb-accent);vertical-align:-4px;margin-left:1px"></span></span></div>
+  </div>
+  <div style="padding:8px 24px 8px;display:flex;align-items:center"><span style="flex:1;display:flex;gap:6px"><span style="width:16px;height:4px;border-radius:2px;background:var(--wb-accent)"></span><span style="width:16px;height:4px;border-radius:2px;background:var(--wb-surface-high)"></span></span><span style="height:40px;padding:0 20px;border-radius:var(--wb-r-md);border:1px solid var(--wb-accent);color:var(--wb-accent);font:var(--wb-t-body-md);display:inline-flex;align-items:center;gap:6px">Continue<i class="ph ph-arrow-right" style="font-size:16px"></i></span></div>
+  <div style="flex:none">{{ keyboard }}</div>
+  <div class="gest"></div>
+</div></div>
+
+<div class="wb-fr" id="onb-2"><div class="wb-lbl"><b>Onboarding-Choose</b>pair or start fresh</div>
+<div class="phone" data-screen-label="Onboarding-Choose">
+  <div class="sb"><span>12:30</span><span><i class="ph ph-wifi-high"></i><i class="ph ph-cell-signal-full"></i><i class="ph ph-battery-full"></i></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;padding:48px 24px 0;gap:28px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:var(--wb-t-label-md);color:var(--wb-accent);letter-spacing:.06em;text-transform:uppercase">wobook</div>
+      <div style="font:var(--wb-t-display);text-wrap:pretty">Already have bookmarks somewhere?</div>
+      <div style="font:var(--wb-t-body-lg);color:var(--wb-text-muted);text-wrap:pretty">Pair with a desktop or another phone and this one fills up over the local network. No account, nothing leaves your devices.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="padding:16px;border-radius:var(--wb-r-lg);border:1px solid var(--wb-accent);display:flex;align-items:center;gap:14px">
+        <i class="ph ph-qr-code" style="font-size:28px;color:var(--wb-accent);flex:none"></i>
+        <div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-title-sm)">Pair with an existing device</div><div style="font:var(--wb-t-body);color:var(--wb-text-muted)">Scan the QR code it shows you</div></div>
+        <i class="ph ph-arrow-right" style="font-size:20px;color:var(--wb-accent)"></i>
+      </div>
+      <div style="padding:16px;border-radius:var(--wb-r-lg);border:1px solid var(--wb-outline);display:flex;align-items:center;gap:14px">
+        <i class="ph ph-bookmark-simple" style="font-size:28px;color:var(--wb-text-muted);flex:none"></i>
+        <div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font:var(--wb-t-title-sm)">Start fresh</div><div style="font:var(--wb-t-body);color:var(--wb-text-muted)">You can pair any time from Devices</div></div>
+        <i class="ph ph-arrow-right" style="font-size:20px;color:var(--wb-text-muted)"></i>
+      </div>
+    </div>
+  </div>
+  <div style="padding:8px 24px 44px;display:flex;align-items:center"><span style="flex:1;display:flex;gap:6px"><span style="width:16px;height:4px;border-radius:2px;background:var(--wb-surface-high)"></span><span style="width:16px;height:4px;border-radius:2px;background:var(--wb-accent)"></span></span><span style="font:var(--wb-t-label);color:var(--wb-text-faint)">Named pixel-8</span></div>
+  <div class="gest"></div>
+</div></div>
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  keyboard() {
+    const h = React.createElement;
+    const key = (c, i, w, bg, color) => h('div', { key: i, style: { height: 42, flex: w || 1, borderRadius: 6, background: bg || 'var(--wb-surface-high)', display: 'flex', alignItems: 'center', justifyContent: 'center', font: '400 17px/1 var(--wb-font)', color: color || 'var(--wb-text)' } }, c);
+    const rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+    return h('div', { style: { background: 'var(--wb-bg-low)', padding: '8px 6px 46px', display: 'flex', flexDirection: 'column', gap: 9 } },
+      ...rows.map((r, i) => h('div', { key: i, style: { display: 'flex', gap: 6, padding: i === 1 ? '0 20px' : 0 } },
+        ...(i === 2 ? [key(h('i', { className: 'ph ph-arrow-fat-up', style: { fontSize: 20 } }), 's', 1.5, 'var(--wb-surface)')] : []),
+        ...r.split('').map((c, j) => key(c, j)),
+        ...(i === 2 ? [key(h('i', { className: 'ph ph-backspace', style: { fontSize: 20 } }), 'b', 1.5, 'var(--wb-surface)')] : []))),
+      h('div', { key: 'r4', style: { display: 'flex', gap: 6 } },
+        key('?123', 0, 1.5, 'var(--wb-surface)'), key(',', 1), key('', 2, 4.5), key('.', 3),
+        key(h('i', { className: 'ph ph-magnifying-glass', style: { fontSize: 20 } }), 4, 1.5, 'var(--wb-accent)', 'var(--wb-on-accent)')));
+  }
+  qr(n, size) {
+    const h = React.createElement; const cells = [];
+    let s = 1337; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    const finder = (r, c) => (r < 7 && c < 7) || (r < 7 && c >= n - 7) || (r >= n - 7 && c < 7);
+    const inFinder = (r, c) => { const rr = r < 7 ? r : r - (n - 7), cc = c < 7 ? c : c - (n - 7); return rr === 0 || rr === 6 || cc === 0 || cc === 6 || (rr >= 2 && rr <= 4 && cc >= 2 && cc <= 4); };
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      const sep = (r === 7 && (c < 8 || c >= n - 8)) || (c === 7 && (r < 8 || r >= n - 8)) || (r === n - 8 && c < 8) || (c === n - 8 && r < 8);
+      const on = finder(r, c) ? inFinder(r, c) : sep ? false : rnd() > 0.52;
+      cells.push(h('div', { key: r * n + c, style: { background: on ? 'var(--ctp-crust)' : 'transparent' } }));
+    }
+    return h('div', { style: { width: size, height: size, display: 'grid', gridTemplateColumns: `repeat(${n},1fr)`, gridTemplateRows: `repeat(${n},1fr)` } }, ...cells);
+  }
+  syncBar() {
+    return React.createElement('span', { style: { position: 'absolute', top: 0, left: 0, height: '100%', width: '40%', background: 'var(--wb-accent)', borderRadius: 1, animation: 'wb-sync 1.6s ease-in-out infinite' } });
+  }
+  shimmer(w) {
+    return React.createElement('span', { style: { display: 'block', height: 14, width: w || '70%', borderRadius: 4, background: 'linear-gradient(90deg,var(--wb-surface) 25%,var(--wb-surface-high) 50%,var(--wb-surface) 75%)', backgroundSize: '200% 100%', animation: 'wb-shimmer 1.4s linear infinite' } });
+  }
+  renderVals() {
+    const recent = [
+      { title: 'Arch Wiki — systemd/Timers', url: 'wiki.archlinux.org/title/Systemd/Timers', tags: ['linux', 'systemd'], pressedBg: 'var(--wb-surface)' },
+      { title: 'Tailscale ACL syntax reference', url: 'tailscale.com/kb/1018/acls', tags: ['tailscale', 'network'], pressedBg: 'transparent' },
+      { title: 'A Gentle Introduction to CRDTs', url: 'vlcn.io/blog/intro-to-crdts', tags: ['crdt', 'sync'], pressedBg: 'transparent' },
+      { title: 'OWASP Cheat Sheet Series', url: 'cheatsheetseries.owasp.org', tags: ['security', 'docs'], pressedBg: 'transparent' },
+      { title: 'buku — bookmark manager like a text-based mind', url: 'github.com/jarun/buku', tags: ['linux', 'cli'], pressedBg: 'transparent' },
+      { title: 'Jetpack Compose — Side effects', url: 'developer.android.com/develop/ui/compose/side-effects', tags: ['android', 'docs'], pressedBg: 'transparent' },
+      { title: 'How fzf matching works', url: 'github.com/junegunn/fzf/blob/master/src/algo/algo.go', tags: ['cli', 'algorithms'], pressedBg: 'transparent' },
+      { title: 'Catppuccin — Soothing pastel theme', url: 'catppuccin.com/palette', tags: ['ui', 'theme'], pressedBg: 'transparent' },
+    ];
+    return {
+      recent,
+      recentAfterDelete: recent.slice(1),
+      keyboard: this.keyboard(),
+      syncBar: this.syncBar(),
+      shimmer: this.shimmer('70%'),
+      shimmerLong: this.shimmer('92%'),
+      qrSmall: this.qr(25, 104),
+      qrLarge: this.qr(29, 248),
+    };
+  }
+}
+</script>
+</body>
+</html>
