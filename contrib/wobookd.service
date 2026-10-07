@@ -1,0 +1,13 @@
+# systemd user unit for wobookd. Install manually until the nix-module change:
+#   cp contrib/wobookd.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload && systemctl --user enable --now wobookd
+# Adjust ExecStart if wobookd is not installed in ~/.nix-profile/bin.
+[Unit]
+Description=wobook bookmark daemon
+
+[Service]
+ExecStart=%h/.nix-profile/bin/wobookd
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

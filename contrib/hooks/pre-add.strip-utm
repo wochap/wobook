@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# pre-add hook: drop utm_*, fbclid and gclid query parameters.
+set -euo pipefail
+
+record=$(jq -c '.bookmark')
+url=$(jq -r '.url' <<<"$record")
+
+case "$url" in
+*\?*) ;;
+*) exit 0 ;;
+esac
+
+base=${url%%\?*}
+rest=${url#*\?}
+fragment=""
+if [[ "$rest" == *"#"* ]]; then
+  fragment="#${rest#*#}"
+  rest=${rest%%#*}
+fi
+
+kept=()
+IFS='&' read -r -a params <<<"$rest"
+for param in "${params[@]}"; do
+  name=${param%%=*}
+  case "$name" in
+  utm_* | fbclid | gclid | "") ;;
+  *) kept+=("$param") ;;
+  esac
+done
+
+new="$base"
+if ((${#kept[@]} > 0)); then
+  new="$base?$(
+    IFS='&'
+    echo "${kept[*]}"
+  )"
+fi
+new="$new$fragment"
+
+if [[ "$new" != "$url" ]]; then
+  jq -c --arg url "$new" '.url = $url' <<<"$record"
+fi

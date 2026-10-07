@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# post-add hook: desktop notification for bookmarks added on another device.
+set -euo pipefail
+
+case "${WOBOOK_ORIGIN:-}" in
+remote:*)
+  title=$(jq -r '.bookmark.title // ""')
+  notify-send "wobook: ${WOBOOK_ORIGIN#remote:}" "${title:-$WOBOOK_URL}"
+  ;;
+esac
