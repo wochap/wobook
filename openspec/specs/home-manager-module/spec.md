@@ -6,7 +6,7 @@ The homeManagerModules.wobook options and what each one installs (daemon unit, h
 ## Requirements
 
 ### Requirement: Module and options
-The flake SHALL export `homeManagerModules.wobook` declaring `programs.wobook.{enable, package, daemonPackage, deviceName, dataDir, daemon.enable, daemon.extraArgs, hooks, fzf.enable, shellCompletions.enable, browsers.firefox.enable, browsers.googleChrome.enable, browsers.brave.enable, browsers.firefoxExtensionId, browsers.chromiumExtensionIds, browsers.extraChromiumDirs}`. With `enable = false` the module SHALL change nothing.
+The flake SHALL export `homeManagerModules.wobook` declaring `programs.wobook.{enable, package, daemonPackage, deviceName, dataDir, daemon.enable, daemon.extraArgs, hooks, fzf.enable, shellCompletions.enable, browsers.firefox.enable, browsers.googleChrome.enable, browsers.brave.enable, browsers.chromiumExtensionIds, browsers.extraChromiumDirs, browsers.extraFirefoxDirs}`. With `enable = false` the module SHALL change nothing.
 
 #### Scenario: Disabled module is inert
 - **WHEN** the module is imported with `programs.wobook.enable = false`
@@ -15,6 +15,10 @@ The flake SHALL export `homeManagerModules.wobook` declaring `programs.wobook.{e
 #### Scenario: Enable installs the CLI
 - **WHEN** `programs.wobook.enable = true` with defaults
 - **THEN** `wobook` is in `home.packages` and the `wobookd` user service is defined
+
+#### Scenario: Removed Firefox id option
+- **WHEN** a configuration sets `programs.wobook.browsers.firefoxExtensionId`
+- **THEN** evaluation fails because the option does not exist
 
 ### Requirement: Daemon as a systemd user service
 When `daemon.enable` is true the module SHALL define `systemd.user.services.wobookd` with `ExecStart` pointing at `${daemonPackage}/bin/wobookd` plus `daemon.extraArgs`, `Restart = "on-failure"`, `Install.WantedBy = [ "default.target" ]`, and `Environment` entries `WOBOOK_DATA_DIR` and `WOBOOK_DEVICE_NAME` when `dataDir` or `deviceName` are set.
