@@ -21,6 +21,7 @@ let
             googleChrome.enable = true;
             brave.enable = true;
             chromiumExtensionIds = [ "abcdefghijklmnopabcdefghijklmnop" ];
+            extraFirefoxDirs = [ ".librewolf" ];
           };
         };
       }
@@ -56,6 +57,18 @@ in
     test -e $files/.mozilla/native-messaging-hosts/dev.wochap.wobook.json
     test -e $files/.config/google-chrome/NativeMessagingHosts/dev.wochap.wobook.json
     test -e $files/.config/BraveSoftware/Brave-Browser/NativeMessagingHosts/dev.wochap.wobook.json
+    grep -q 'wobook@wochap.dev' $files/.librewolf/native-messaging-hosts/dev.wochap.wobook.json
     touch $out
   '';
+
+  wobook-no-completions =
+    let
+      inherit ((pkgs.callPackage ./package.nix { inherit rust; withShellCompletions = false; })) wobook;
+    in
+    pkgs.runCommand "wobook-no-completions" { } ''
+      test ! -e ${wobook}/share
+      test -x ${wobook}/bin/wobook
+      test -x ${wobook}/bin/wobook-native-host
+      touch $out
+    '';
 }

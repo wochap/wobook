@@ -24,7 +24,8 @@ let
     type = "stdio";
   };
   firefoxManifest = builtins.toJSON (manifestBase // {
-    allowed_extensions = [ cfg.browsers.firefoxExtensionId ];
+    # Gecko id from extension/manifest.json.
+    allowed_extensions = [ "wobook@wochap.dev" ];
   });
   chromiumManifest = builtins.toJSON (manifestBase // {
     allowed_origins = map (id: "chrome-extension://${id}/") cfg.browsers.chromiumExtensionIds;
@@ -86,11 +87,6 @@ in
       firefox.enable = mkEnableOption "the Firefox native messaging host manifest";
       googleChrome.enable = mkEnableOption "the Google Chrome native messaging host manifest";
       brave.enable = mkEnableOption "the Brave native messaging host manifest";
-      firefoxExtensionId = mkOption {
-        type = types.str;
-        default = "wobook@wochap.dev";
-        description = "Firefox extension id allowed to talk to the host.";
-      };
       chromiumExtensionIds = mkOption {
         type = types.listOf types.str;
         default = [ ];
@@ -100,7 +96,13 @@ in
         type = types.listOf types.str;
         default = [ ];
         example = [ "chromium" ];
-        description = "Extra Chromium-family config dirs relative to ~/.config that receive the manifest.";
+        description = "Extra Chromium-family config dirs, relative to ~/.config, that receive <dir>/NativeMessagingHosts/dev.wochap.wobook.json.";
+      };
+      extraFirefoxDirs = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        example = [ ".librewolf" ];
+        description = "Extra Firefox-family config dirs, relative to the home directory (not ~/.config), that receive <dir>/native-messaging-hosts/dev.wochap.wobook.json. Does not require firefox.enable.";
       };
     };
   };
@@ -147,7 +149,10 @@ in
         }
         // lib.listToAttrs (map (dir: lib.nameValuePair ".config/${dir}/NativeMessagingHosts/${hostName}.json" {
           text = chromiumManifest;
-        }) chromiumDirs);
+        }) chromiumDirs)
+        // lib.listToAttrs (map (dir: lib.nameValuePair "${dir}/native-messaging-hosts/${hostName}.json" {
+          text = firefoxManifest;
+        }) cfg.browsers.extraFirefoxDirs);
     })
   ];
 }

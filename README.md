@@ -172,19 +172,63 @@ programs.wobook = {
 | `hooks` | `{}` | name -> text or path, installed executable in `~/.config/wobook/hooks/` |
 | `fzf.enable` | `false` | install `wobook-fzf` (bundles fzf, wl-clipboard, xdg-utils) |
 | `shellCompletions.enable` | `true` | zsh/fish/bash completions; `false` installs `bin/` only |
-| `browsers.{firefox,googleChrome,brave}.enable` | `false` | native messaging host manifest `dev.wochap.wobook.json` |
-| `browsers.firefoxExtensionId` | `wobook@wochap.dev` | Firefox `allowed_extensions` |
+| `browsers.{firefox,googleChrome,brave}.enable` | `false` | only writes the native messaging host manifest `dev.wochap.wobook.json`; does not install the extension |
 | `browsers.chromiumExtensionIds` | `[]` | Chromium `allowed_origins`; required when a Chromium browser is enabled |
-| `browsers.extraChromiumDirs` | `[]` | extra dirs under `~/.config` (e.g. `chromium`) |
+| `browsers.extraChromiumDirs` | `[]` | extra dirs relative to `~/.config` (e.g. `chromium`), get `NativeMessagingHosts/` |
+| `browsers.extraFirefoxDirs` | `[]` | extra dirs relative to `~` (e.g. `.librewolf`), get `native-messaging-hosts/`; independent of `firefox.enable` |
 
 Overlay: `import nixpkgs { overlays = [ inputs.wobook.overlays.default ]; }` gives `pkgs.wobook`.
 
-Extension bundles are unsigned. `nix build .#extension-firefox` produces
-`result/wobook-<version>.xpi`; load it from `about:debugging` → This Firefox → Load Temporary
-Add-on (permanent install needs Developer Edition/Nightly with
-`xpinstall.signatures.required = false`). `nix build .#extension-chromium` produces an unpacked
-directory for `chrome://extensions` → Developer mode → Load unpacked; copy the shown id into
-`browsers.chromiumExtensionIds`.
+### Installing the extension
+
+The module does not install the browser extension. It writes the native messaging host
+manifest, installs `wobook` and `wobook-native-host`, and runs `wobookd` (which must be running
+for the extension to work). The extension bundles are unsigned and loaded by hand.
+
+Firefox (extension id is fixed: `wobook@wochap.dev`):
+
+```sh
+nix build github:wochap/wobook#extension-firefox -o ff-ext
+```
+
+Open `about:debugging` → This Firefox → Load Temporary Add-on and pick
+`ff-ext/wobook-<version>.xpi`. Temporary add-ons are removed when Firefox restarts; a permanent
+install needs Firefox Developer Edition or Nightly with `xpinstall.signatures.required = false`
+in `about:config`.
+
+Chrome / Brave:
+
+```sh
+nix build github:wochap/wobook#extension-chromium -o chromium-ext
+cp -rL chromium-ext ~/.local/share/wobook-extension
+chmod -R u+w ~/.local/share/wobook-extension
+```
+
+The unpacked extension id is derived from its load path, so load it from a stable copy rather
+than the store. Open `chrome://extensions` (or `brave://extensions`) → Developer mode → Load
+unpacked → pick the copy, then add the shown id to `browsers.chromiumExtensionIds`, rebuild
+home-manager and restart the browser. The option is a list because each Chromium-family
+browser generates its own id.
+
+Forks: Firefox forks such as LibreWolf use `browsers.extraFirefoxDirs = [ ".librewolf" ];`
+(relative to `~`); Chromium forks use `browsers.extraChromiumDirs = [ "chromium" ];` (relative
+to `~/.config`).
+
+### Shell completions
+
+The package ships zsh, fish and bash completions under `share/`. With home-manager,
+`shellCompletions.enable = false` installs only `bin/`. Without the module, zsh picks up
+`share/zsh/site-functions` through `fpath`, or generate them at startup:
+
+```zsh
+eval "$(wobook completions zsh)"
+# or, with zsh-defer, after compinit:
+zsh-defer eval "$(wobook completions zsh)"
+```
+
+`nix/package.nix` takes `withShellCompletions ? true`; override it through `callPackage`
+(`pkgs.callPackage ./nix/package.nix { ...; withShellCompletions = false; }`) to build without
+completions.
 
 `nix flake check` runs fmt, clippy (`-D warnings`), the test suite and a home-manager evaluation
 of the module.
