@@ -160,6 +160,12 @@ pub enum FetchOutcome {
     Skipped,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Record)]
+pub struct FaviconData {
+    pub bytes: Vec<u8>,
+    pub mime: String,
+}
+
 #[derive(Debug, Clone, uniffi::Record)]
 pub struct AddResult {
     pub bookmark: Bookmark,
@@ -621,6 +627,25 @@ impl WobookApp {
                 reason: e.to_string(),
             }),
         }
+    }
+
+    /// Discovers the icon of a site origin (`scheme://host[:port]`); any failure is `None`.
+    pub async fn fetch_favicon(&self, origin: String) -> Option<FaviconData> {
+        self.rt
+            .spawn(async move {
+                wobook_core::fetch::fetch_favicon(
+                    &origin,
+                    wobook_core::fetch::FetchLimits::default(),
+                )
+                .await
+            })
+            .await
+            .ok()
+            .flatten()
+            .map(|icon| FaviconData {
+                bytes: icon.bytes,
+                mime: icon.mime,
+            })
     }
 
     pub async fn import(

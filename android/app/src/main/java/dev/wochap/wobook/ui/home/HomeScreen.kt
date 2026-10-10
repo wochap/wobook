@@ -74,6 +74,7 @@ import dev.wochap.wobook.ui.HomeState
 import dev.wochap.wobook.ui.components.ButtonTone
 import dev.wochap.wobook.ui.components.ChipState
 import dev.wochap.wobook.ui.components.EmptyRow
+import dev.wochap.wobook.ui.components.FaviconSlot
 import dev.wochap.wobook.ui.components.ResultRow
 import dev.wochap.wobook.ui.components.SearchField
 import dev.wochap.wobook.ui.components.SyncLine
@@ -106,6 +107,7 @@ fun HomeScreen(
     repo: AppRepository,
     state: HomeState,
     tap: TapBehaviour,
+    loadIcons: Boolean,
     onDetail: (String) -> Unit,
     onAdd: (String) -> Unit,
     onEdit: (String) -> Unit,
@@ -212,6 +214,7 @@ fun HomeScreen(
                         onLong = { sheet = it; focusManager.clearFocus() },
                         onCopy = { copyUrl(context, it.url) },
                         onOpen = { openUrl(context, it.url) },
+                        icon = { FaviconSlot(it.url, repo.favicons, loadIcons) },
                     )
                 }
             }
@@ -271,6 +274,7 @@ private fun ResultList(
     onLong: (RowItem) -> Unit,
     onCopy: (RowItem) -> Unit,
     onOpen: (RowItem) -> Unit,
+    icon: @Composable (RowItem) -> Unit,
 ) {
     val listState = rememberLazyListState()
     LazyColumn(state = listState, modifier = Modifier.fillMaxSize().testTag("result-list"), contentPadding = PaddingValues(bottom = 96.dp)) {
@@ -309,6 +313,7 @@ private fun ResultList(
                     onLongClick = { onLong(item) },
                     onCopy = { onCopy(item) },
                     onOpen = { onOpen(item) },
+                    icon = { icon(item) },
                     modifier = Modifier.background(MaterialTheme.colorScheme.background).testTag("row-${item.displayUrl}"),
                 )
             }

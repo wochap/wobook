@@ -33,16 +33,23 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.File
 
 /**
  * Thin facade over the Rust `WobookApp` (design D3). The Rust read model is
  * the cache: Kotlin only keeps a revision counter, the sync status, devices
  * and pairing events, refreshed from `AppListener` callbacks.
  */
-class AppRepository(private val opener: suspend (AppListener) -> WobookApp) {
+class AppRepository(
+    cacheDir: File,
+    private val opener: suspend (AppListener) -> WobookApp,
+) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val lock = Mutex()
     @Volatile private var app: WobookApp? = null
+
+    /** Site icons, shared by Home rows and the refresh worker. */
+    val favicons = FaviconCache(File(cacheDir, "favicons")) { origin -> io { it.fetchFavicon(origin) } }
 
     private val _revision = MutableStateFlow(0L)
     /** Bumped on every local or remote document change. */

@@ -225,6 +225,7 @@ private fun WobookNav(
                 repo = repo,
                 state = home,
                 tap = state.tap,
+                loadIcons = state.loadIcons,
                 onDetail = { nav.navigate(Routes.detail(it)) },
                 onAdd = { url -> nav.navigate(Routes.form(FormArgs(url = url))) },
                 onEdit = { nav.navigate(Routes.form(FormArgs(url = it, edit = true))) },

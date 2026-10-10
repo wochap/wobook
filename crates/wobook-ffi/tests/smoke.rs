@@ -143,6 +143,12 @@ fn smoke() {
         Err(WobookError::InvalidRequest { .. })
     ));
 
+    let closed = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let origin = format!("http://{}", closed.local_addr().unwrap());
+    drop(closed);
+    assert_eq!(block(app.fetch_favicon(origin)), None);
+    assert_eq!(block(app.fetch_favicon("not a url".into())), None);
+
     std::thread::sleep(std::time::Duration::from_millis(100));
     assert!(*listener.changes.lock().unwrap() > 0);
     app.shutdown().unwrap();

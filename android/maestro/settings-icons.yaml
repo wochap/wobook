@@ -1,0 +1,13 @@
+# "Load site icons" off disables "Refresh site icons"; back on enables it.
+appId: dev.wochap.wobook
+---
+- launchApp
+- tapOn: { id: "open-settings" }
+- scrollUntilVisible:
+    element: { id: "settings-refresh-icons" }
+- assertVisible: { id: "settings-refresh-icons", enabled: true }
+- tapOn: { id: "settings-load-icons" }
+- assertVisible: { id: "settings-refresh-icons", enabled: false }
+- tapOn: { id: "settings-load-icons" }
+- assertVisible: { id: "settings-refresh-icons", enabled: true }
+- back

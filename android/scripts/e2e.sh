@@ -88,6 +88,7 @@ flow search-open
 flow edit-tags
 flow delete-undo
 flow devices
+flow settings-icons
 
 log "sync: desktop → phone"
 "$WOBOOK" add https://conv.example/ --title "Convergence check" --tags sync --no-fetch >/dev/null

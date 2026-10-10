@@ -38,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
@@ -50,6 +51,8 @@ import com.adamglin.phosphoricons.regular.CaretRight
 import com.adamglin.phosphoricons.regular.DownloadSimple
 import com.adamglin.phosphoricons.regular.PencilSimple
 import com.adamglin.phosphoricons.regular.UploadSimple
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import dev.wochap.wobook.BuildConfig
 import dev.wochap.wobook.data.AppRepository
 import dev.wochap.wobook.data.Settings
@@ -59,6 +62,7 @@ import dev.wochap.wobook.data.userMessage
 import dev.wochap.wobook.domain.Formatting
 import dev.wochap.wobook.ffi.InterchangeFormat
 import dev.wochap.wobook.ffi.SyncState
+import dev.wochap.wobook.service.FaviconRefreshWorker
 import dev.wochap.wobook.ui.LocalSnackbar
 import dev.wochap.wobook.ui.components.AppBar
 import dev.wochap.wobook.ui.components.ContentColumn
@@ -95,6 +99,23 @@ fun SettingsScreen(
     var importFormat by remember { mutableStateOf(InterchangeFormat.JSONL) }
     var exportFormat by remember { mutableStateOf(InterchangeFormat.JSONL) }
     var licenses by remember { mutableStateOf(false) }
+
+    val iconWork by remember { WorkManager.getInstance(context).getWorkInfosForUniqueWorkFlow(FaviconRefreshWorker.NAME) }
+        .collectAsState(initial = emptyList())
+    val iconInfo = iconWork.firstOrNull()
+    val iconRunning = iconInfo?.state == WorkInfo.State.RUNNING || iconInfo?.state == WorkInfo.State.ENQUEUED
+    var iconsCached by remember { mutableStateOf(0) }
+    var iconWasRunning by remember { mutableStateOf<Boolean?>(null) }
+    LaunchedEffect(iconInfo?.state) {
+        iconsCached = repo.favicons.cachedCount()
+        val finished = iconInfo?.state == WorkInfo.State.SUCCEEDED
+        if (iconWasRunning == true && finished) {
+            val found = iconInfo.outputData.getInt(FaviconRefreshWorker.KEY_FOUND, 0)
+            val none = iconInfo.outputData.getInt(FaviconRefreshWorker.KEY_NONE, 0)
+            snackbar.showSnackbar("Icons updated: $found found, $none none")
+        }
+        iconWasRunning = iconRunning
+    }
 
     LaunchedEffect(revision) {
         deviceName = runCatching { repo.thisDevice().name }.getOrDefault("")
@@ -216,6 +237,20 @@ fun SettingsScreen(
             SettingRow("Auto-fetch title and description", "Loads the page once when you add a URL", "settings-autofetch", trailing = {
                 WbSwitch(state.autoFetch) { on -> scope.launch { settings.setAutoFetch(on) } }
             }) { scope.launch { settings.setAutoFetch(!state.autoFetch) } }
+            SettingRow("Load site icons", "Fetches each site's icon once a month; off shows letters", "settings-load-icons", trailing = {
+                WbSwitch(state.loadIcons) { on -> scope.launch { settings.setLoadIcons(on) } }
+            }) { scope.launch { settings.setLoadIcons(!state.loadIcons) } }
+            val iconSubtitle = if (iconRunning) {
+                val done = iconInfo?.progress?.getInt(FaviconRefreshWorker.KEY_DONE, 0) ?: 0
+                val total = iconInfo?.progress?.getInt(FaviconRefreshWorker.KEY_TOTAL, 0) ?: 0
+                "Fetching $done / $total sites"
+            } else {
+                val last = state.lastIconRefreshMs?.let { "last run ${Formatting.relative(it)}" } ?: "never run"
+                "$iconsCached cached · $last"
+            }
+            SettingRow("Refresh site icons", iconSubtitle, "settings-refresh-icons", enabled = state.loadIcons, trailing = {
+                if (iconRunning) WbTextButton("Cancel", onClick = { FaviconRefreshWorker.cancel(context) }, modifier = Modifier.testTag("settings-refresh-icons-cancel"))
+            }) { if (!iconRunning) FaviconRefreshWorker.start(context) }
 
             SectionLabel("About")
             SettingRow("wobook ${BuildConfig.VERSION_NAME}", "Reinstalling loses this device's identity; peers then revoke it and you pair again.", "settings-version") {}
@@ -271,10 +306,11 @@ private fun SettingRow(
     subtitle: String?,
     tag: String,
     trailing: (@Composable () -> Unit)? = null,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Row(
-        Modifier.fillMaxWidth().heightIn(min = 64.dp).clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 10.dp).testTag(tag),
+        Modifier.fillMaxWidth().heightIn(min = 64.dp).clickable(enabled = enabled, onClick = onClick).alpha(if (enabled) 1f else 0.38f).padding(horizontal = 16.dp, vertical = 10.dp).testTag(tag),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {

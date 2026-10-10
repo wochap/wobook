@@ -33,7 +33,7 @@ class WobookApplication : Application() {
         settings = Settings(this)
         val keyStore = KeystoreSecureStore(filesDir)
         val dataDir = File(filesDir, "wobook")
-        repository = AppRepository { listener ->
+        repository = AppRepository(cacheDir) { listener ->
             val config = AppConfig(
                 dataDir = dataDir.absolutePath,
                 deviceName = "",

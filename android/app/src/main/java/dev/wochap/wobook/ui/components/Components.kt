@@ -8,6 +8,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -45,6 +46,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -70,6 +72,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import dev.wochap.wobook.data.FaviconCache
+import dev.wochap.wobook.domain.Favicons
+import dev.wochap.wobook.domain.UrlDisplay
 import com.adamglin.PhosphorIcons
 import com.adamglin.phosphoricons.Regular
 import com.adamglin.phosphoricons.regular.AndroidLogo
@@ -404,6 +410,7 @@ fun ResultRow(
     onCopy: () -> Unit,
     onOpen: () -> Unit,
     modifier: Modifier = Modifier,
+    icon: @Composable () -> Unit = { LetterTile(UrlDisplay.host(displayUrl)) },
 ) {
     val scheme = MaterialTheme.colorScheme
     Row(
@@ -413,7 +420,7 @@ fun ResultRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Box(Modifier.size(20.dp).background(scheme.surfaceContainer, MaterialTheme.shapes.extraSmall))
+        icon()
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
             HighlightedText(title.ifBlank { displayUrl }, if (title.isBlank()) emptyList() else titleIndices, WobookType.rowTitle, scheme.onSurface)
             HighlightedText(displayUrl, urlIndices, WobookType.mono, scheme.onSurfaceVariant)
@@ -427,6 +434,39 @@ fun ResultRow(
                 Icon(PhosphorIcons.Regular.ArrowSquareOut, "Open in browser", Modifier.size(22.dp), tint = scheme.primary)
             }
         }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Favicon slot
+
+/** 20 dp tile with the host's first letter on a colour derived from the host. */
+@Composable
+fun LetterTile(host: String, modifier: Modifier = Modifier) {
+    val scheme = MaterialTheme.colorScheme
+    val wb = Wb.colors
+    val palette = listOf(scheme.primary, wb.tailscale, scheme.error, wb.success, wb.warning)
+    Box(
+        modifier.size(20.dp).background(palette[Favicons.colorIndex(host)], MaterialTheme.shapes.extraSmall).testTag("letter-tile"),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(Favicons.letter(host), style = WobookType.labelMd.copy(fontSize = 11.sp, lineHeight = 12.sp), color = scheme.onPrimary)
+    }
+}
+
+/** Site icon for a bookmark URL; letter tile while loading, without an icon, or with icons off. */
+@Composable
+fun FaviconSlot(url: String, cache: FaviconCache, loadIcons: Boolean) {
+    val origin = remember(url) { Favicons.origin(url) }
+    val host = remember(url, origin) { origin?.let(Favicons::host) ?: UrlDisplay.host(url) }
+    val bitmap by produceState(initialValue = origin?.takeIf { loadIcons }?.let(cache::peek), origin, loadIcons) {
+        value = if (loadIcons && origin != null) cache.icon(origin) else null
+    }
+    val image = bitmap
+    if (image != null) {
+        Image(image, null, Modifier.size(20.dp).clip(MaterialTheme.shapes.extraSmall).testTag("favicon"))
+    } else {
+        LetterTile(host)
     }
 }
 
