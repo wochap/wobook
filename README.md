@@ -97,13 +97,19 @@ wobook sync now                         # dial every peer now
 wobook device name [<name>]
 ```
 
-Firewall: allow inbound UDP 47390-47399 on the LAN interface and on
-`tailscale0`; mDNS uses the standard multicast group on 5353. On NixOS:
+Firewall: peers need inbound UDP 47390-47399 (sync) and UDP 5353 (mDNS). On
+NixOS, import the flake's NixOS module next to the home-manager one; it opens
+both on all interfaces by default:
 
 ```nix
-networking.firewall.interfaces."tailscale0".allowedUDPPortRanges = [ { from = 47390; to = 47399; } ];
-networking.firewall.interfaces."enp3s0".allowedUDPPortRanges = [ { from = 47390; to = 47399; } ];
+imports = [ inputs.wobook.nixosModules.wobook ];
+# Optional: open the ports only on these interfaces.
+services.wobook.firewallInterfaces = [ "enp3s0" "tailscale0" ];
+# services.wobook.openFirewall = false;  # to manage the rules yourself
 ```
+
+The module covers only the default port range. A `WOBOOK_SYNC_PORT` forced
+outside 47390-47399 needs its own firewall rule.
 
 Tailscale: tailnet addresses (`100.64.0.0/10`) are included in the pairing
 payload and in the hello each peer sends on connect, so peers reach each other

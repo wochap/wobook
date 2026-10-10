@@ -10,6 +10,8 @@
 # 3. Per host (e.g. hosts/gdesktop/default.nix):
 #      _custom.programs.buku.enable = false;
 #      _custom.programs.wobook.enable = true;
+#    The NixOS module imported below opens UDP 47390-47399 and 5353 only when
+#    wobook is enabled on that host.
 # 4. In tui-bookmarks.sh swap `buku-fzf {}` for `wobook-fzf {}`.
 #
 # If `_custom.hm` does not accept `imports`, drop the `imports` line below and
@@ -19,26 +21,32 @@
 
 let cfg = config._custom.programs.wobook;
 in {
+  # System firewall for sync and mDNS; the home-manager module cannot open ports.
+  imports = [ inputs.wobook.nixosModules.wobook ];
+
   options._custom.programs.wobook.enable = lib.mkEnableOption { };
 
-  config = lib.mkIf cfg.enable {
-    _custom.hm = {
-      imports = [ inputs.wobook.homeManagerModules.wobook ];
+  config = lib.mkMerge [
+    { services.wobook.openFirewall = cfg.enable; }
+    (lib.mkIf cfg.enable {
+      _custom.hm = {
+        imports = [ inputs.wobook.homeManagerModules.wobook ];
 
-      programs.wobook = {
-        enable = true;
-        daemon.enable = true;
-        fzf.enable = true;
-        deviceName = config.networking.hostName;
-        hooks."pre-add.strip-utm" = "${inputs.wobook}/contrib/hooks/pre-add.strip-utm";
-        browsers = {
-          firefox.enable = true;
-          googleChrome.enable = true;
-          brave.enable = true;
-          # Id shown on chrome://extensions after "Load unpacked".
-          chromiumExtensionIds = [ "REPLACE_WITH_EXTENSION_ID" ];
+        programs.wobook = {
+          enable = true;
+          daemon.enable = true;
+          fzf.enable = true;
+          deviceName = config.networking.hostName;
+          hooks."pre-add.strip-utm" = "${inputs.wobook}/contrib/hooks/pre-add.strip-utm";
+          browsers = {
+            firefox.enable = true;
+            googleChrome.enable = true;
+            brave.enable = true;
+            # Id shown on chrome://extensions after "Load unpacked".
+            chromiumExtensionIds = [ "REPLACE_WITH_EXTENSION_ID" ];
+          };
         };
       };
-    };
-  };
+    })
+  ];
 }

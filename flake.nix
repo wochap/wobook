@@ -77,9 +77,12 @@
       homeManagerModules.wobook = import ./nix/hm-module.nix { inherit self; };
       homeManagerModules.default = self.homeManagerModules.wobook;
 
+      nixosModules.wobook = import ./nix/nixos-module.nix;
+      nixosModules.default = self.nixosModules.wobook;
+
       checks = forAllSystems (system:
         import ./nix/checks.nix {
-          inherit self home-manager;
+          inherit self nixpkgs home-manager;
           pkgs = nixpkgs.legacyPackages.${system};
           rust = rustFor nixpkgs.legacyPackages.${system};
         });

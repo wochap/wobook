@@ -1,6 +1,6 @@
 # `nix flake check` gate: Rust fmt/clippy/tests via crane and a home-manager
-# evaluation of the module.
-{ self, pkgs, rust, home-manager }:
+# evaluation of the module, and a NixOS evaluation of the firewall module.
+{ self, nixpkgs, pkgs, rust, home-manager }:
 let
   inherit (rust) craneLib commonArgs cargoArtifacts;
   system = pkgs.stdenv.hostPlatform.system;
@@ -27,6 +27,24 @@ let
       }
     ];
   };
+
+  nixosFirewall = extra: (nixpkgs.lib.nixosSystem {
+    inherit system;
+    modules = [
+      self.nixosModules.wobook
+      {
+        boot.loader.grub.enable = false;
+        fileSystems."/".device = "nodev";
+        system.stateVersion = "25.05";
+      }
+      extra
+    ];
+  }).config.networking.firewall;
+  range = { from = 47390; to = 47399; };
+  opens = fw: builtins.elem range fw.allowedUDPPortRanges && builtins.elem 5353 fw.allowedUDPPorts;
+  global = nixosFirewall { };
+  named = nixosFirewall { services.wobook.firewallInterfaces = [ "enp3s0" "tailscale0" ]; };
+  disabled = nixosFirewall { services.wobook.openFirewall = false; };
 in
 {
   wobook-fmt = craneLib.cargoFmt { inherit (commonArgs) src pname version; };
@@ -71,4 +89,11 @@ in
       test -x ${wobook}/bin/wobook-native-host
       touch $out
     '';
+
+  nixos-module-eval =
+    assert opens global;
+    assert opens named.interfaces.enp3s0 && opens named.interfaces.tailscale0;
+    assert !builtins.elem range named.allowedUDPPortRanges && !builtins.elem 5353 named.allowedUDPPorts;
+    assert !builtins.elem range disabled.allowedUDPPortRanges && !builtins.elem 5353 disabled.allowedUDPPorts;
+    pkgs.runCommand "nixos-module-eval" { } "touch $out";
 }
