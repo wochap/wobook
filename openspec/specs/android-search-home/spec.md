@@ -24,7 +24,7 @@ A horizontally scrollable row of tag chips ordered by usage SHALL sit under the 
 - **THEN** only bookmarks carrying both tags are listed
 
 ### Requirement: Result row
-Each row SHALL show an optional 20 dp favicon slot (empty surface square by default), one-line title, one-line monospace host+path, one clipped tag line with `+N` overflow, and trailing 48 dp Copy and Open buttons. Tap performs the configured tap behaviour, long press opens an action sheet (Open in browser, Copy URL, Share, Edit, Delete), swipe right copies the URL.
+Each row SHALL show a 20 dp icon slot holding the site icon of the bookmark's host, or a letter tile when no icon is available (see the `android-favicons` capability), one-line title, one-line monospace host+path, one clipped tag line with `+N` overflow, and trailing 48 dp Copy and Open buttons. Tap performs the configured tap behaviour, long press opens an action sheet (Open in browser, Copy URL, Share, Edit, Delete), swipe right copies the URL.
 
 #### Scenario: Copy from row
 - **WHEN** the user taps the Copy button
@@ -33,6 +33,10 @@ Each row SHALL show an optional 20 dp favicon slot (empty surface square by defa
 #### Scenario: Long press sheet
 - **WHEN** the user long-presses a row and taps Delete
 - **THEN** the bookmark is tombstoned and a snackbar with Undo appears for 6 seconds
+
+#### Scenario: Icon slot is never an empty square
+- **WHEN** a row is shown for a host with no cached icon
+- **THEN** the slot shows a letter tile, then the site icon if one is fetched
 
 ### Requirement: Home states
 Home SHALL render: empty library (explains share-sheet saving and pairing with Scan QR and Show my QR buttons), no results (message plus "Add a bookmark" prefilled with the query when it parses as a URL), results, idle (keyboard dismissed, Recent list, Add FAB), and syncing (2 dp indeterminate line under the search field). Offline with local data SHALL look identical to online. The Add FAB SHALL be hidden while the keyboard is visible.

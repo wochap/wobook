@@ -46,7 +46,7 @@ On first launch the app SHALL show two screens: name this device (prefilled with
 - **THEN** Devices is shown with Home directly beneath it on the back stack
 
 ### Requirement: Settings
-Settings SHALL offer: device name (editable), link to Devices, background sync toggle with "Sync now" and last-sync line, import (JSONL, Netscape HTML, buku database) and export (JSONL, Netscape HTML) through the system document picker, library size line, tap behaviour (Shows detail | Opens in browser), auto-fetch toggle, and an About section with version and licenses.
+Settings SHALL offer: device name (editable), link to Devices, background sync toggle with "Sync now" and last-sync line, import (JSONL, Netscape HTML, buku database) and export (JSONL, Netscape HTML) through the system document picker, library size line, tap behaviour (Shows detail | Opens in browser), auto-fetch toggle, "Load site icons" toggle and "Refresh site icons" row (see the `android-favicons` capability), and an About section with version and licenses.
 
 #### Scenario: Tap behaviour applies
 - **WHEN** tap behaviour is set to "Opens in browser" and a result row is tapped
@@ -55,6 +55,10 @@ Settings SHALL offer: device name (editable), link to Devices, background sync t
 #### Scenario: Export via picker
 - **WHEN** the user chooses Export → JSONL and picks a destination
 - **THEN** the file is written through the content resolver and contains one JSON record per bookmark
+
+#### Scenario: Icon entries present
+- **WHEN** the user opens Settings on a fresh install
+- **THEN** "Load site icons" is on and "Refresh site icons" is enabled, next to the auto-fetch toggle
 
 ### Requirement: Large screens and dynamic type
 Content SHALL be single-column, clamped to 640 dp and centered on wide screens. All text SHALL use `sp`, result rows SHALL use min-height 64 dp, titles and URLs SHALL stay single-line with ellipsis and the tag line SHALL clip with `+N` at font scale 1.3.

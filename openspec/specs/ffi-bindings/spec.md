@@ -76,3 +76,14 @@ The Android Gradle build SHALL compile `wobook-ffi` with `cargo-ndk` for `arm64-
 #### Scenario: cargo test
 - **WHEN** `cargo test -p wobook-ffi` runs
 - **THEN** the smoke test passes without network access
+
+### Requirement: Favicon fetch over the FFI
+`WobookApp` SHALL expose an async `fetch_favicon(origin)` that runs the `metadata-fetch` favicon discovery off the caller's thread and returns the icon bytes and media type, or none when no icon was found or any error occurred. It SHALL never write to the document or read model.
+
+#### Scenario: Icon found
+- **WHEN** `fetch_favicon` is called for a local test origin serving `/favicon.ico` as `image/x-icon`
+- **THEN** it returns those bytes with media type `image/x-icon`
+
+#### Scenario: Unreachable origin
+- **WHEN** `fetch_favicon` is called for an origin that does not resolve
+- **THEN** it returns none without raising an error
