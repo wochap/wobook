@@ -61,8 +61,30 @@ When the daemon socket cannot be connected, the host SHALL write a framed `{"ok"
 - **THEN** `allowed_origins` is `["chrome-extension://abcdefghijklmnopabcdefghijklmnop/"]`
 
 ### Requirement: Wrapper script for manifests
-`contrib/wobook-native-host` SHALL be an executable shell wrapper running `exec wobook native-host "$@"`, because host manifests accept a path without arguments.
+`contrib/wobook-native-host` SHALL be an executable shell wrapper running `exec wobook native-host "$@"`, because host manifests accept a path without arguments. Arguments the browser passes at launch SHALL reach `wobook native-host`, which ignores them.
 
 #### Scenario: Wrapper forwards
 - **WHEN** `contrib/wobook-native-host` is executed with `wobook` on PATH
 - **THEN** it behaves identically to `wobook native-host`
+
+#### Scenario: Wrapper started by Firefox
+- **WHEN** `contrib/wobook-native-host` is executed with a manifest path and `wobook@wochap.dev` as arguments
+- **THEN** it answers framed requests normally instead of exiting with a usage error
+
+### Requirement: Browser launch arguments are ignored
+When run as a host (without `--print-manifest`), `wobook native-host` SHALL accept and ignore any number of extra positional arguments and a `--parent-window=<n>` option, as passed by browsers at launch, and SHALL behave exactly as if started without them.
+
+#### Scenario: Firefox launch arguments
+- **WHEN** the host is started as `wobook native-host /home/u/.mozilla/native-messaging-hosts/dev.wochap.wobook.json wobook@wochap.dev` and a framed `{"type":"ping"}` is sent while `wobookd` is running
+- **THEN** the host writes one framed response containing `"ok":true` and exits 0 on stdin EOF
+
+#### Scenario: Chromium launch arguments
+- **WHEN** the host is started as `wobook native-host chrome-extension://abcdefghijklmnopabcdefghijklmnop/ --parent-window=0` and a framed `{"type":"ping"}` is sent while `wobookd` is running
+- **THEN** the host writes one framed response containing `"ok":true`
+
+### Requirement: Extension reports a silent host exit as a crash
+When the browser rejects a native message with Firefox's generic "An unexpected error occurred", the extension SHALL report it as the `host_crashed` error ("wobook native host crashed; check the browser console").
+
+#### Scenario: Generic Firefox rejection
+- **WHEN** `runtime.sendNativeMessage` rejects with the message `An unexpected error occurred`
+- **THEN** the popup shows the `host_crashed` message
