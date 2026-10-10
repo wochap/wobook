@@ -31,11 +31,19 @@ A single activity SHALL host Compose Navigation routes for onboarding, home, det
 - **THEN** the user is on Home with the previous search state intact
 
 ### Requirement: Onboarding
-On first launch the app SHALL show two screens: name this device (prefilled with the Android device model, Continue), then a choice between "Pair with an existing device" (goes to Scan) and "Start fresh" (goes to the empty Home). Onboarding SHALL not show again once completed.
+On first launch the app SHALL show two screens: name this device (prefilled with the Android device model, Continue), then a choice between "Pair with an existing device" (goes to Scan) and "Start fresh" (goes to the empty Home). Onboarding SHALL not show again once completed. When onboarding ends through pairing (completed, or closed from a pairing result or a rejected confirmation), the app SHALL replace the whole back stack so that Home is its root and Devices is on top; onboarding and pairing screens SHALL NOT be reachable with Back afterwards.
 
 #### Scenario: Start fresh
 - **WHEN** the user enters a name and taps Start fresh
 - **THEN** Home shows the empty state and `this_device().name` equals the entered name
+
+#### Scenario: Pair during onboarding, then Back
+- **WHEN** on a fresh install the user names the device, chooses "Pair with an existing device", confirms the fingerprint, lands on Devices and presses Back
+- **THEN** Home is shown, and pressing Back again leaves the app instead of showing Scan or an onboarding screen
+
+#### Scenario: Failed pairing during onboarding, then Close
+- **WHEN** a pairing started from onboarding ends on a result state and the user taps Close
+- **THEN** Devices is shown with Home directly beneath it on the back stack
 
 ### Requirement: Settings
 Settings SHALL offer: device name (editable), link to Devices, background sync toggle with "Sync now" and last-sync line, import (JSONL, Netscape HTML, buku database) and export (JSONL, Netscape HTML) through the system document picker, library size line, tap behaviour (Shows detail | Opens in browser), auto-fetch toggle, and an About section with version and licenses.
