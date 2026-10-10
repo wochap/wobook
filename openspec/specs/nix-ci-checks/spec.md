@@ -27,6 +27,17 @@ nix flake check contents, including the home-manager module evaluation check.
 - **WHEN** `hm-module-eval` succeeds
 - **THEN** its output contains the `wobookd.service` unit, the hook file and the three manifests
 
+### Requirement: NixOS module evaluation check
+`checks.x86_64-linux.nixos-module-eval` SHALL evaluate a minimal NixOS configuration that imports `nixosModules.wobook`, and SHALL fail unless the resulting `networking.firewall` contains the sync port range and port 5353 both for the default (all interfaces) case and for a named-interface case.
+
+#### Scenario: Option typo detected
+- **WHEN** the NixOS module references a misspelled option or an undefined attribute
+- **THEN** `nixos-module-eval` fails evaluation
+
+#### Scenario: Wrong port range detected
+- **WHEN** the module opens a range other than UDP 47390-47399
+- **THEN** `nixos-module-eval` fails
+
 ### Requirement: Flake check is the single gate
 `nix flake check` SHALL run every check above plus shellcheck of the fzf wrapper (through `writeShellApplication`) and SHALL exit 0 on the committed tree.
 
