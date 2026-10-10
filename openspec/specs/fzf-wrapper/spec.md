@@ -6,7 +6,7 @@ Wobook-fzf script behaviour compatible with the existing buku-fzf script.
 ## Requirements
 
 ### Requirement: Compatible with the existing buku-fzf script
-`contrib/wobook-fzf.sh` SHALL accept `--select`, `--open`, `--add`, `--edit` and SHALL print `Available Options : --select --open --add --edit` otherwise. It SHALL feed `wobook list --format tsv` to `fzf` with the URL hidden as the key column, a `wobook show` preview, `--reverse` and `--preview-window=wrap`.
+`contrib/wobook-fzf.sh` SHALL accept `--select`, `--open`, `--add`, `--edit` and SHALL print `Available Options : --select --open --add --edit` otherwise. It SHALL feed `wobook list --format tsv` to `fzf` with the URL hidden as the key column, a coloured `wobook --color=always show {1}` preview, `--reverse` and `--preview-window=wrap`.
 
 #### Scenario: Select copies URL
 - **WHEN** `wobook-fzf --select` runs and the user picks a line
@@ -27,6 +27,10 @@ Wobook-fzf script behaviour compatible with the existing buku-fzf script.
 #### Scenario: Nothing selected
 - **WHEN** the user cancels fzf
 - **THEN** the script exits 0 without touching clipboard or browser
+
+#### Scenario: Coloured preview
+- **WHEN** the fzf preview pane renders a bookmark
+- **THEN** it shows the title, URL and tags in buku's colours
 
 ### Requirement: Shell-checkable
 The script SHALL pass `shellcheck` with no warnings and use only `bash`, `fzf`, `cut`, `wl-copy` and `xdg-open`.

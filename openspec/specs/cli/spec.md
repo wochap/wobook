@@ -26,6 +26,8 @@ When the socket cannot be connected, the CLI SHALL print a one-line message expl
 ### Requirement: Output formats
 `list` and `search` SHALL support `--format tsv|json|jsonl|pretty`. TSV SHALL print `url<TAB>title<TAB>tags` with tags comma-joined and any tab or newline inside a field replaced by a space. `pretty` SHALL print a buku-like block per bookmark. Default is `pretty` on a TTY and `tsv` otherwise.
 
+The CLI SHALL accept a global `--color auto|always|never` option, default `auto`. Colour SHALL apply only to `pretty` output (`show`, and `list`/`search` with `pretty`). With `auto`, colour SHALL be used only when stdout is a terminal and the `NO_COLOR` environment variable is unset or empty. `always` SHALL colour regardless of terminal or `NO_COLOR`; `never` SHALL never colour. Colours SHALL follow buku's default scheme: title bold bright green (`92;1`), the `>`, `+` and `#` markers bright red (`91`), URL yellow (`93`), description default colour, tags blue (`94`), each coloured span followed by a reset. TSV, JSON and JSONL output SHALL never contain ANSI escape sequences.
+
 #### Scenario: TSV for fzf
 - **WHEN** `wobook list --format tsv` runs
 - **THEN** each line has exactly two tabs and column 1 is the normalized URL
@@ -34,8 +36,24 @@ When the socket cannot be connected, the CLI SHALL print a one-line message expl
 - **WHEN** `wobook show <url> --json` runs
 - **THEN** stdout is one JSON object in the JSONL record shape
 
+#### Scenario: Forced colour when piped
+- **WHEN** `wobook --color=always show <url>` runs with stdout piped
+- **THEN** stdout contains `\x1b[93m` before the URL and `\x1b[0m` resets
+
+#### Scenario: Auto colour when piped
+- **WHEN** `wobook show <url>` runs with stdout piped
+- **THEN** stdout contains no ANSI escape sequence
+
+#### Scenario: NO_COLOR respected
+- **WHEN** `NO_COLOR=1 wobook show <url>` runs on a terminal
+- **THEN** stdout contains no ANSI escape sequence
+
+#### Scenario: Colour never touches TSV
+- **WHEN** `wobook --color=always list --format tsv` runs
+- **THEN** stdout contains no ANSI escape sequence
+
 ### Requirement: Editor flow
-`wobook edit <url>` SHALL open `$EDITOR` (fallback `$VISUAL`, then `vi`) on a buku-style template with commented instructions and lines for URL, TITLE, TAGS (comma-separated) and a multi-line DESCRIPTION. On save, a changed URL line SHALL perform a rename, other changes an update, and an unchanged file SHALL do nothing. `wobook edit --new` SHALL open the template empty and perform an add on save; a blank TITLE SHALL trigger metadata fetch and `-` SHALL mean no title.
+`wobook edit <url>` SHALL open `$EDITOR` (fallback `$VISUAL`, then `vi`) on a buku-style template with commented instructions and lines for URL, TITLE, TAGS (comma-separated) and a multi-line DESCRIPTION. The temp file name SHALL have no extension, so editors fall back to comment-aware filetype detection as with buku. On save, a changed URL line SHALL perform a rename, other changes an update, and an unchanged file SHALL do nothing. `wobook edit --new` SHALL open the template empty and perform an add on save; a blank TITLE SHALL trigger metadata fetch and `-` SHALL mean no title.
 
 #### Scenario: Edit tags in editor
 - **WHEN** `EDITOR` is a script that rewrites the TAGS line to `a, b`
@@ -48,6 +66,10 @@ When the socket cannot be connected, the CLI SHALL print a one-line message expl
 #### Scenario: Editor aborted
 - **WHEN** the editor exits non-zero
 - **THEN** nothing is changed and the CLI exits 1
+
+#### Scenario: Temp file has no extension
+- **WHEN** `EDITOR` is a script that records the path it receives
+- **THEN** the recorded file name contains no `.`-separated extension
 
 ### Requirement: Exit codes
 The CLI SHALL exit 0 on success, 1 on not found or invalid input, 2 on usage errors, 69 when the daemon is unavailable and 70 on internal errors.
