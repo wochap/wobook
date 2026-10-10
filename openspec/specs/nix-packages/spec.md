@@ -69,3 +69,14 @@ Built binaries SHALL report `<cargo version> (<git short rev>)`, with `dirty` or
 #### Scenario: Completions disabled
 - **WHEN** `nix/package.nix` is called with `withShellCompletions = false`
 - **THEN** the `wobook` result has no `share/` directory and contains `bin/wobook` and `bin/wobook-native-host`
+
+### Requirement: Signed Firefox extension package
+The flake SHALL expose `packages.<system>.extension-firefox-signed` as the signed `.xpi` fetched from the release recorded in `nix/extension-signed.nix` (`version`, `url`, `hash`), verified by that hash. While the recorded `hash` is empty the attribute SHALL be absent, and flake evaluation (`nix flake show`, `nix flake check`) SHALL still succeed.
+
+#### Scenario: Pin filled in
+- **WHEN** `nix/extension-signed.nix` has a non-empty `hash` and `nix build .#extension-firefox-signed` runs
+- **THEN** the result is a single file named `wobook-<version>.xpi` matching the recorded hash
+
+#### Scenario: Pin empty
+- **WHEN** `nix/extension-signed.nix` has `hash = ""`
+- **THEN** `nix flake show` succeeds and lists no `extension-firefox-signed` package
