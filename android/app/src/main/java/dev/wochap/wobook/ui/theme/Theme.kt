@@ -1,6 +1,7 @@
 package dev.wochap.wobook.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -10,13 +11,16 @@ import androidx.compose.runtime.ReadOnlyComposable
 @Composable
 fun WobookTheme(dark: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val palette = if (dark) Mocha else Latte
+    val colorScheme = palette.colorScheme(dark)
     CompositionLocalProvider(LocalWobookColors provides palette.wobookColors(dark)) {
         MaterialTheme(
-            colorScheme = palette.colorScheme(dark),
+            colorScheme = colorScheme,
             typography = WobookTypography,
             shapes = WobookShapes,
-            content = content,
-        )
+        ) {
+            // No root Surface/Scaffold sets this, so unstyled Text/Icon would default to black.
+            CompositionLocalProvider(LocalContentColor provides colorScheme.onBackground, content = content)
+        }
     }
 }
 

@@ -3,6 +3,7 @@ appId: dev.wochap.wobook
 ---
 - launchApp
 - tapOn: { id: "open-settings" }
+- takeScreenshot: settings-colors
 - scrollUntilVisible:
     element: { id: "settings-refresh-icons" }
 - assertVisible: { id: "settings-refresh-icons", enabled: true }
