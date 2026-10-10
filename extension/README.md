@@ -86,6 +86,11 @@ Keep `key.pem` private; only the base64 public key goes into the manifest.
   or not on the `PATH` the browser sees. Run the wrapper by hand: it should wait
   on stdin and exit 0 on Ctrl+D. Host logs go to the browser console (Chromium:
   launch from a terminal; Firefox: Browser Console).
+- **"An unexpected error occurred"** (Firefox): the host exited without
+  replying, so the popup reports it as a crash. Run the wrapper by hand with the
+  arguments the browser passes, e.g.
+  `wobook-native-host ~/.mozilla/native-messaging-hosts/dev.wochap.wobook.json wobook@wochap.dev`,
+  and check that it waits on stdin instead of printing a usage error.
 - **"wobookd is not running"**: start it with `systemctl --user start wobookd`.
 
 The popup always opens on the Save tab; the shortcut cannot be told apart from

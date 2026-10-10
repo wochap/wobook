@@ -107,10 +107,15 @@ struct Host {
 
 impl Host {
     fn spawn(socket: &Path) -> Self {
+        Self::spawn_with(socket, &[])
+    }
+
+    fn spawn_with(socket: &Path, browser_args: &[&str]) -> Self {
         let mut child = Command::new(wobook_bin())
             .arg("--socket")
             .arg(socket)
             .arg("native-host")
+            .args(browser_args)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .spawn()
@@ -146,6 +151,36 @@ impl Host {
         drop(self.stdin.take());
         self.child.wait().unwrap()
     }
+}
+
+#[test]
+fn ignores_firefox_launch_arguments() {
+    let d = Daemon::new("");
+    let mut host = Host::spawn_with(
+        &d.socket,
+        &[
+            "/home/u/.mozilla/native-messaging-hosts/dev.wochap.wobook.json",
+            "wobook@wochap.dev",
+        ],
+    );
+    let pong = host.call(json!({"type":"ping"}));
+    assert_eq!(pong["ok"], true, "{pong}");
+    assert!(host.close().success());
+}
+
+#[test]
+fn ignores_chromium_launch_arguments() {
+    let d = Daemon::new("");
+    let mut host = Host::spawn_with(
+        &d.socket,
+        &[
+            "chrome-extension://abcdefghijklmnopabcdefghijklmnop/",
+            "--parent-window=0",
+        ],
+    );
+    let pong = host.call(json!({"type":"ping"}));
+    assert_eq!(pong["ok"], true, "{pong}");
+    assert!(host.close().success());
 }
 
 #[test]

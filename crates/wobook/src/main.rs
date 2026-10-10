@@ -191,6 +191,10 @@ enum Command {
         /// Absolute path of the host executable written into the manifest.
         #[arg(long, requires = "print_manifest")]
         binary: Option<PathBuf>,
+        /// Arguments browsers pass at launch (manifest path, extension id,
+        /// caller origin, `--parent-window=<n>`); ignored.
+        #[arg(hide = true, trailing_var_arg = true, allow_hyphen_values = true)]
+        browser_args: Vec<String>,
     },
     /// This device.
     Device {
@@ -296,6 +300,7 @@ fn main() -> ExitCode {
         print_manifest,
         extension_id,
         binary,
+        ..
     } = cli.command
     {
         return match print_manifest {

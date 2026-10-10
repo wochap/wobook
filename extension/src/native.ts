@@ -24,7 +24,7 @@ export function fromThrown(e: unknown): UiError {
   if (/not found|No such native application/i.test(raw)) {
     return { kind: "host_missing", message: `wobook native host is not installed (${README})` };
   }
-  if (/exited|Error when communicating|disconnected port/i.test(raw)) {
+  if (/exited|Error when communicating|disconnected port|An unexpected error occurred/i.test(raw)) {
     return {
       kind: "host_crashed",
       message: "wobook native host crashed; check the browser console",
