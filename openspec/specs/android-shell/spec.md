@@ -13,7 +13,7 @@ The Android app SHALL live in `android/`, use Kotlin 2.x with Jetpack Compose Ma
 - **THEN** it produces `app/build/outputs/apk/debug/app-debug.apk`
 
 ### Requirement: Theme tokens from the design bundle
-The app theme SHALL map the Catppuccin Mocha (dark, default) and Latte (light) tokens of `design/project/wobook-tokens.css` to the Material 3 `colorScheme`, typography and shapes exactly as `design/project/readme.md` specifies, including a `WobookColors` composition local for success, tailscale and warning colors. The theme SHALL follow the system dark/light setting. Inter SHALL be the UI font and JetBrains Mono the font for URLs and fingerprints. Icons SHALL be Phosphor Regular.
+The app theme SHALL map the Catppuccin Mocha (dark, default) and Latte (light) tokens of `design/project/wobook-tokens.css` to the Material 3 `colorScheme`, typography and shapes exactly as `design/project/readme.md` specifies, including a `WobookColors` composition local for success, tailscale and warning colors. The theme SHALL follow the system dark/light setting. Inter SHALL be the UI font and JetBrains Mono the font for URLs and fingerprints. Icons SHALL be Phosphor Regular. Text and icons that do not specify their own color SHALL render in the Catppuccin `text` token of the active flavor, never in pure black `#000`, on every screen including the share sheet.
 
 #### Scenario: Dark by default
 - **WHEN** the system is in dark mode
@@ -22,6 +22,14 @@ The app theme SHALL map the Catppuccin Mocha (dark, default) and Latte (light) t
 #### Scenario: Light follows system
 - **WHEN** the system is in light mode
 - **THEN** the background is `#eff1f5` and the primary color is `#1e66f5`
+
+#### Scenario: Default text uses the Catppuccin text color in dark mode
+- **WHEN** the system is in dark mode and the user opens Settings
+- **THEN** the row titles "Device name", "Devices" and "Background sync" render in `#cdd6f4`
+
+#### Scenario: Default text uses the Catppuccin text color in light mode
+- **WHEN** the system is in light mode and the user opens Settings
+- **THEN** the row titles "Device name", "Devices" and "Background sync" render in `#4c4f69`
 
 ### Requirement: Navigation
 A single activity SHALL host Compose Navigation routes for onboarding, home, detail, form, pairing (scan, show, confirm, result), devices and settings, with predictive back and edge-to-edge enabled. Each screen state from the design SHALL expose a `testTag` equal to the design frame id (for example `home-results`, `pair-confirm`).
