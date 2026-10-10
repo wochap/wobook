@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -178,10 +179,7 @@ private fun WobookNav(
                     pairing.connecting = null
                     pairing.result = null
                     settings.setOnboardingDone(true)
-                    nav.navigate(Routes.DEVICES) {
-                        popUpTo(Routes.HOME) { inclusive = false }
-                        launchSingleTop = true
-                    }
+                    nav.toDevicesOverHome()
                     snackbar.showSnackbar("Paired with ${event.device.name}")
                 }
                 is PairingEvent.Expired, is PairingEvent.Rejected, is PairingEvent.Unreachable, is PairingEvent.Failed -> {
@@ -279,14 +277,12 @@ private fun WobookNav(
         }
         composable(Routes.CONFIRM, arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
             val id = entry.arguments?.getString("id").orEmpty()
-            ConfirmScreen(repo = repo, pairing = pairing, id = id, onRejected = {
-                nav.navigate(Routes.DEVICES) { popUpTo(Routes.HOME) { inclusive = false } }
-            })
+            ConfirmScreen(repo = repo, pairing = pairing, id = id, onRejected = { nav.toDevicesOverHome() })
         }
         composable(Routes.RESULT) {
             PairingResultScreen(
                 pairing = pairing,
-                onClose = { nav.navigate(Routes.DEVICES) { popUpTo(Routes.HOME) { inclusive = false } } },
+                onClose = { nav.toDevicesOverHome() },
                 onScanAgain = { nav.navigate(Routes.SCAN) { popUpTo(Routes.RESULT) { inclusive = true } } },
             )
         }
@@ -307,5 +303,22 @@ private fun WobookNav(
                 onDevices = { nav.navigate(Routes.DEVICES) },
             )
         }
+    }
+}
+
+/**
+ * Show Devices with Home directly beneath it. During onboarding Home is not on
+ * the back stack, so the whole stack is replaced to keep onboarding and
+ * pairing screens out of reach of Back.
+ */
+private fun NavController.toDevicesOverHome() {
+    if (runCatching { getBackStackEntry(Routes.HOME) }.isSuccess) {
+        navigate(Routes.DEVICES) {
+            popUpTo(Routes.HOME) { inclusive = false }
+            launchSingleTop = true
+        }
+    } else {
+        navigate(Routes.HOME) { popUpTo(0) { inclusive = true } }
+        navigate(Routes.DEVICES) { launchSingleTop = true }
     }
 }

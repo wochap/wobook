@@ -102,4 +102,16 @@ for _ in $(seq 30); do
 done
 "$WOBOOK" show https://phone.example/ >/dev/null || die "phone bookmark did not reach the fixture within 30 s"
 
+# Runs last: it wipes the phone and adds a second phone identity to the
+# fixture's trust store, which would break the device list in devices.yaml.
+log "pairing during onboarding: fresh phone, Back from Devices lands on Home"
+"$WOBOOK" pair --json --yes >"$WORK/pair2.out" 2>"$WORK/pair2.err" &
+PAIR_PID=$!
+for _ in $(seq 50); do [[ -s $WORK/pair2.out ]] && break; sleep 0.2; done
+PAYLOAD=$(head -1 "$WORK/pair2.out")
+[[ -n $PAYLOAD ]] || die "no pairing payload for onboarding-pair"
+flow onboarding-pair -e "PAYLOAD=$(jq -rn --arg p "$PAYLOAD" '$p|@uri')"
+wait "$PAIR_PID" || die "fixture side of onboarding pairing failed: $(cat "$WORK/pair2.err")"
+PAIR_PID=
+
 log "all flows passed"

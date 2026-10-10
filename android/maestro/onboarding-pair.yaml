@@ -1,0 +1,38 @@
+# Fresh install: name the device, pair through the onboarding choice screen,
+# then Back from Devices must land on Home, not on Scan or onboarding.
+appId: dev.wochap.wobook
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: { id: "onb-1" }
+    timeout: 30000
+- tapOn: { id: "onb-name" }
+- eraseText: 80
+- eraseText: 80
+- inputText: "e2e-phone-2"
+- tapOn: { id: "onb-continue" }
+- extendedWaitUntil:
+    visible: { id: "onb-2" }
+    timeout: 5000
+# Maestro cannot type JSON, so the payload arrives through the wobook://pair link.
+- openLink: "wobook://pair?code=${PAYLOAD}"
+- tapOn:
+    text: "Don.t allow"
+    optional: true
+- assertVisible: { id: "paste-input" }
+- tapOn: { id: "paste-connect" }
+- extendedWaitUntil:
+    visible: { id: "pair-confirm" }
+    timeout: 30000
+- tapOn: { id: "confirm-trust" }
+- extendedWaitUntil:
+    visible: { id: "devices" }
+    timeout: 30000
+- pressKey: back
+- extendedWaitUntil:
+    visible: { id: "home" }
+    timeout: 10000
+- assertNotVisible: { id: "onb-1" }
+- assertNotVisible: { id: "onb-2" }
+- assertNotVisible: { id: "paste-input" }
