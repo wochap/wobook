@@ -337,6 +337,43 @@ fn core_flow() {
         .assert()
         .success();
 
+    // Temp file passed to the editor has no extension.
+    let seen = tmp.path().join("seen");
+    let rec = tmp.path().join("rec.sh");
+    write_exec(
+        &rec,
+        &format!("#!/bin/sh\nprintf '%s' \"$1\" > '{}'\n", seen.display()),
+    );
+    d.cmd()
+        .env("EDITOR", &rec)
+        .args(["edit", "https://vuejs.org/guide/"])
+        .assert()
+        .success();
+    let path = std::fs::read_to_string(&seen).unwrap();
+    let name = Path::new(&path).file_name().unwrap().to_string_lossy();
+    assert!(name.starts_with("wobook-") && !name.contains('.'), "{name}");
+
+    // Colour control.
+    let url = "https://vuejs.org/guide/";
+    let coloured = d.ok(&["--color=always", "show", url]);
+    assert!(
+        coloured.contains("\x1b[93mhttps://vuejs.org/guide/\x1b[0m"),
+        "{coloured:?}"
+    );
+    assert!(!d.ok(&["show", url]).contains("\x1b["));
+    assert!(
+        !d.ok(&["--color=always", "list", "--format", "tsv"])
+            .contains("\x1b[")
+    );
+    let out = d
+        .cmd()
+        .env("NO_COLOR", "1")
+        .args(["--color=auto", "show", url])
+        .output()
+        .unwrap();
+    assert!(out.status.success());
+    assert!(!String::from_utf8_lossy(&out.stdout).contains("\x1b["));
+
     // mv.
     assert!(
         d.ok(&["mv", "https://vuejs.org/guide/", "vuejs.org/v3"])

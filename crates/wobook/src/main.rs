@@ -22,7 +22,7 @@ use wobook_core::{
 
 use crate::{
     client::ClientError,
-    output::{OutputFormat, render},
+    output::{ColorChoice, OutputFormat, Palette, render},
 };
 
 #[derive(Parser, Debug)]
@@ -31,6 +31,9 @@ struct Cli {
     /// Daemon socket (default: $WOBOOK_SOCKET or $XDG_RUNTIME_DIR/wobook/wobookd.sock).
     #[arg(long, global = true)]
     socket: Option<PathBuf>,
+    /// Colour pretty output: auto (terminal and no NO_COLOR), always or never.
+    #[arg(long, global = true, value_enum, default_value_t = ColorChoice::Auto)]
+    color: ColorChoice,
     #[command(subcommand)]
     command: Command,
 }
@@ -263,6 +266,7 @@ pub(crate) type Result<T> = std::result::Result<T, Fail>;
 
 pub(crate) struct Ctx {
     socket: PathBuf,
+    palette: Palette,
 }
 
 impl Ctx {
@@ -295,6 +299,7 @@ fn main() -> ExitCode {
     let cli = Cli::parse();
     let ctx = Ctx {
         socket: cli.socket.unwrap_or_else(wobook_core::paths::socket_path),
+        palette: Palette::new(cli.color.enabled()),
     };
     if let Command::NativeHost {
         print_manifest,
@@ -404,7 +409,7 @@ fn run(ctx: &Ctx, command: Command) -> Result<()> {
                     serde_json::to_string(&b).unwrap_or_default()
                 ));
             } else {
-                print(&output::pretty(&b));
+                print(&output::pretty(&b, &ctx.palette));
             }
         }
         Command::List {
@@ -418,7 +423,7 @@ fn run(ctx: &Ctx, command: Command) -> Result<()> {
                 include_deleted,
                 limit,
             })?)?;
-            print(&render(&list, OutputFormat::resolve(format)));
+            print(&render(&list, OutputFormat::resolve(format), &ctx.palette));
         }
         Command::Search {
             query,
@@ -437,7 +442,7 @@ fn run(ctx: &Ctx, command: Command) -> Result<()> {
                 .into_iter()
                 .map(|mut h| parse::<Bookmark>(h["bookmark"].take()))
                 .collect::<Result<Vec<_>>>()?;
-            print(&render(&list, OutputFormat::resolve(format)));
+            print(&render(&list, OutputFormat::resolve(format), &ctx.palette));
         }
         Command::Tags { format } => {
             let tags = ctx.call(&Request::Tags)?;
@@ -613,7 +618,6 @@ fn report_add(result: &Value) {
 fn run_editor(initial: &str) -> Result<Option<String>> {
     let mut file = tempfile::Builder::new()
         .prefix("wobook-")
-        .suffix(".txt")
         .tempfile()
         .map_err(|e| Fail::Internal(e.to_string()))?;
     file.write_all(initial.as_bytes())

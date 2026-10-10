@@ -3,7 +3,7 @@
 
 pick() {
   wobook list --format tsv |
-    fzf --delimiter=$'\t' --with-nth=2.. --preview 'wobook show {1}' --reverse --preview-window=wrap |
+    fzf --delimiter=$'\t' --with-nth=2.. --preview 'wobook --color=always show {1}' --reverse --preview-window=wrap |
     cut -f 1
 }
 
