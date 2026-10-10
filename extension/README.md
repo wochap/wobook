@@ -36,6 +36,45 @@ pnpm package:firefox
   Developer mode → Load unpacked → `dist/chromium`. Copy the extension id shown
   on the card; the host manifest needs it.
 
+## Permanent install (Firefox)
+
+Release Firefox only keeps signed extensions: it ignores
+`xpinstall.signatures.required`, and temporary add-ons from `about:debugging`
+are removed on restart. Sign the extension on the AMO "unlisted" channel
+(self-distribution, no public listing) and install it through Firefox policies.
+
+1. Create AMO API credentials at
+   <https://addons.mozilla.org/developers/addon/api/key/> and export them:
+   `export WEB_EXT_API_KEY=user:... WEB_EXT_API_SECRET=...`. Never commit them.
+2. Run `pnpm lint` so AMO's automated validation has nothing to flag.
+3. Bump `version` in `manifest.json` (and `package.json`). AMO rejects a
+   version it has already signed.
+4. Run `pnpm sign:firefox`. The signed `.xpi` lands in `dist/signed/`.
+5. Create a GitHub release tagged `extension-v<version>` and attach the signed
+   file as `wobook-<version>.xpi`.
+6. Update `nix/extension-signed.nix` in the same commit as the version bump:
+   set `version`, `url`, and `hash` from
+
+   ```sh
+   nix store prefetch-file --json https://github.com/wochap/wobook/releases/download/extension-v<version>/wobook-<version>.xpi
+   ```
+
+   While `hash = ""` the flake has no `extension-firefox-signed` package.
+7. Install permanently with home-manager:
+
+   ```nix
+   programs.firefox.policies.ExtensionSettings."wobook@wochap.dev" = {
+     installation_mode = "force_installed";
+     install_url = "file://${inputs.wobook.packages.${pkgs.system}.extension-firefox-signed}";
+   };
+   ```
+
+## Mobile
+
+There is no mobile browser extension. Firefox for Android lacks
+`nativeMessaging`, and Chrome for Android has no extensions. On Android, save
+bookmarks through the wobook app's share sheet.
+
 ## Native host
 
 Native messaging manifests take a path without arguments, so the manifest

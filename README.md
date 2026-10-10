@@ -202,6 +202,13 @@ Open `about:debugging` → This Firefox → Load Temporary Add-on and pick
 install needs Firefox Developer Edition or Nightly with `xpinstall.signatures.required = false`
 in `about:config`.
 
+For a permanent install on release Firefox, use the signed build `extension-firefox-signed` with a
+`force_installed` policy; see "Permanent install (Firefox)" in `extension/README.md`.
+
+Mobile: there is no mobile browser extension. Firefox for Android lacks `nativeMessaging` and
+Chrome for Android has no extensions; on Android, save bookmarks through the wobook app's share
+sheet.
+
 Chrome / Brave:
 
 ```sh

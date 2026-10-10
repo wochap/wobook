@@ -67,8 +67,14 @@
           pkgs = nixpkgs.legacyPackages.${system};
           rust = rustFor pkgs;
           rustPkgs = wobookPackages pkgs rust;
+          signedExt = import ./nix/extension-signed.nix;
         in rustPkgs // import ./nix/extension.nix { inherit (pkgs) lib runCommand esbuild jq zip; } // {
           default = rustPkgs.wobook;
+        } // pkgs.lib.optionalAttrs (signedExt.hash != "") {
+          extension-firefox-signed = pkgs.fetchurl {
+            inherit (signedExt) url hash;
+            name = "wobook-${signedExt.version}.xpi";
+          };
         });
 
       overlays.default = final: prev:

@@ -8,7 +8,8 @@
     "watch": "node esbuild.mjs --watch",
     "test": "node esbuild.mjs && playwright test",
     "lint": "tsc --noEmit && biome check src tests esbuild.mjs playwright.config.ts && node esbuild.mjs && web-ext lint --source-dir dist/firefox",
-    "package:firefox": "node esbuild.mjs && web-ext build --source-dir dist/firefox --artifacts-dir dist/artifacts --overwrite-dest"
+    "package:firefox": "node esbuild.mjs && web-ext build --source-dir dist/firefox --artifacts-dir dist/artifacts --overwrite-dest",
+    "sign:firefox": "bash scripts/sign-firefox.sh"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
