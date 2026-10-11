@@ -50,6 +50,14 @@ are removed on restart. Sign the extension on the AMO "unlisted" channel
 3. Bump `version` in `manifest.json` (and `package.json`). AMO rejects a
    version it has already signed.
 4. Run `pnpm sign:firefox`. The signed `.xpi` lands in `dist/signed/`.
+   "Waiting for approval..." usually takes a few minutes. If `web-ext` times
+   out, the submission is kept: download the signed file from
+   <https://addons.mozilla.org/developers/addons> → the add-on → Manage Status
+   & Versions. Do not re-run with the same version.
+
+   To install without Nix, open `about:addons` → gear icon → Install Add-on
+   From File… and pick the `.xpi`. Steps 5–7 are only for a declarative
+   install.
 5. Create a GitHub release tagged `extension-v<version>` and attach the signed
    file as `wobook-<version>.xpi`.
 6. Update `nix/extension-signed.nix` in the same commit as the version bump:
