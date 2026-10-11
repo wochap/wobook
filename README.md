@@ -133,7 +133,9 @@ manually.
 
 `contrib/wobook-fzf.sh` replaces `buku-fzf`: `--select` copies a URL with
 `wl-copy`, `--open` runs `xdg-open`, `--add` opens an empty editor template,
-`--edit` loops over edits.
+`--edit` loops over edits. With no argument it behaves like `--open`.
+In every mode: `Ctrl-E` edits the highlighted bookmark, `Ctrl-Y` copies its URL
+and exits, `Ctrl-X` deletes it (tombstone, recover with `wobook rm --restore`).
 
 ## Install with Nix
 
