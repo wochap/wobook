@@ -16,6 +16,8 @@ function copyStatic() {
     const m = structuredClone(manifest);
     if (target === "chromium") {
       m.browser_specific_settings = undefined;
+      // Firefox needs background.scripts; Chromium MV3 warns on it.
+      m.background.scripts = undefined;
     }
     writeFileSync(`${out}/manifest.json`, `${JSON.stringify(m, null, 2)}\n`);
   }
