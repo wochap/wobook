@@ -87,3 +87,18 @@ The Android Gradle build SHALL compile `wobook-ffi` with `cargo-ndk` for `arm64-
 #### Scenario: Unreachable origin
 - **WHEN** `fetch_favicon` is called for an origin that does not resolve
 - **THEN** it returns none without raising an error
+
+### Requirement: Pin operations over the FFI
+The FFI `Bookmark` record SHALL include `pinned_ms` (optional). `WobookApp` SHALL expose `pin(url)` and `unpin(url)` returning the updated bookmark, with the normalization, `not_found` error and `updated_ms` semantics of the `bookmark-model` capability. A successful pin or unpin SHALL fire `on_data_changed`.
+
+#### Scenario: Pin and read back
+- **WHEN** a bookmark is added and `pin` is called with its URL
+- **THEN** the returned bookmark and a following `get` have `pinned_ms` set and the same `updated_ms` as before
+
+#### Scenario: Unpin
+- **WHEN** `unpin` is called for a pinned bookmark
+- **THEN** the returned bookmark has `pinned_ms` null
+
+#### Scenario: Unknown URL
+- **WHEN** `pin` is called for a URL that was never added
+- **THEN** the call fails with `WobookError.NotFound`

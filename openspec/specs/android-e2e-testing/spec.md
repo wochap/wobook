@@ -20,7 +20,7 @@ The flake SHALL provide `android` (SDK 36, build-tools 36.0.0, NDK, JDK 21, carg
 - **THEN** the pairing completes through `10.0.2.2`
 
 ### Requirement: Maestro flows
-Flows under `android/maestro/` SHALL cover: onboarding (name, start fresh), share-add via `adb shell am start -a android.intent.action.SEND` with a multi-word tag, search and open, edit tags, delete and undo, pairing by paste with fingerprint confirmation on both sides, devices list, and sync convergence in both directions (desktop add appears on the phone within 30 seconds, phone add appears in `wobook show` on the fixture).
+Flows under `android/maestro/` SHALL cover: onboarding (name, start fresh), share-add via `adb shell am start -a android.intent.action.SEND` with a multi-word tag, search and open, edit tags, delete and undo, pin and unpin, pairing by paste with fingerprint confirmation on both sides, devices list, and sync convergence in both directions (desktop add appears on the phone within 30 seconds, phone add appears in `wobook show` on the fixture).
 
 #### Scenario: Full run
 - **WHEN** `android/scripts/e2e.sh` runs
@@ -29,6 +29,10 @@ Flows under `android/maestro/` SHALL cover: onboarding (name, start fresh), shar
 #### Scenario: Sync convergence
 - **WHEN** `wobook add https://conv.example/` runs on the fixture after pairing
 - **THEN** the Home list on the emulator shows `conv.example` within 30 seconds
+
+#### Scenario: Pin and unpin flow
+- **WHEN** the pin flow pins an older bookmark from the long-press sheet and then unpins it
+- **THEN** the bookmark is the first row of the unfiltered list after pinning and returns to its recency position after unpinning
 
 ### Requirement: Unit tests limited to pure domain
 JVM unit tests SHALL exist only for QR payload validation, TagEditor commit rules and URL display formatting. UI and data behaviour SHALL be covered by Maestro flows, not unit tests.

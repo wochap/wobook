@@ -33,3 +33,14 @@ A rebuild SHALL run inside a single SQLite transaction so readers never observe 
 #### Scenario: Rebuild of many records
 - **WHEN** the document holds 5,000 bookmarks and a rebuild runs
 - **THEN** the rebuild completes in one transaction and finishes in under 2 seconds on the development machine
+
+### Requirement: Read model carries pin state
+The read model SHALL store each bookmark's `pinned_ms` so `list`, `get` and `search` return it. A read model built before the field existed SHALL be discarded and rebuilt from the Automerge document without error.
+
+#### Scenario: Pin visible after projection
+- **WHEN** a bookmark is pinned through the daemon or the FFI
+- **THEN** a subsequent `get` returns the bookmark with `pinned_ms` set and `list` rows carry it
+
+#### Scenario: Old read model upgraded
+- **WHEN** a `read-model.sqlite` from the previous schema version exists and the app starts
+- **THEN** it is rebuilt from the document and pinned bookmarks read as pinned

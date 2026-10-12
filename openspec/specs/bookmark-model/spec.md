@@ -32,11 +32,11 @@ The system SHALL parse tags from comma-separated input by trimming, lowercasing,
 - **THEN** the stored tag set is `{"ui library", "react", "ai agent"}`
 
 ### Requirement: Bookmark fields
-A bookmark SHALL consist of `url` (identity), `title`, `description`, `tags` (set), `created_ms`, `updated_ms` and a `deleted` tombstone flag. Title and description MAY be empty.
+A bookmark SHALL consist of `url` (identity), `title`, `description`, `tags` (set), `created_ms`, `updated_ms`, an optional `pinned_ms` and a `deleted` tombstone flag. Title and description MAY be empty.
 
 #### Scenario: Minimal bookmark
 - **WHEN** a bookmark is created with only a URL
-- **THEN** it is stored with empty title, empty description, empty tags, `created_ms` and `updated_ms` set to the current wall clock and `deleted` false
+- **THEN** it is stored with empty title, empty description, empty tags, `created_ms` and `updated_ms` set to the current wall clock, `pinned_ms` null and `deleted` false
 
 ### Requirement: Automerge document is the source of truth
 All bookmark state SHALL live in one Automerge document under `ROOT.bookmarks[url_key]` with scalar fields as plain registers and `tags` as a map from tag to `true`. The document SHALL carry `ROOT.meta.schema = 1`.
@@ -65,12 +65,51 @@ Deleting a bookmark SHALL set `deleted = true` and never remove the entry from t
 - **THEN** the bookmark is deleted on both replicas and the edited description is retained in the tombstoned entry
 
 ### Requirement: Changing a URL is a move
-Renaming a bookmark's URL SHALL tombstone the old key and create the new key carrying over title, description, tags and `created_ms`.
+Renaming a bookmark's URL SHALL tombstone the old key and create the new key carrying over title, description, tags, `created_ms` and `pinned_ms`.
 
 #### Scenario: Rename keeps metadata
 - **WHEN** `https://a.example/` with tags `{x}` and title `T` is renamed to `https://b.example/`
 - **THEN** `https://a.example/` is tombstoned and `https://b.example/` exists with tags `{x}`, title `T` and the original `created_ms`
 
+#### Scenario: Rename keeps the pin
+- **WHEN** a pinned bookmark is renamed to a new URL
+- **THEN** the new key reads with the same `pinned_ms`
+
 #### Scenario: Rename onto an existing URL merges
 - **WHEN** a bookmark is renamed to a URL that already exists and is not deleted
 - **THEN** the target's tags become the union of both and its empty fields are filled from the source, and the source is tombstoned
+
+#### Scenario: Rename onto an existing URL keeps the later pin
+- **WHEN** a pinned bookmark is renamed onto an existing bookmark that is unpinned or pinned earlier
+- **THEN** the target reads with the later `pinned_ms` of the two
+
+### Requirement: Pinning bookmarks
+A bookmark SHALL carry an optional `pinned_ms`. A null `pinned_ms` means the bookmark is unpinned; otherwise it holds the wall-clock time of the most recent pin. Pinning SHALL set `pinned_ms` to the current time, also when the bookmark is already pinned. Unpinning SHALL clear it. Pinning and unpinning SHALL NOT change `updated_ms` and SHALL fail with `not_found` for an unknown URL. Pin state SHALL live in the Automerge document and sync like any other field. Documents written before this field existed SHALL read as unpinned.
+
+#### Scenario: Pin sets the timestamp
+- **WHEN** an unpinned bookmark is pinned
+- **THEN** it reads with `pinned_ms` set to the current wall clock and its `updated_ms` is unchanged
+
+#### Scenario: Re-pin moves it to the front
+- **WHEN** a bookmark pinned earlier is pinned again
+- **THEN** its `pinned_ms` is the new, later time
+
+#### Scenario: Unpin clears the field
+- **WHEN** a pinned bookmark is unpinned
+- **THEN** it reads with `pinned_ms` null and its `updated_ms` is unchanged
+
+#### Scenario: Pin on unknown URL
+- **WHEN** `https://missing.example/` does not exist and is pinned
+- **THEN** the operation fails with `not_found` and nothing is stored
+
+#### Scenario: Concurrent pin and unpin converge
+- **WHEN** replica A unpins a bookmark while replica B concurrently pins it again, and the replicas merge
+- **THEN** both replicas read the same `pinned_ms` and no error is raised
+
+#### Scenario: Pin survives delete and restore
+- **WHEN** a pinned bookmark is deleted and then restored
+- **THEN** it reads with its previous `pinned_ms`
+
+#### Scenario: Legacy document
+- **WHEN** a bookmark written without a pin field is read
+- **THEN** it reads as unpinned
