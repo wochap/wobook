@@ -191,7 +191,7 @@ fun HomeScreen(
 
     Box(Modifier.fillMaxSize().testTag("home"), contentAlignment = Alignment.TopCenter) {
         Column(
-            Modifier.widthIn(max = Dimens.maxContent).fillMaxSize().statusBarsPadding().imePadding().testTag(frame),
+            Modifier.widthIn(max = Dimens.maxContent).fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding().testTag(frame),
         ) {
             SearchField(
                 state.query, { state.query = it }, focus, onSettings, syncing,
