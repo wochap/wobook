@@ -17,6 +17,9 @@ pub struct Bookmark {
     pub created_ms: i64,
     #[serde(default)]
     pub updated_ms: i64,
+    /// Wall-clock time of the most recent pin; `None` means unpinned.
+    #[serde(default)]
+    pub pinned_ms: Option<i64>,
     #[serde(default)]
     pub deleted: bool,
 }

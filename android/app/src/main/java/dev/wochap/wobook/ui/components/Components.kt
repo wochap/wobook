@@ -87,6 +87,7 @@ import com.adamglin.phosphoricons.regular.CheckCircle
 import com.adamglin.phosphoricons.regular.CircleNotch
 import com.adamglin.phosphoricons.regular.CloudSlash
 import com.adamglin.phosphoricons.regular.Copy
+import com.adamglin.phosphoricons.regular.PushPin
 import com.adamglin.phosphoricons.regular.Desktop
 import com.adamglin.phosphoricons.regular.DeviceMobile
 import com.adamglin.phosphoricons.regular.DotsThreeVertical
@@ -410,11 +411,13 @@ fun ResultRow(
     onCopy: () -> Unit,
     onOpen: () -> Unit,
     modifier: Modifier = Modifier,
+    pinned: Boolean = false,
     icon: @Composable () -> Unit = { LetterTile(UrlDisplay.host(displayUrl)) },
 ) {
     val scheme = MaterialTheme.colorScheme
     Row(
-        modifier.fillMaxWidth().heightIn(min = Dimens.row)
+        modifier.then(if (pinned) Modifier.background(scheme.primary.copy(alpha = 0.08f)) else Modifier)
+            .fillMaxWidth().heightIn(min = Dimens.row)
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .padding(start = 16.dp, end = 4.dp, top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -425,6 +428,9 @@ fun ResultRow(
             HighlightedText(title.ifBlank { displayUrl }, if (title.isBlank()) emptyList() else titleIndices, WobookType.rowTitle, scheme.onSurface)
             HighlightedText(displayUrl, urlIndices, WobookType.mono, scheme.onSurfaceVariant)
             TagLine(tags)
+        }
+        if (pinned) {
+            Icon(PhosphorIcons.Regular.PushPin, "Pinned", Modifier.size(16.dp).testTag("row-pin"), tint = scheme.primary)
         }
         Row {
             IconButton(onClick = onCopy, modifier = Modifier.size(Dimens.tap).testTag("row-copy")) {

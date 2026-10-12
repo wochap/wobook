@@ -247,6 +247,23 @@ impl Daemon {
             }
             Request::Delete { url, origin } => self.set_deleted(&url, true, &origin).await,
             Request::Restore { url, origin } => self.set_deleted(&url, false, &origin).await,
+            Request::Pin { url, pinned } => {
+                let url = norm_url(&url)?;
+                let _guard = self.writes.lock().await;
+                self.read(&url).await?.ok_or_else(|| not_found(&url))?;
+                let key = url.clone();
+                let now = now_ms();
+                self.commit(move |tx| {
+                    if pinned {
+                        doc::pin(tx, &key, now)
+                    } else {
+                        doc::unpin(tx, &key)
+                    }
+                })
+                .await?;
+                let bookmark = self.read(&url).await?.ok_or_else(|| not_found(&url))?;
+                Ok(to_json(&bookmark))
+            }
             Request::Get { url } => {
                 let url = norm_url(&url)?;
                 let model = self.model.lock().map_err(internal)?;
@@ -503,6 +520,7 @@ impl Daemon {
             tags: record.tags,
             created_ms: now,
             updated_ms: now,
+            pinned_ms: None,
             deleted: false,
         };
         let (bookmark, kind) = combine(previous.as_ref(), incoming, now);
@@ -554,6 +572,7 @@ impl Daemon {
                     tags: norm_tags(&record.tags),
                     created_ms: record.created_ms.unwrap_or(now),
                     updated_ms: record.updated_ms.or(record.created_ms).unwrap_or(now),
+                    pinned_ms: None,
                     deleted: false,
                 }),
                 Err(Failure(_, message)) => {

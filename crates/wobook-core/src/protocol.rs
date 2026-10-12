@@ -66,6 +66,11 @@ pub enum Request {
         #[serde(default = "default_origin")]
         origin: String,
     },
+    /// Pins or unpins without touching `updated_ms`.
+    Pin {
+        url: String,
+        pinned: bool,
+    },
     Get {
         url: String,
     },

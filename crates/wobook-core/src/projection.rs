@@ -6,11 +6,11 @@ use rusqlite::{Connection, OptionalExtension, params};
 
 use crate::model::Bookmark;
 
-pub const SCHEMA_VERSION: &str = "1";
+pub const SCHEMA_VERSION: &str = "2";
 
 const SCHEMA: &str = "
 CREATE TABLE meta(key TEXT PRIMARY KEY, value TEXT);
-CREATE TABLE bookmarks(url TEXT PRIMARY KEY, title TEXT, description TEXT, created_ms INTEGER, updated_ms INTEGER, deleted INTEGER);
+CREATE TABLE bookmarks(url TEXT PRIMARY KEY, title TEXT, description TEXT, created_ms INTEGER, updated_ms INTEGER, pinned_ms INTEGER, deleted INTEGER);
 CREATE TABLE tags(url TEXT REFERENCES bookmarks(url) ON DELETE CASCADE, tag TEXT, PRIMARY KEY(url, tag));
 CREATE INDEX tags_tag ON tags(tag);
 ";
@@ -124,7 +124,7 @@ impl ReadModel {
         tx.execute("DELETE FROM bookmarks", [])?;
         {
             let mut ins = tx.prepare(
-                "INSERT INTO bookmarks(url, title, description, created_ms, updated_ms, deleted) VALUES(?1, ?2, ?3, ?4, ?5, ?6)",
+                "INSERT INTO bookmarks(url, title, description, created_ms, updated_ms, pinned_ms, deleted) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7)",
             )?;
             let mut tag = tx.prepare("INSERT OR IGNORE INTO tags(url, tag) VALUES(?1, ?2)")?;
             for b in all {
@@ -134,6 +134,7 @@ impl ReadModel {
                     b.description,
                     b.created_ms,
                     b.updated_ms,
+                    b.pinned_ms,
                     b.deleted
                 ])?;
                 for t in &b.tags {
@@ -161,7 +162,7 @@ impl ReadModel {
         let row = self
             .conn
             .query_row(
-                "SELECT url, title, description, created_ms, updated_ms, deleted FROM bookmarks WHERE url=?1",
+                "SELECT url, title, description, created_ms, updated_ms, pinned_ms, deleted FROM bookmarks WHERE url=?1",
                 [url],
                 row_to_bookmark,
             )
@@ -178,7 +179,7 @@ impl ReadModel {
     /// Bookmarks carrying every tag in `tags`, newest `created_ms` first.
     pub fn list(&self, tags: &[String], include_deleted: bool) -> Result<Vec<Bookmark>> {
         let mut sql = String::from(
-            "SELECT url, title, description, created_ms, updated_ms, deleted FROM bookmarks WHERE 1=1",
+            "SELECT url, title, description, created_ms, updated_ms, pinned_ms, deleted FROM bookmarks WHERE 1=1",
         );
         if !include_deleted {
             sql.push_str(" AND deleted=0");
@@ -236,7 +237,8 @@ fn row_to_bookmark(r: &rusqlite::Row<'_>) -> rusqlite::Result<Bookmark> {
         tags: Vec::new(),
         created_ms: r.get(3)?,
         updated_ms: r.get(4)?,
-        deleted: r.get(5)?,
+        pinned_ms: r.get(5)?,
+        deleted: r.get(6)?,
     })
 }
 
@@ -296,6 +298,32 @@ mod tests {
         }
         let mut rm = ReadModel::open_or_recreate(&path).unwrap();
         assert!(rm.reconcile(&doc_with(1)).unwrap());
+    }
+
+    #[test]
+    fn old_schema_rebuilds_with_pins() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("rm.sqlite");
+        {
+            let conn = Connection::open(&path).unwrap();
+            conn.execute_batch(
+                "CREATE TABLE meta(key TEXT PRIMARY KEY, value TEXT);
+                 INSERT INTO meta VALUES('schema_version','1');
+                 CREATE TABLE bookmarks(url TEXT PRIMARY KEY, title TEXT, description TEXT, created_ms INTEGER, updated_ms INTEGER, deleted INTEGER);",
+            )
+            .unwrap();
+        }
+        let mut doc = doc_with(1);
+        doc.transact_with::<_, _, crate::doc::DocError, _>(
+            |_| CommitOptions::default(),
+            |tx| crate::doc::pin(tx, "https://e0.example/", 77),
+        )
+        .unwrap();
+        let mut rm = ReadModel::open_or_recreate(&path).unwrap();
+        assert!(rm.reconcile(&doc).unwrap());
+        let got = rm.get("https://e0.example/").unwrap().unwrap();
+        assert_eq!(got.pinned_ms, Some(77));
+        assert_eq!(rm.list(&[], false).unwrap()[0].pinned_ms, Some(77));
     }
 
     #[test]

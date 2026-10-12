@@ -87,6 +87,7 @@ PAIR_PID=
 flow search-open
 flow edit-tags
 flow delete-undo
+flow pin
 flow devices
 flow settings-icons
 

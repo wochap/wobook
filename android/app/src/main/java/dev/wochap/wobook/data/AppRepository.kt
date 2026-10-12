@@ -132,6 +132,8 @@ class AppRepository(
     suspend fun rename(from: String, to: String): Bookmark = io { it.rename(from, to) }
     suspend fun delete(url: String): Bookmark = io { it.delete(url) }
     suspend fun restore(url: String): Bookmark = io { it.restore(url) }
+    suspend fun pin(url: String): Bookmark = io { it.pin(url) }
+    suspend fun unpin(url: String): Bookmark = io { it.unpin(url) }
     suspend fun fetchMetadata(url: String): Metadata = io { it.fetchMetadata(url) }
     suspend fun import(format: InterchangeFormat, path: String): ImportReport = io { it.import(format, path) }
     suspend fun export(format: InterchangeFormat, path: String): Long =

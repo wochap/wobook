@@ -2,7 +2,8 @@
 //!
 //! ```text
 //! ROOT.bookmarks[url] = Map { url, title, description, tags: Map<tag, true>,
-//!                             created_ms, updated_ms, deleted }
+//!                             created_ms, updated_ms, deleted,
+//!                             pinned_ms? }
 //! ROOT.meta = Map { schema: 1 }
 //! ```
 //! Concurrent creation of the same URL yields conflicting maps under one key;
@@ -79,6 +80,18 @@ fn get_i64<D: ReadDoc>(doc: &D, obj: &ObjId, key: &str) -> Result<i64> {
     })
 }
 
+fn get_opt_i64<D: ReadDoc>(doc: &D, obj: &ObjId, key: &str) -> Result<Option<i64>> {
+    Ok(match doc.get(obj, key)? {
+        Some((Value::Scalar(s), _)) => match s.as_ref() {
+            ScalarValue::Int(n) => Some(*n),
+            ScalarValue::Uint(n) => Some(i64::try_from(*n).unwrap_or(i64::MAX)),
+            ScalarValue::Timestamp(n) => Some(*n),
+            _ => None,
+        },
+        _ => None,
+    })
+}
+
 fn get_bool<D: ReadDoc>(doc: &D, obj: &ObjId, key: &str) -> Result<bool> {
     Ok(matches!(
         doc.get(obj, key)?,
@@ -105,6 +118,7 @@ fn read_obj<D: ReadDoc>(doc: &D, key: &str, obj: &ObjId) -> Result<Bookmark> {
         tags: read_tags(doc, obj)?,
         created_ms: get_i64(doc, obj, "created_ms")?,
         updated_ms: get_i64(doc, obj, "updated_ms")?,
+        pinned_ms: get_opt_i64(doc, obj, "pinned_ms")?,
         deleted: get_bool(doc, obj, "deleted")?,
     })
 }
@@ -143,7 +157,8 @@ fn merged_read<D: ReadDoc>(doc: &D, bookmarks: &ObjId, key: &str) -> Result<Opti
     }))
 }
 
-/// Unions tags and fills empty title/description of `target` from `source`.
+/// Unions tags, fills empty title/description and keeps the later pin of
+/// `target` from `source`.
 pub fn merge_into(target: &mut Bookmark, source: &Bookmark) {
     for tag in &source.tags {
         if !target.tags.contains(tag) {
@@ -157,6 +172,7 @@ pub fn merge_into(target: &mut Bookmark, source: &Bookmark) {
     if target.description.is_empty() {
         target.description.clone_from(&source.description);
     }
+    target.pinned_ms = target.pinned_ms.max(source.pinned_ms);
 }
 
 pub fn read<D: ReadDoc>(doc: &D, key: &str) -> Result<Option<Bookmark>> {
@@ -192,6 +208,9 @@ fn write_full<T: Transactable>(tx: &mut T, bookmarks: &ObjId, b: &Bookmark) -> R
     tx.put(&obj, "created_ms", b.created_ms)?;
     tx.put(&obj, "updated_ms", b.updated_ms)?;
     tx.put(&obj, "deleted", b.deleted)?;
+    if let Some(pinned_ms) = b.pinned_ms {
+        tx.put(&obj, "pinned_ms", pinned_ms)?;
+    }
     Ok(obj)
 }
 
@@ -323,6 +342,22 @@ pub fn remove_tags<T: Transactable>(
     Ok(())
 }
 
+/// Pins `key` at `now_ms`. Leaves `updated_ms` untouched.
+pub fn pin<T: Transactable>(tx: &mut T, key: &str, now_ms: i64) -> Result<()> {
+    let obj = require(tx, key)?;
+    tx.put(&obj, "pinned_ms", now_ms)?;
+    Ok(())
+}
+
+/// Clears the pin of `key`. Leaves `updated_ms` untouched.
+pub fn unpin<T: Transactable>(tx: &mut T, key: &str) -> Result<()> {
+    let obj = require(tx, key)?;
+    if tx.get(&obj, "pinned_ms")?.is_some() {
+        tx.delete(&obj, "pinned_ms")?;
+    }
+    Ok(())
+}
+
 pub fn tombstone<T: Transactable>(tx: &mut T, key: &str, now_ms: i64) -> Result<()> {
     let obj = require(tx, key)?;
     tx.put(&obj, "deleted", true)?;
@@ -371,6 +406,9 @@ pub fn rename<T: Transactable>(tx: &mut T, old: &str, new: &str, now_ms: i64) ->
         },
     };
     upsert(tx, &result)?;
+    if let (Some(pinned_ms), Some(obj)) = (result.pinned_ms, entry(tx, new)?) {
+        tx.put(&obj, "pinned_ms", pinned_ms)?;
+    }
     tombstone(tx, old, now_ms)?;
     Ok(result)
 }
@@ -395,6 +433,7 @@ mod tests {
             tags: tags.iter().map(ToString::to_string).collect(),
             created_ms: 1,
             updated_ms: 1,
+            pinned_ms: None,
             deleted: false,
         }
     }
@@ -520,6 +559,105 @@ mod tests {
             ("B", "from a")
         );
         assert!(read(&doc, "https://a/").unwrap().unwrap().deleted);
+    }
+
+    #[test]
+    fn pin_unpin_keep_updated_ms_and_reject_unknown() {
+        let mut doc = base();
+        upsert(&mut doc, &bm("https://a/", &[])).unwrap();
+        pin(&mut doc, "https://a/", 50).unwrap();
+        let got = read(&doc, "https://a/").unwrap().unwrap();
+        assert_eq!((got.pinned_ms, got.updated_ms), (Some(50), 1));
+        pin(&mut doc, "https://a/", 60).unwrap();
+        assert_eq!(read(&doc, "https://a/").unwrap().unwrap().pinned_ms, Some(60));
+        unpin(&mut doc, "https://a/").unwrap();
+        let got = read(&doc, "https://a/").unwrap().unwrap();
+        assert_eq!((got.pinned_ms, got.updated_ms), (None, 1));
+        assert!(matches!(
+            pin(&mut doc, "https://missing/", 1),
+            Err(DocError::NotFound(_))
+        ));
+        assert!(matches!(
+            unpin(&mut doc, "https://missing/"),
+            Err(DocError::NotFound(_))
+        ));
+        assert!(read(&doc, "https://missing/").unwrap().is_none());
+    }
+
+    #[test]
+    fn concurrent_pin_and_unpin_converge() {
+        let mut a = base();
+        upsert(&mut a, &bm("https://a/", &[])).unwrap();
+        pin(&mut a, "https://a/", 10).unwrap();
+        let mut b = fork(&mut a);
+        unpin(&mut a, "https://a/").unwrap();
+        pin(&mut b, "https://a/", 20).unwrap();
+        a.merge(&mut b).unwrap();
+        b.merge(&mut a).unwrap();
+        assert_eq!(
+            read(&a, "https://a/").unwrap().unwrap().pinned_ms,
+            read(&b, "https://a/").unwrap().unwrap().pinned_ms
+        );
+    }
+
+    #[test]
+    fn merge_takes_later_pin_and_legacy_reads_unpinned() {
+        let mut acc = bm("https://a/", &[]);
+        let mut src = bm("https://a/", &[]);
+        merge_into(&mut acc, &src);
+        assert_eq!(acc.pinned_ms, None);
+        src.pinned_ms = Some(5);
+        merge_into(&mut acc, &src);
+        assert_eq!(acc.pinned_ms, Some(5));
+        acc.pinned_ms = Some(9);
+        merge_into(&mut acc, &src);
+        assert_eq!(acc.pinned_ms, Some(9));
+    }
+
+    #[test]
+    fn duplicate_maps_merge_to_later_pin() {
+        let mut a = base();
+        let mut b = fork(&mut a);
+        let mut one = bm("https://a/", &[]);
+        one.pinned_ms = Some(7);
+        upsert(&mut a, &one).unwrap();
+        upsert(&mut b, &bm("https://a/", &[])).unwrap();
+        a.merge(&mut b).unwrap();
+        assert_eq!(read(&a, "https://a/").unwrap().unwrap().pinned_ms, Some(7));
+        add_tags(&mut a, "https://a/", &["t".into()], 3).unwrap();
+        assert_eq!(read(&a, "https://a/").unwrap().unwrap().pinned_ms, Some(7));
+    }
+
+    #[test]
+    fn rename_carries_and_merges_pin() {
+        let mut doc = base();
+        upsert(&mut doc, &bm("https://a/", &[])).unwrap();
+        pin(&mut doc, "https://a/", 30).unwrap();
+        rename(&mut doc, "https://a/", "https://b/", 5).unwrap();
+        assert_eq!(read(&doc, "https://b/").unwrap().unwrap().pinned_ms, Some(30));
+
+        upsert(&mut doc, &bm("https://c/", &[])).unwrap();
+        pin(&mut doc, "https://c/", 10).unwrap();
+        rename(&mut doc, "https://b/", "https://c/", 6).unwrap();
+        assert_eq!(read(&doc, "https://c/").unwrap().unwrap().pinned_ms, Some(30));
+
+        upsert(&mut doc, &bm("https://d/", &[])).unwrap();
+        pin(&mut doc, "https://d/", 99).unwrap();
+        upsert(&mut doc, &bm("https://e/", &[])).unwrap();
+        pin(&mut doc, "https://e/", 1).unwrap();
+        rename(&mut doc, "https://e/", "https://d/", 7).unwrap();
+        assert_eq!(read(&doc, "https://d/").unwrap().unwrap().pinned_ms, Some(99));
+    }
+
+    #[test]
+    fn pin_survives_delete_restore() {
+        let mut doc = base();
+        upsert(&mut doc, &bm("https://a/", &[])).unwrap();
+        pin(&mut doc, "https://a/", 42).unwrap();
+        tombstone(&mut doc, "https://a/", 2).unwrap();
+        restore(&mut doc, "https://a/", 3).unwrap();
+        let got = read(&doc, "https://a/").unwrap().unwrap();
+        assert_eq!((got.pinned_ms, got.deleted), (Some(42), false));
     }
 
     #[test]

@@ -17,6 +17,7 @@ impl From<wobook_core::model::Bookmark> for Bookmark {
             tags: b.tags,
             created_ms: b.created_ms,
             updated_ms: b.updated_ms,
+            pinned_ms: b.pinned_ms,
             deleted: b.deleted,
         }
     }

@@ -132,6 +132,7 @@ pub struct Bookmark {
     pub tags: Vec<String>,
     pub created_ms: i64,
     pub updated_ms: i64,
+    pub pinned_ms: Option<i64>,
     pub deleted: bool,
 }
 
@@ -545,6 +546,16 @@ impl WobookApp {
                 origin: ORIGIN.into(),
             })
             .await?;
+        convert::bookmark(value)
+    }
+
+    pub async fn pin(&self, url: String) -> Result<Bookmark, WobookError> {
+        let value = self.call(Request::Pin { url, pinned: true }).await?;
+        convert::bookmark(value)
+    }
+
+    pub async fn unpin(&self, url: String) -> Result<Bookmark, WobookError> {
+        let value = self.call(Request::Pin { url, pinned: false }).await?;
         convert::bookmark(value)
     }
 

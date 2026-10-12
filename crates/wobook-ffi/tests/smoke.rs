@@ -111,6 +111,19 @@ fn smoke() {
     assert!(merged.merged);
     assert_eq!(merged.bookmark.tags.len(), 3);
 
+    let before = merged.bookmark.updated_ms;
+    let pinned = block(app.pin("https://ui.shadcn.com".into())).unwrap();
+    assert!(pinned.pinned_ms.is_some());
+    assert_eq!(pinned.updated_ms, before);
+    let got = app.get("https://ui.shadcn.com/".into()).unwrap().unwrap();
+    assert_eq!((got.pinned_ms, got.updated_ms), (pinned.pinned_ms, before));
+    let unpinned = block(app.unpin("https://ui.shadcn.com/".into())).unwrap();
+    assert_eq!((unpinned.pinned_ms, unpinned.updated_ms), (None, before));
+    assert!(matches!(
+        block(app.pin("https://never.example/".into())),
+        Err(WobookError::NotFound { .. })
+    ));
+
     let hits = app
         .search(SearchQuery {
             query: "shcn".into(),

@@ -480,6 +480,44 @@ fn offline_edits_reconnect_and_endpoints() {
 }
 
 #[test]
+fn pin_syncs_and_converges() {
+    let a = Node::new("alpha");
+    let mut b = Node::new("beta");
+    let url = "https://pin.example/";
+    a.add(url, &["x"]);
+    pair(&a, &b);
+    let find = |n: &Node| n.list().into_iter().find(|x| x["url"] == url).unwrap();
+    let updated = find(&a)["updated_ms"].clone();
+
+    // Pin on A syncs to B without touching updated_ms.
+    let pinned = a.req(&json!({"type":"pin","url":url,"pinned":true}));
+    assert!(pinned["pinned_ms"].as_i64().unwrap() > 0);
+    assert_eq!(pinned["updated_ms"], updated);
+    wait_until("pin propagates", Duration::from_secs(10), || {
+        find(&b)["pinned_ms"].is_i64()
+    });
+    assert_eq!(find(&b)["updated_ms"], updated);
+    converge(&a, &b);
+
+    // Concurrent unpin (A) and re-pin (B) converge on one value.
+    b.stop();
+    a.req(&json!({"type":"pin","url":url,"pinned":false}));
+    b.start();
+    b.req(&json!({"type":"pin","url":url,"pinned":true}));
+    b.ok(&["sync", "now"]);
+    converge(&a, &b);
+    wait_until("read models agree", Duration::from_secs(10), || {
+        find(&a)["pinned_ms"] == find(&b)["pinned_ms"]
+    });
+    assert_eq!(find(&a)["updated_ms"], updated);
+
+    assert_eq!(
+        a.err_code(&json!({"type":"pin","url":"https://missing.example/","pinned":true})),
+        "not_found"
+    );
+}
+
+#[test]
 fn revoke_and_pairing_failures() {
     let a = Node::new("alpha");
     let b = Node::new("beta");

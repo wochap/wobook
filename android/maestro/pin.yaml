@@ -1,0 +1,59 @@
+# Long-press → Pin lifts a bookmark to the top of the unfiltered list only;
+# chips and search keep their order. Unpin returns it to its recency position.
+# Arch Wiki is older than buku (edit-tags ran before delete-undo restored buku).
+appId: dev.wochap.wobook
+---
+- launchApp
+- extendedWaitUntil:
+    visible: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
+    timeout: 10000
+- assertNotVisible: { id: "row-pin" }
+- assertVisible:
+    id: "row-wiki.archlinux.org/title/Systemd/Timers"
+    below: { id: "row-github.com/jarun/buku" }
+
+# Pin from the sheet: the pinned row leads and shows the glyph.
+- longPressOn: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
+- tapOn: "Pin"
+- extendedWaitUntil:
+    visible: { id: "row-pin" }
+    timeout: 5000
+- assertVisible:
+    id: "row-github.com/jarun/buku"
+    below: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
+
+# A tag chip keeps recency order: buku stays above the pinned bookmark.
+- tapOn: { id: "chip-linux" }
+- extendedWaitUntil:
+    visible: { id: "home-results" }
+    timeout: 5000
+- assertVisible:
+    id: "row-wiki.archlinux.org/title/Systemd/Timers"
+    below: { id: "row-github.com/jarun/buku" }
+- tapOn: { id: "chip-linux" }
+- extendedWaitUntil:
+    visible: { id: "home-idle" }
+    timeout: 5000
+
+# Search ignores pins: only the matching bookmark is listed, with no glyph.
+- tapOn: { id: "search-field" }
+- inputText: "buku"
+- extendedWaitUntil:
+    visible: { id: "home-results" }
+    timeout: 5000
+- assertVisible: { id: "row-github.com/jarun/buku" }
+- assertNotVisible: { id: "row-pin" }
+- eraseText: 10
+- extendedWaitUntil:
+    visible: { id: "home-idle" }
+    timeout: 5000
+
+# Unpin: the glyph goes away and buku leads again.
+- longPressOn: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
+- tapOn: "Unpin"
+- extendedWaitUntil:
+    notVisible: { id: "row-pin" }
+    timeout: 5000
+- assertVisible:
+    id: "row-wiki.archlinux.org/title/Systemd/Timers"
+    below: { id: "row-github.com/jarun/buku" }

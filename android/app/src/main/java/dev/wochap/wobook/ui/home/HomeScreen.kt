@@ -60,6 +60,7 @@ import com.adamglin.phosphoricons.regular.ArrowSquareOut
 import com.adamglin.phosphoricons.regular.Copy
 import com.adamglin.phosphoricons.regular.PencilSimple
 import com.adamglin.phosphoricons.regular.Plus
+import com.adamglin.phosphoricons.regular.PushPin
 import com.adamglin.phosphoricons.regular.QrCode
 import com.adamglin.phosphoricons.regular.Scan
 import com.adamglin.phosphoricons.regular.ShareNetwork
@@ -68,6 +69,7 @@ import dev.wochap.wobook.data.AppRepository
 import dev.wochap.wobook.data.TapBehaviour
 import dev.wochap.wobook.domain.Formatting
 import dev.wochap.wobook.domain.UrlDisplay
+import dev.wochap.wobook.ffi.Bookmark
 import dev.wochap.wobook.ffi.SyncState
 import dev.wochap.wobook.ui.LocalSnackbar
 import dev.wochap.wobook.ui.HomeState
@@ -88,6 +90,7 @@ import dev.wochap.wobook.ui.theme.Dimens
 import dev.wochap.wobook.ui.theme.Wb
 import dev.wochap.wobook.ui.theme.WobookType
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /** One row's data, from a search hit or a plain list. */
 data class RowItem(
@@ -97,7 +100,10 @@ data class RowItem(
     val displayUrl: String,
     val urlIndices: List<Int>,
     val tags: List<String>,
-)
+    val pinnedMs: Long? = null,
+) {
+    val pinned get() = pinnedMs != null
+}
 
 private var focusedOnce = false
 
@@ -142,14 +148,20 @@ fun HomeScreen(
         delay(60)
         rows = runCatching {
             if (state.query.isBlank()) {
-                repo.list(selected).sortedByDescending { it.updatedMs }.map {
-                    RowItem(it.url, it.title, emptyList(), UrlDisplay.format(it.url), emptyList(), it.tags)
+                val all = repo.list(selected)
+                val ordered = if (selected.isEmpty()) {
+                    all.sortedWith(compareByDescending<Bookmark> { it.pinnedMs ?: Long.MIN_VALUE }.thenByDescending { it.updatedMs })
+                } else {
+                    all.sortedByDescending { it.updatedMs }
+                }
+                ordered.map {
+                    RowItem(it.url, it.title, emptyList(), UrlDisplay.format(it.url), emptyList(), it.tags, it.pinnedMs)
                 }
             } else {
                 repo.search(state.query, selected).map { h ->
                     RowItem(
                         h.bookmark.url, h.bookmark.title, h.titleIndices.map { it.toInt() },
-                        h.displayUrl, h.urlIndices.map { it.toInt() }, h.bookmark.tags,
+                        h.displayUrl, h.urlIndices.map { it.toInt() }, h.bookmark.tags, h.bookmark.pinnedMs,
                     )
                 }
             }
@@ -245,6 +257,7 @@ fun HomeScreen(
             onCopy = { copyUrl(context, item.url) },
             onShare = { shareUrl(context, item.url, item.title) },
             onEdit = { onEdit(item.url) },
+            onTogglePin = { scope.launch { runCatching { if (item.pinned) repo.unpin(item.url) else repo.pin(item.url) } } },
             onDelete = { deleteWithUndo(scope, repo, snackbar, item.url, item.title) },
         )
     }
@@ -313,6 +326,7 @@ private fun ResultList(
                     onLongClick = { onLong(item) },
                     onCopy = { onCopy(item) },
                     onOpen = { onOpen(item) },
+                    pinned = item.pinned,
                     icon = { icon(item) },
                     modifier = Modifier.background(MaterialTheme.colorScheme.background).testTag("row-${item.displayUrl}"),
                 )
@@ -366,6 +380,7 @@ private fun ActionSheet(
     onCopy: () -> Unit,
     onShare: () -> Unit,
     onEdit: () -> Unit,
+    onTogglePin: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -387,6 +402,10 @@ private fun ActionSheet(
             SheetItem(PhosphorIcons.Regular.Copy, "Copy URL", "sheet-copy", act(onCopy))
             SheetItem(PhosphorIcons.Regular.ShareNetwork, "Share", "sheet-share", act(onShare))
             SheetItem(PhosphorIcons.Regular.PencilSimple, "Edit", "sheet-edit", act(onEdit))
+            SheetItem(
+                PhosphorIcons.Regular.PushPin, if (item.pinned) "Unpin" else "Pin",
+                if (item.pinned) "sheet-unpin" else "sheet-pin", act(onTogglePin),
+            )
             SheetItem(PhosphorIcons.Regular.Trash, "Delete", "sheet-delete", act(onDelete), destructive = true)
         }
     }
