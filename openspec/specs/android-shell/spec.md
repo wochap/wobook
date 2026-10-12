@@ -32,11 +32,19 @@ The app theme SHALL map the Catppuccin Mocha (dark, default) and Latte (light) t
 - **THEN** the row titles "Device name", "Devices" and "Background sync" render in `#4c4f69`
 
 ### Requirement: Navigation
-A single activity SHALL host Compose Navigation routes for onboarding, home, detail, form, pairing (scan, show, confirm, result), devices and settings, with predictive back and edge-to-edge enabled. Each screen state from the design SHALL expose a `testTag` equal to the design frame id (for example `home-results`, `pair-confirm`).
+A single activity SHALL host Compose Navigation routes for onboarding, home, detail, form, pairing (scan, show, confirm, result), devices and settings, with predictive back and edge-to-edge enabled. Each screen state from the design SHALL expose a `testTag` equal to the design frame id (for example `home-results`, `pair-confirm`). Scrolling content on every screen SHALL stop above the system navigation bar and SHALL NOT be visible through it, in both 3-button and gesture navigation.
 
 #### Scenario: Deep navigation back
 - **WHEN** the user navigates Home → Detail → Form and presses back twice
 - **THEN** the user is on Home with the previous search state intact
+
+#### Scenario: Home list does not scroll under the navigation bar
+- **WHEN** the library holds more bookmarks than fit on screen, 3-button navigation is active and the user scrolls Home to the end
+- **THEN** the last row ends above the navigation buttons and no row is visible behind the triangle, circle and square buttons
+
+#### Scenario: Add button stays reachable
+- **WHEN** Home is shown with the navigation bar visible
+- **THEN** the Add button sits fully above the navigation bar and can be tapped
 
 ### Requirement: Onboarding
 On first launch the app SHALL show two screens: name this device (prefilled with the Android device model, Continue), then a choice between "Pair with an existing device" (goes to Scan) and "Start fresh" (goes to the empty Home). Onboarding SHALL not show again once completed. When onboarding ends through pairing (completed, or closed from a pairing result or a rejected confirmation), the app SHALL replace the whole back stack so that Home is its root and Devices is on top; onboarding and pairing screens SHALL NOT be reachable with Back afterwards.
