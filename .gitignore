@@ -14,7 +14,7 @@ result
 design/**/*.webp
 design/**/*.png
 design/**/*.jpg
-.thumbnail
+design/project/.thumbnail
 
 ff-ext
 chromium-ext
