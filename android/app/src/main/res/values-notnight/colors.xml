@@ -1,0 +1,5 @@
+<resources>
+    <color name="wb_launcher_bg">#FFEFF1F5</color>
+    <color name="wb_launcher_fg">#FF1E66F5</color>
+    <color name="wb_launcher_fg_back">#FF7287FD</color>
+</resources>

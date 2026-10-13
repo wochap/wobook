@@ -1,9 +1,17 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
-    <!-- bookmark outline -->
+    <!-- back ribbon: outline only -->
     <path
-        android:pathData="M40,34h28v40l-14,-9 -14,9z"
+        android:pathData="M46,22H74V72L60,61L46,72Z"
+        android:strokeColor="@color/wb_launcher_fg_back"
+        android:strokeAlpha="0.7"
+        android:strokeWidth="4.5"
+        android:strokeLineJoin="round" />
+    <!-- front ribbon: outline filled with the background color -->
+    <path
+        android:pathData="M34,34H62V86L48,75L34,86Z"
+        android:fillColor="@color/wb_launcher_bg"
         android:strokeColor="@color/wb_launcher_fg"
         android:strokeWidth="5"
         android:strokeLineJoin="round" />
