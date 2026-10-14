@@ -1,4 +1,4 @@
-# Long-press → Delete → Undo restores the bookmark with its tags.
+# Long-press → select-delete → Undo restores the bookmark with its tags.
 appId: dev.wochap.wobook
 ---
 - launchApp
@@ -8,7 +8,7 @@ appId: dev.wochap.wobook
     visible: "github.com/jarun/buku"
     timeout: 5000
 - longPressOn: "github.com/jarun/buku"
-- tapOn: "Delete"
+- tapOn: { id: "select-delete" }
 - extendedWaitUntil:
     visible: "Undo"
     timeout: 5000

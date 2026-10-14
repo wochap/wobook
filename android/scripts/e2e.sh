@@ -88,6 +88,7 @@ flow search-open
 flow edit-tags
 flow delete-undo
 flow pin
+flow multi-select
 flow devices
 flow settings-icons
 

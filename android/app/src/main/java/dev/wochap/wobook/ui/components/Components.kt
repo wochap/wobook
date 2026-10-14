@@ -412,18 +412,39 @@ fun ResultRow(
     onOpen: () -> Unit,
     modifier: Modifier = Modifier,
     pinned: Boolean = false,
+    selected: Boolean = false,
+    selecting: Boolean = false,
+    onToggle: () -> Unit = {},
     icon: @Composable () -> Unit = { LetterTile(UrlDisplay.host(displayUrl)) },
 ) {
     val scheme = MaterialTheme.colorScheme
+    // Selected beats pinned so a selected pinned row still reads as selected.
+    val tint = when {
+        selected -> Modifier.background(scheme.primary.copy(alpha = 0.22f))
+        pinned -> Modifier.background(scheme.primary.copy(alpha = 0.08f))
+        else -> Modifier
+    }
     Row(
-        modifier.then(if (pinned) Modifier.background(scheme.primary.copy(alpha = 0.08f)) else Modifier)
+        modifier.then(tint)
             .fillMaxWidth().heightIn(min = Dimens.row)
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .combinedClickable(
+                onClick = if (selecting) onToggle else onClick,
+                onLongClick = if (selecting) onToggle else onLongClick,
+            )
             .padding(start = 16.dp, end = 4.dp, top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        icon()
+        Box(Modifier.size(20.dp), contentAlignment = Alignment.Center) {
+            if (selected) {
+                Box(
+                    Modifier.size(20.dp).background(scheme.primary, MaterialTheme.shapes.extraSmall).testTag("row-selected"),
+                    contentAlignment = Alignment.Center,
+                ) { Icon(PhosphorIcons.Regular.Check, "Selected", Modifier.size(14.dp), tint = scheme.onPrimary) }
+            } else {
+                icon()
+            }
+        }
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
             HighlightedText(title.ifBlank { displayUrl }, if (title.isBlank()) emptyList() else titleIndices, WobookType.rowTitle, scheme.onSurface)
             HighlightedText(displayUrl, urlIndices, WobookType.mono, scheme.onSurfaceVariant)
@@ -432,7 +453,7 @@ fun ResultRow(
         if (pinned) {
             Icon(PhosphorIcons.Regular.PushPin, "Pinned", Modifier.size(16.dp).testTag("row-pin"), tint = scheme.primary)
         }
-        Row {
+        if (!selecting) Row {
             IconButton(onClick = onCopy, modifier = Modifier.size(Dimens.tap).testTag("row-copy")) {
                 Icon(PhosphorIcons.Regular.Copy, "Copy URL", Modifier.size(22.dp), tint = scheme.onSurfaceVariant)
             }

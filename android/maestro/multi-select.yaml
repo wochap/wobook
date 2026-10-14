@@ -1,0 +1,99 @@
+# Long-press selection on Home: toggle, Back, Select all under a chip, bulk
+# tags and bulk delete with Undo. Leaves the library as it found it.
+# Fixture rows: buku (linux, cli) and Arch Wiki (linux, systemd, docs) carry linux.
+appId: dev.wochap.wobook
+---
+- launchApp
+- extendedWaitUntil:
+    visible: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
+    timeout: 10000
+
+# Long press selects one; a tap adds a second.
+- longPressOn: { id: "row-github.com/jarun/buku" }
+- assertVisible: "1 selected"
+- assertNotVisible: { id: "add-fab" }
+- tapOn: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
+- assertVisible: "2 selected"
+
+# Back leaves selection and stays on Home.
+- back
+- assertNotVisible: { id: "select-bar" }
+- assertVisible: { id: "search-field" }
+
+# Select all under chip linux selects exactly its two rows.
+- tapOn: { id: "chip-linux" }
+- extendedWaitUntil:
+    visible: { id: "home-results" }
+    timeout: 5000
+- longPressOn: { id: "row-github.com/jarun/buku" }
+- tapOn: { id: "select-all" }
+- assertVisible: "2 selected"
+
+# Tags: add "to read", set linux to none.
+- tapOn: { id: "select-tags" }
+- extendedWaitUntil:
+    visible: { id: "tags-sheet" }
+    timeout: 5000
+- tapOn: { id: "tag-input" }
+- inputText: "to read"
+- pressKey: Enter
+- tapOn: { id: "tags-entry-linux" }
+- assertVisible: "none"
+- hideKeyboard
+- tapOn: { id: "tags-apply" }
+# No bookmark carries linux now, so its chip and the filter go away.
+- extendedWaitUntil:
+    visible: { id: "home-idle" }
+    timeout: 5000
+- tapOn: { id: "search-field" }
+- inputText: "to read"
+- extendedWaitUntil:
+    visible: { id: "row-github.com/jarun/buku" }
+    timeout: 5000
+- assertVisible: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
+- assertNotVisible:
+    text: "linux"
+    childOf: { id: "result-list" }
+- hideKeyboard
+
+# Restore: linux back on both, "to read" off.
+- longPressOn: { id: "row-github.com/jarun/buku" }
+- tapOn: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
+- assertVisible: "2 selected"
+- tapOn: { id: "select-tags" }
+- extendedWaitUntil:
+    visible: { id: "tags-sheet" }
+    timeout: 5000
+- tapOn: { id: "tag-input" }
+- inputText: "linux"
+- pressKey: Enter
+- tapOn: { id: "tags-entry-to read" }
+- assertVisible: "none"
+- hideKeyboard
+- tapOn: { id: "tags-apply" }
+- tapOn: { id: "search-field" }
+- eraseText: 10
+- extendedWaitUntil:
+    visible: { id: "home-idle" }
+    timeout: 5000
+
+# Delete both under chip linux, then Undo brings them back with tags.
+- tapOn: { id: "chip-linux" }
+- extendedWaitUntil:
+    visible: { id: "row-github.com/jarun/buku" }
+    timeout: 5000
+- assertVisible: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
+- longPressOn: { id: "row-github.com/jarun/buku" }
+- tapOn: { id: "select-all" }
+- tapOn: { id: "select-delete" }
+- extendedWaitUntil:
+    visible: "Deleted 2 bookmarks"
+    timeout: 5000
+- tapOn: "Undo"
+- extendedWaitUntil:
+    visible: { id: "row-github.com/jarun/buku" }
+    timeout: 5000
+- assertVisible: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
+- assertVisible: "cli"
+- assertVisible: "systemd"
+- tapOn: { id: "chip-linux" }

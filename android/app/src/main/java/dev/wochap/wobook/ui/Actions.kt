@@ -49,21 +49,38 @@ fun shareUrl(context: Context, url: String, title: String) {
 }
 
 /** Tombstones now, then offers Undo for 6 s (never a dialog). */
-fun deleteWithUndo(scope: CoroutineScope, repo: AppRepository, snackbar: SnackbarHostState, url: String, title: String) {
+fun deleteWithUndo(scope: CoroutineScope, repo: AppRepository, snackbar: SnackbarHostState, url: String, title: String) =
+    deleteWithUndo(scope, repo, snackbar, listOf(url to title))
+
+/** Tombstones each (url, title) in order; Undo restores only the ones that were deleted. */
+fun deleteWithUndo(scope: CoroutineScope, repo: AppRepository, snackbar: SnackbarHostState, items: List<Pair<String, String>>) {
+    if (items.isEmpty()) return
     scope.launch {
-        try {
-            repo.delete(url)
-        } catch (e: Exception) {
-            snackbar.showSnackbar(e.userMessage())
+        val deleted = mutableListOf<Pair<String, String>>()
+        var failure: Exception? = null
+        for (item in items) {
+            try {
+                repo.delete(item.first)
+                deleted += item
+            } catch (e: Exception) {
+                failure = failure ?: e
+            }
+        }
+        if (deleted.isEmpty()) {
+            failure?.let { snackbar.showSnackbar(it.userMessage()) }
             return@launch
         }
-        val label = title.ifBlank { url }
+        val message = when {
+            items.size == 1 -> "Deleted “${items[0].second.ifBlank { items[0].first }}”"
+            deleted.size == items.size -> "Deleted ${items.size} bookmarks"
+            else -> "Deleted ${deleted.size} of ${items.size} bookmarks"
+        }
         val result = withTimeoutOrNull(6_000) {
-            snackbar.showSnackbar("Deleted “$label”", actionLabel = "Undo", duration = SnackbarDuration.Indefinite)
+            snackbar.showSnackbar(message, actionLabel = "Undo", duration = SnackbarDuration.Indefinite)
         }
         if (result == null) snackbar.currentSnackbarData?.dismiss()
         if (result == SnackbarResult.ActionPerformed) {
-            runCatching { repo.restore(url) }
+            for ((url, _) in deleted) runCatching { repo.restore(url) }
         }
     }
 }

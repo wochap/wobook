@@ -1,4 +1,4 @@
-# Long-press → Pin lifts a bookmark to the top of the unfiltered list only;
+# Long-press → select-pin lifts a bookmark to the top of the unfiltered list only;
 # chips and search keep their order. Unpin returns it to its recency position.
 # Arch Wiki is older than buku (edit-tags ran before delete-undo restored buku).
 appId: dev.wochap.wobook
@@ -12,9 +12,10 @@ appId: dev.wochap.wobook
     id: "row-wiki.archlinux.org/title/Systemd/Timers"
     below: { id: "row-github.com/jarun/buku" }
 
-# Pin from the sheet: the pinned row leads and shows the glyph.
+# Pin through selection: the pinned row leads and shows the glyph.
 - longPressOn: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
-- tapOn: "Pin"
+- assertVisible: { id: "select-bar" }
+- tapOn: { id: "select-pin" }
 - extendedWaitUntil:
     visible: { id: "row-pin" }
     timeout: 5000
@@ -50,7 +51,8 @@ appId: dev.wochap.wobook
 
 # Unpin: the glyph goes away and buku leads again.
 - longPressOn: { id: "row-wiki.archlinux.org/title/Systemd/Timers" }
-- tapOn: "Unpin"
+- assertVisible: "Unpin"
+- tapOn: { id: "select-pin" }
 - extendedWaitUntil:
     notVisible: { id: "row-pin" }
     timeout: 5000
