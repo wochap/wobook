@@ -24,14 +24,18 @@ A horizontally scrollable row of tag chips ordered by usage SHALL sit under the 
 - **THEN** only bookmarks carrying both tags are listed
 
 ### Requirement: Result row
-Each row SHALL show a 20 dp icon slot holding the site icon of the bookmark's host, or a letter tile when no icon is available (see the `android-favicons` capability), one-line title, one-line monospace host+path, one clipped tag line with `+N` overflow, and trailing 48 dp Copy and Open buttons. A pinned bookmark's row SHALL also show a pin glyph and a subtly tinted row background so it is distinguishable at a glance, in every view including search results. Tap performs the configured tap behaviour, long press opens an action sheet (Open in browser, Copy URL, Share, Edit, Pin or Unpin, Delete), swipe right copies the URL.
+Each row SHALL show a 20 dp icon slot holding the site icon of the bookmark's host, or a letter tile when no icon is available (see the `android-favicons` capability), one-line title, one-line monospace host+path, one clipped tag line with `+N` overflow, and trailing 48 dp Copy and Open buttons. A pinned bookmark's row SHALL also show a pin glyph and a subtly tinted row background so it is distinguishable at a glance, in every view including search results. Tap performs the configured tap behaviour, long press enters selection mode with that row selected (see the `android-multi-select` capability), swipe right copies the URL. Open in browser, Copy URL, Share, Edit, Pin or Unpin and Delete for a single bookmark are reached by selecting that one row and using the selection bar.
+
+#### Scenario: Long press selects
+- **WHEN** the user long-presses a row
+- **THEN** selection mode starts with that row selected and no action sheet is shown
 
 #### Scenario: Copy from row
 - **WHEN** the user taps the Copy button
 - **THEN** the clipboard contains the bookmark URL and a brief confirmation is shown
 
 #### Scenario: Long press sheet
-- **WHEN** the user long-presses a row and taps Delete
+- **WHEN** the user long-presses a row and taps Delete in the selection bar
 - **THEN** the bookmark is tombstoned and a snackbar with Undo appears for 6 seconds
 
 #### Scenario: Icon slot is never an empty square
@@ -43,12 +47,12 @@ Each row SHALL show a 20 dp icon slot holding the site icon of the bookmark's ho
 - **THEN** the pinned row shows the pin glyph and the tinted background and the unpinned row shows neither
 
 #### Scenario: Pin from the sheet
-- **WHEN** the user long-presses an unpinned row and taps Pin
+- **WHEN** the user long-presses an unpinned row and taps Pin in the selection bar
 - **THEN** the bookmark moves to the top of the unfiltered list and its row shows the pin glyph and tinted background
 
 #### Scenario: Unpin from the sheet
 - **WHEN** the user long-presses a pinned row
-- **THEN** the sheet shows Unpin instead of Pin, and tapping it removes the glyph and returns the bookmark to its recency position
+- **THEN** the selection bar shows Unpin instead of Pin, and tapping it removes the glyph and returns the bookmark to its recency position
 
 ### Requirement: Home states
 Home SHALL render: empty library (explains share-sheet saving and pairing with Scan QR and Show my QR buttons), no results (message plus "Add a bookmark" prefilled with the query when it parses as a URL), results, idle (keyboard dismissed, Recent list, Add FAB), and syncing (2 dp indeterminate line under the search field). Offline with local data SHALL look identical to online. The Add FAB SHALL be hidden while the keyboard is visible.

@@ -46,8 +46,12 @@ In Edit mode the URL field SHALL be read-only with a "Change" button. Tapping it
 - **THEN** the old URL is tombstoned, the new URL exists with the same tags and description, and the user lands on the new Detail
 
 ### Requirement: Delete with undo
-Delete from Detail, the action sheet or the form SHALL tombstone immediately, return to Home and show a snackbar "Deleted “<title>”" with Undo for 6 seconds. Undo SHALL call `restore`. No confirmation dialog SHALL be shown for delete.
+Delete from Detail, the Home selection bar or the form SHALL tombstone immediately, return to Home and show a snackbar "Deleted “<title>”" with Undo for 6 seconds; when more than one bookmark is deleted from the selection bar the snackbar SHALL read "Deleted <n> bookmarks" (see the `android-multi-select` capability). Undo SHALL call `restore` for every deleted bookmark. No confirmation dialog SHALL be shown for delete.
 
 #### Scenario: Undo restores
 - **WHEN** the user deletes a bookmark and taps Undo within 6 seconds
 - **THEN** the bookmark is listed again with its previous tags
+
+#### Scenario: Undo restores a bulk delete
+- **WHEN** the user deletes three selected bookmarks and taps Undo within 6 seconds
+- **THEN** all three are listed again with their previous tags
